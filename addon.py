@@ -8,12 +8,15 @@ categories = [('new',         30001),
               ('selection',   30002),
               ('most_viewed', 30003),
               ('last_chance', 30004)]
+
 # http://www.arte.tv/papi/tvguide/videos/stream/{lang}/{id}_PLUS7-{lang}/{protocol}/{quality}.json
 # lang     : F | D
 # protocol : HBBTV | RTMP
 # quality  : SQ (High) | EQ (Med) | HQ (Low)
 video_json = base_url + '/papi/tvguide/videos/stream/{lang}/{id}_PLUS7-{lang}/{protocol}/ALL.json'
-# http://www.arte.tv/papi/tvguide/videos/livestream/F/
+
+# http://www.arte.tv/papi/tvguide/videos/livestream/{lang}/
+# lang     : F | D
 live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
 
 plugin = Plugin()
@@ -27,7 +30,7 @@ def index():
     items = [{
         'label': plugin.get_string(value),
         'path': plugin.url_for('show_' + key)
-    }for key, value in categories]
+    } for key, value in categories]
     items.append({
         'label': plugin.get_string(30005),
         'path': plugin.url_for('play_live'),
