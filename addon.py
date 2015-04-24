@@ -4,8 +4,8 @@ import urllib2
 
 base_url = 'http://www.arte.tv'
 
-categories = [('new',         30001),
-              ('selection',   30002),
+categories = [('new', 30001),
+              ('selection', 30002),
               ('most_viewed', 30003),
               ('last_chance', 30004)]
 
@@ -16,14 +16,27 @@ categories = [('new',         30001),
 video_json = base_url + '/papi/tvguide/videos/stream/{lang}/{id}_PLUS7-{lang}/{protocol}/ALL.json'
 
 # http://www.arte.tv/papi/tvguide/videos/livestream/{lang}/
-# lang     : F | D
+# lang : F | D
 live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
+
+# http://www.arte.tv/guide/{lang}/plus7/par_dates.json?value={date}
+# lang : fr | de
+# date : date sous la forme yyy-mm-jj
+
+# http://www.arte.tv/guide/{lang}/plus7/par_themes.json?value={genre}
+# lang  : fr | de
+# genre : trigramme du genre (ACT DOC DEC EUR GEO SOC JUN AUT CIN ART CUL ENV)
+
+# http://www.arte.tv/guide/{lang}/plus7/par_emissions.json?value={emission}
+# lang     : fr | de
+# emission : trigramme de l'emission (VMI TSG AJT JTE COU FUM KAR DCA MTR PNB PHI SUA TRA VOX XEN YOU
 
 plugin = Plugin()
 
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
 quality = plugin.get_setting('quality', int)
 protocol = 'HBBTV' if plugin.get_setting('protocol', int) == 0 else 'RMP4'
+
 
 @plugin.route('/')
 def index():
@@ -38,14 +51,19 @@ def index():
     })
     return items
 
-@plugin.route('/new', name='show_new', options={'json_url': base_url + '/guide/{lang}/plus7.json'})
-@plugin.route('/selection', name='show_selection', options={'json_url': base_url + '/guide/{lang}/plus7/selection.json'})
-@plugin.route('/most_viewed', name='show_most_viewed', options={'json_url': base_url + '/guide/{lang}/plus7/plus_vues.json'})
-@plugin.route('/last_chance', name='show_last_chance', options={'json_url': base_url + '/guide/{lang}/plus7/derniere_chance.json'})
+
+@plugin.route('/new', name='show_new',
+              options={'json_url': base_url + '/guide/{lang}/plus7.json'})
+@plugin.route('/selection', name='show_selection',
+              options={'json_url': base_url + '/guide/{lang}/plus7/selection.json'})
+@plugin.route('/most_viewed', name='show_most_viewed',
+              options={'json_url': base_url + '/guide/{lang}/plus7/plus_vues.json'})
+@plugin.route('/last_chance', name='show_last_chance',
+              options={'json_url': base_url + '/guide/{lang}/plus7/derniere_chance.json'})
 def list(json_url):
     plugin.set_content('tvshows')
     data = json.loads(get_url(json_url.format(lang=language)))
-    items=[{
+    items = [{
         'label': video['title'].encode('utf-8'),
         'path': plugin.url_for('play', id=str(video['em'])),
         'thumbnail': video['image_url'],
@@ -65,9 +83,11 @@ def list(json_url):
     } for video in data['videos']]
     return plugin.finish(items)
 
+
 @plugin.route('/play/<id>', name='play')
 def play(id):
     return plugin.set_resolved_url(create_item(id))
+
 
 @plugin.route('/live', name='play_live')
 def play_live():
@@ -78,6 +98,7 @@ def play_live():
         'path': (data['video']['VSR'][0]['VUR'] + ' live=1').encode('utf-8')
     })
 
+
 def create_item(id):
     fetch_url = video_json.format(id=id, lang=language[0].upper(), protocol=protocol)
     data = json.loads(get_url(fetch_url))
@@ -85,11 +106,12 @@ def create_item(id):
         url = data['video']['VSR'][quality]['VUR'].encode('utf-8')
     except:
         url = data['video']['VSR'][0]['VUR'].encode('utf-8')
-    item =  {
+    item = {
         'label': data['video']['VTI'].encode('utf-8'),
         'path': url
     }
     return item
+
 
 def get_url(url):
     req = urllib2.Request(url)
@@ -97,6 +119,7 @@ def get_url(url):
     link = response.read()
     response.close()
     return link
+
 
 if __name__ == '__main__':
     plugin.run()
