@@ -8,9 +8,10 @@
     <string id="30005">Direct</string>
 
     <string id="30020">Add to queue</string>
-    <string id="30020">Save to disk</string>
+    <string id="30021">Télécharger la vidéo</string>
 
     <string id="30050">Langage (Vidéos)</string>
     <string id="30051">Qualité vidéo préferée</string>
     <string id="30052">Protocole de streaming</string>
+    <string id="30053">Répertoire de téléchargement</string>
 </strings>
