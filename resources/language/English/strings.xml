@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-  <string id="30000">Arte +7</string>
-  <string id="30001">All the videos</string>
-  <string id="30002">Selection</string>
-  <string id="30003">Most viewed</string>
-  <string id="30004">Last chance</string>
-  <string id="30005">Live</string>
+    <string id="30000">Arte +7</string>
+    <string id="30001">All the videos</string>
+    <string id="30002">Selection</string>
+    <string id="30003">Most viewed</string>
+    <string id="30004">Last chance</string>
+    <string id="30005">Live</string>
 
-  <string id="30020">Add to queue</string>
-  <string id="30020">Save to disk</string>
+    <string id="30020">Add to queue</string>
+    <string id="30021">Download video</string>
 
-  <string id="30050">Language (Videos)</string>
-  <string id="30051">Preferred video quality</string>
-  <string id="30052">Streaming protocol</string>
+    <string id="30050">Language (Videos)</string>
+    <string id="30051">Preferred video quality</string>
+    <string id="30052">Streaming protocol</string>
+    <string id="30053">Download directory</string>
 </strings>

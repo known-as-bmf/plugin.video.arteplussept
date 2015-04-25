@@ -1,4 +1,6 @@
 from xbmcswift2 import Plugin
+from xbmcswift2 import actions
+import SimpleDownloader as downloader
 import json
 import urllib2
 
@@ -32,10 +34,13 @@ live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
 # emission : trigramme de l'emission (VMI TSG AJT JTE COU FUM KAR DCA MTR PNB PHI SUA TRA VOX XEN YOU
 
 plugin = Plugin()
+downloader = downloader.SimpleDownloader()
 
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
 quality = plugin.get_setting('quality', int)
 protocol = 'HBBTV' if plugin.get_setting('protocol', int) == 0 else 'RMP4'
+
+download_dir = plugin.get_setting('folder', str)
 
 
 @plugin.route('/')
@@ -80,6 +85,9 @@ def list(json_url):
         'properties': {
             'fanart_image': video['image_url'],
         },
+        'context_menu': [
+            (plugin.get_string(30021), actions.background(plugin.url_for('download', id=str(video['em'])))),
+        ],
     } for video in data['videos']]
     return plugin.finish(items)
 
@@ -87,6 +95,18 @@ def list(json_url):
 @plugin.route('/play/<id>', name='play')
 def play(id):
     return plugin.set_resolved_url(create_item(id))
+
+
+@plugin.route('/download/<id>', name='download')
+def download_file(id):
+    data = load_json(id)
+    params = {
+        'url': data['video']['VSR'][quality]['VUR'].encode('utf-8'),
+        'download_path': download_dir,
+        'Title': data['video']['VTI'].encode('utf-8')
+    }
+    filename = id + data['video']['VST']['VNA'] + '.mp4'
+    downloader.download(filename.encode('utf-8'), params)
 
 
 @plugin.route('/live', name='play_live')
