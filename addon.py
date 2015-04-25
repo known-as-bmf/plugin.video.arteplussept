@@ -93,24 +93,32 @@ def play(id):
 def play_live():
     fetch_url = live_json.format(lang=language[0].upper())
     data = json.loads(get_url(fetch_url))
+    url = data['video']['VSR'][0]['VUR'].encode('utf-8')
     return plugin.play_video({
         'label': data['video']['VTI'].encode('utf-8'),
-        'path': (data['video']['VSR'][0]['VUR'] + ' live=1').encode('utf-8')
+        'path': (url + ' live=1').encode('utf-8')
     })
 
-
+quality_map = { 0: 'SQ', 1: 'EQ', 2: 'HQ' }
 def create_item(id):
-    fetch_url = video_json.format(id=id, lang=language[0].upper(), protocol=protocol)
-    data = json.loads(get_url(fetch_url))
-    try:
-        url = data['video']['VSR'][quality]['VUR'].encode('utf-8')
-    except:
+    data = load_json(id)
+    url = None
+    for version in data['video']['VSR']:
+        if version['VQU'] == quality_map[quality]:
+            url = version['VUR'].encode('utf-8')
+            break
+    if not url:
         url = data['video']['VSR'][0]['VUR'].encode('utf-8')
     item = {
         'label': data['video']['VTI'].encode('utf-8'),
         'path': url
     }
     return item
+
+
+def load_json(id):
+    fetch_url = video_json.format(id=id, lang=language[0].upper(), protocol=protocol)
+    return json.loads(get_url(fetch_url))
 
 
 def get_url(url):
