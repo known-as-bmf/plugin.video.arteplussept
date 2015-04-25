@@ -1,3 +1,8 @@
+# Version 0.2
+
+* Fixed quality setting
+* Added ability to download videos
+
 # Version 0.1
 
 Initial version
