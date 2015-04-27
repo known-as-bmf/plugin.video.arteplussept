@@ -1,4 +1,5 @@
 # plugin.video.arteplussept
+
 Plugin Kodi (ex XBMC) permettant de voir les vidéos disponibles sur Arte +7
 
 # Installation
@@ -7,66 +8,31 @@ First of all, download the plugin [here](https://github.com/known-as-bmf/plugin.
 
 Then follow the steps bellow depending on your system and software version
 
-## Kodi
+##1. Open the addons folder
 
 ### Windows
 
-* Press `Windows + R` and type in `%APPDATA%\kodi\addons`
-
-* Extract the content of the zip in this directory
-
-* Rename the extracted directory from `plugin.video.arteplussept-master` to `plugin.video.arteplussept`
-
-* Done ! The plugin should show up in your video add-ons section.
+* For Kodi : Press `Windows + R` and type in `%APPDATA%\kodi\addons`
+* For XBMC : Press `Windows + R` and type in `%APPDATA%\XBMC\addons`
 
 ### Linux
 
-* Open the `~/.kodi/addons` directory
-
-* Extract the content of the zip in this directory
-
-* Rename the extracted directory from `plugin.video.arteplussept-master` to `plugin.video.arteplussept`
-
-* Done ! The plugin should show up in your video add-ons section.
+* For Kodi : Open the `~/.kodi/addons` folder
+* For XBMC : Open the `~/.xbmc/addons` folder
 
 ### OSX
 
-* Open the `/Users/<your_user_name>/Library/Application Support/Kodi/addons` directory
+* For Kodi : Open the `/Users/<your_user_name>/Library/Application Support/Kodi/addons` folder
+* For XBMC : Open the `/Users/<your_user_name>/Library/Application Support/XBMC/addons` folder
 
-* Extract the content of the zip in this directory
+##2. Install the add-on
 
+* Extract the content of the zip in the `addons` folder
 * Rename the extracted directory from `plugin.video.arteplussept-master` to `plugin.video.arteplussept`
-
 * Done ! The plugin should show up in your video add-ons section.
 
-## XBMC
+# Troubleshooting
 
-### Windows
+If you are having issues with the add-on, you can open a issue ticket and join your log file (usually present in the parent directory of the addons folder used in the installation process). The log file will contain your system user name so you may want to sanitize it beforehand.
 
-* Press `Windows + R` and type in `%APPDATA%\XBMC\addons`
-
-* Extract the content of the zip in this directory
-
-* Rename the extracted directory from `plugin.video.arteplussept-master` to `plugin.video.arteplussept`
-
-* Done ! The plugin should show up in your video add-ons section.
-
-### Linux
-
-* Open the `~/.XBMC/addons` directory
-
-* Extract the content of the zip in this directory
-
-* Rename the extracted directory from `plugin.video.arteplussept-master` to `plugin.video.arteplussept`
-
-* Done ! The plugin should show up in your video add-ons section.
-
-### OSX
-
-* Open the `/Users/<your_user_name>/Library/Application Support/XBMC/addons` directory
-
-* Extract the content of the zip in this directory
-
-* Rename the extracted directory from `plugin.video.arteplussept-master` to `plugin.video.arteplussept`
-
-* Done ! The plugin should show up in your video add-ons section.
+You should also try installing the YouTube add-on and the Documentary.net add-on (this will install the two required dependencies : SimpleDownloader and xbmcswift2 if they are not present in your installation)
