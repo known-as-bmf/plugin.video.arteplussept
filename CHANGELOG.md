@@ -1,3 +1,7 @@
+# Version 0.3
+
+* Added ability to browse by theme (thanks to https://github.com/zerty)
+
 # Version 0.2
 
 * Fixed quality setting

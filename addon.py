@@ -10,20 +10,20 @@ categories = [('new', 30001),
               ('selection', 30002),
               ('most_viewed', 30003),
               ('last_chance', 30004),
-                ('category', 30005)]
+              ('themes', 30005)]
 
-sub_categories= [('ACT',3000501),
-                ('DOC',3000502),
-                ('DEC',3000503),
-                ('EUR',3000504),
-                ('GEO',3000505),
-                ('SOC',3000506),
-                ('JUN',3000507),
-                ('AUT',3000508),
-                ('CIN',3000509),
-                ('ART',3000510),
-                ('CUL',3000511),
-                ('ENV',3000512)]
+themes = [('ACT', 3000501),
+          ('DOC', 3000502),
+          ('DEC', 3000503),
+          ('EUR', 3000504),
+          ('GEO', 3000505),
+          ('SOC', 3000506),
+          ('JUN', 3000507),
+          ('AUT', 3000508),
+          ('CIN', 3000509),
+          ('ART', 3000510),
+          ('CUL', 3000511),
+          ('ENV', 3000512)]
 
 # http://www.arte.tv/papi/tvguide/videos/stream/{lang}/{id}_PLUS7-{lang}/{protocol}/{quality}.json
 # lang     : F | D
@@ -53,7 +53,6 @@ downloader = downloader.SimpleDownloader()
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
 quality = plugin.get_setting('quality', int)
 protocol = 'HBBTV' if plugin.get_setting('protocol', int) == 0 else 'RMP4'
-
 download_dir = plugin.get_setting('folder', str)
 
 
@@ -71,20 +70,22 @@ def index():
     return items
 
 
-
 @plugin.route('/new', name='show_new',
-              options={'json_url': base_url + '/guide/{lang}/plus7.json?value={subid}','cat':''})
+              options={'json_url': base_url + '/guide/{lang}/plus7.json'})
 @plugin.route('/selection', name='show_selection',
-              options={'json_url': base_url + '/guide/{lang}/plus7/selection.json?value={subid}','cat':''})
+              options={'json_url': base_url + '/guide/{lang}/plus7/selection.json'})
 @plugin.route('/most_viewed', name='show_most_viewed',
-              options={'json_url': base_url + '/guide/{lang}/plus7/plus_vues.json?value={subid}','cat':''})
+              options={'json_url': base_url + '/guide/{lang}/plus7/plus_vues.json'})
 @plugin.route('/last_chance', name='show_last_chance',
-              options={'json_url': base_url + '/guide/{lang}/plus7/derniere_chance.json?value={subid}','cat':''})
-@plugin.route('/category/<cat>', name='show_cat', options={'json_url': base_url + '/guide/{lang}/plus7/par_themes.json?value={subid}'})
-
-def list(json_url,cat):
+              options={'json_url': base_url + '/guide/{lang}/plus7/derniere_chance.json'})
+@plugin.route('/themes/<theme>', name='show_theme',
+              options={'json_url': base_url + '/guide/{lang}/plus7/par_themes.json?value={theme}'})
+def list(json_url, theme=None):
     plugin.set_content('tvshows')
-    data = json.loads(get_url(json_url.format(lang=language,subid=cat)))
+    if theme is not None:
+        data = json.loads(get_url(json_url.format(lang=language, theme=theme)))
+    else:
+        data = json.loads(get_url(json_url.format(lang=language)))
     items = [{
         'label': video['title'].encode('utf-8'),
         'path': plugin.url_for('play', id=str(video['em'])),
@@ -95,9 +96,9 @@ def list(json_url,cat):
             'label': video['title'].encode('utf-8'),
             'title': video['title'].encode('utf-8'),
             'duration': str(video['duration']),
-            'genre': video['video_channels'].encode('utf-8')if video['video_channels'] is not None else '',
+            'genre': video['video_channels'].encode('utf-8') if video['video_channels'] is not None else '',
             'plot': video['desc'].encode('utf-8') if video['desc'] is not None else '',
-            'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
+            #'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
         },
         'properties': {
             'fanart_image': video['image_url'],
@@ -108,14 +109,14 @@ def list(json_url,cat):
     } for video in data['videos']]
     return plugin.finish(items)
 
-@plugin.route('/category', name='show_category')
-def list_cat():
+
+@plugin.route('/show_themes', name='show_themes')
+def show_themes():
     items = [{
         'label': plugin.get_string(value),
-        'path': plugin.url_for('show_cat',cat=key)
-    } for key, value in sub_categories]
+        'path': plugin.url_for('show_theme', theme=key)
+    } for key, value in themes]
     return plugin.finish(items)
-
 
 
 @plugin.route('/play/<id>', name='play')
@@ -145,7 +146,8 @@ def play_live():
         'path': (url + ' live=1').encode('utf-8')
     })
 
-quality_map = { 0: 'SQ', 1: 'EQ', 2: 'HQ' }
+
+quality_map = {0: 'SQ', 1: 'EQ', 2: 'HQ'}
 def create_item(id):
     data = load_json(id)
     url = None
