@@ -17,9 +17,9 @@
         <description lang="fr">Regardez les vidéos de Arte +7</description>
         <description lang="de">Sehen Sie Videos von Arte +7</description>
         <description lang="en">Watch videos from Arte +7</description>
-        <!--<license></license>
-        <source></source>
-        <forum></forum>
+        <license>GPL v2+</license>
+        <source>https://github.com/known-as-bmf/plugin.video.arteplussept.git</source>
+        <!--<forum></forum>
         <email></email>-->
         <website>http://www.arte.tv</website>
     </extension>
