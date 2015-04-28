@@ -79,7 +79,7 @@ def list(json_url):
             'title': video['title'].encode('utf-8'),
             'duration': str(video['duration']),
             'genre': video['video_channels'].encode('utf-8'),
-            'plot': video['desc'].encode('utf-8'),
+            'plot': video['desc'].encode('utf-8') if video['desc'] is not None else '',
             'aired': video['airdate_long'].encode('utf-8'),
         },
         'properties': {
