@@ -9,7 +9,21 @@ base_url = 'http://www.arte.tv'
 categories = [('new', 30001),
               ('selection', 30002),
               ('most_viewed', 30003),
-              ('last_chance', 30004)]
+              ('last_chance', 30004),
+                ('category', 30005)]
+
+sub_categories= [('ACT',3000501),
+                ('DOC',3000502),
+                ('DEC',3000503),
+                ('EUR',3000504),
+                ('GEO',3000505),
+                ('SOC',3000506),
+                ('JUN',3000507),
+                ('AUT',3000508),
+                ('CIN',3000509),
+                ('ART',3000510),
+                ('CUL',3000511),
+                ('ENV',3000512)]
 
 # http://www.arte.tv/papi/tvguide/videos/stream/{lang}/{id}_PLUS7-{lang}/{protocol}/{quality}.json
 # lang     : F | D
@@ -50,24 +64,27 @@ def index():
         'path': plugin.url_for('show_' + key)
     } for key, value in categories]
     items.append({
-        'label': plugin.get_string(30005),
+        'label': plugin.get_string(30006),
         'path': plugin.url_for('play_live'),
         'is_playable': True
     })
     return items
 
 
+
 @plugin.route('/new', name='show_new',
-              options={'json_url': base_url + '/guide/{lang}/plus7.json'})
+              options={'json_url': base_url + '/guide/{lang}/plus7.json?value={subid}','cat':''})
 @plugin.route('/selection', name='show_selection',
-              options={'json_url': base_url + '/guide/{lang}/plus7/selection.json'})
+              options={'json_url': base_url + '/guide/{lang}/plus7/selection.json?value={subid}','cat':''})
 @plugin.route('/most_viewed', name='show_most_viewed',
-              options={'json_url': base_url + '/guide/{lang}/plus7/plus_vues.json'})
+              options={'json_url': base_url + '/guide/{lang}/plus7/plus_vues.json?value={subid}','cat':''})
 @plugin.route('/last_chance', name='show_last_chance',
-              options={'json_url': base_url + '/guide/{lang}/plus7/derniere_chance.json'})
-def list(json_url):
+              options={'json_url': base_url + '/guide/{lang}/plus7/derniere_chance.json?value={subid}','cat':''})
+@plugin.route('/category/<cat>', name='show_cat', options={'json_url': base_url + '/guide/{lang}/plus7/par_themes.json?value={subid}'})
+
+def list(json_url,cat):
     plugin.set_content('tvshows')
-    data = json.loads(get_url(json_url.format(lang=language)))
+    data = json.loads(get_url(json_url.format(lang=language,subid=cat)))
     items = [{
         'label': video['title'].encode('utf-8'),
         'path': plugin.url_for('play', id=str(video['em'])),
@@ -78,9 +95,9 @@ def list(json_url):
             'label': video['title'].encode('utf-8'),
             'title': video['title'].encode('utf-8'),
             'duration': str(video['duration']),
-            'genre': video['video_channels'].encode('utf-8'),
+            'genre': video['video_channels'].encode('utf-8')if video['video_channels'] is not None else '',
             'plot': video['desc'].encode('utf-8') if video['desc'] is not None else '',
-            'aired': video['airdate_long'].encode('utf-8'),
+            'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
         },
         'properties': {
             'fanart_image': video['image_url'],
@@ -90,6 +107,15 @@ def list(json_url):
         ],
     } for video in data['videos']]
     return plugin.finish(items)
+
+@plugin.route('/category', name='show_category')
+def list_cat():
+    items = [{
+        'label': plugin.get_string(value),
+        'path': plugin.url_for('show_cat',cat=key)
+    } for key, value in sub_categories]
+    return plugin.finish(items)
+
 
 
 @plugin.route('/play/<id>', name='play')
