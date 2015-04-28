@@ -33,6 +33,6 @@ Then follow the steps bellow depending on your system and software version
 
 # Troubleshooting
 
-If you are having issues with the add-on, you can open a issue ticket and join your log file (usually present in the parent directory of the addons folder used in the installation process). The log file will contain your system user name so you may want to sanitize it beforehand.
+If you are having issues with the add-on, you can open a issue ticket and join your log file. The log file will contain your system user name and sometimes passwords of services you use in the software, so you may want to sanitize it beforehand. Detailed procedure [here](http://kodi.wiki/view/Log_file/Easy).
 
 You should also try installing the YouTube add-on and the Documentary.net add-on (this will install the two required dependencies : SimpleDownloader and xbmcswift2 if they are not present in your installation)
