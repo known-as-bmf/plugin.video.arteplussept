@@ -37,6 +37,7 @@ plugin = Plugin()
 downloader = downloader.SimpleDownloader()
 
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
+language_live = 'f' if plugin.get_setting('lang', int) == 0 else 'd'
 quality = plugin.get_setting('quality', int)
 protocol = 'HBBTV' if plugin.get_setting('protocol', int) == 0 else 'RMP4'
 
@@ -78,9 +79,9 @@ def list(json_url):
             'label': video['title'].encode('utf-8'),
             'title': video['title'].encode('utf-8'),
             'duration': str(video['duration']),
-            'genre': video['video_channels'].encode('utf-8'),
+            'genre': video['video_channels'].encode('utf-8')if video['video_channels'] is not None else '',
             'plot': video['desc'].encode('utf-8') if video['desc'] is not None else '',
-            'aired': video['airdate_long'].encode('utf-8'),
+            'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
         },
         'properties': {
             'fanart_image': video['image_url'],
@@ -111,7 +112,7 @@ def download_file(id):
 
 @plugin.route('/live', name='play_live')
 def play_live():
-    fetch_url = live_json.format(lang=language[0].upper())
+    fetch_url = live_json.format(lang=language_live[0].upper())
     data = json.loads(get_url(fetch_url))
     url = data['video']['VSR'][0]['VUR'].encode('utf-8')
     return plugin.play_video({
