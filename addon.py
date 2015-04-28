@@ -79,9 +79,9 @@ def list(json_url):
             'label': video['title'].encode('utf-8'),
             'title': video['title'].encode('utf-8'),
             'duration': str(video['duration']),
-            'genre': video['video_channels'].encode('utf-8'),
+            'genre': video['video_channels'].encode('utf-8')if video['video_channels'] is not None else '',
             'plot': video['desc'].encode('utf-8') if video['desc'] is not None else '',
-            'aired': video['airdate_long'].encode('utf-8'),
+            'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
         },
         'properties': {
             'fanart_image': video['image_url'],
