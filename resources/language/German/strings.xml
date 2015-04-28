@@ -5,6 +5,7 @@
     <string id="30002">Selection</string>
     <string id="30003">Most viewed</string>
     <string id="30004">Last chance</string>
+    <string id="30005">Category</string>
     <string id="30005">Live</string>
 
     <string id="30020">Add to queue</string>
@@ -14,4 +15,17 @@
     <string id="30051">Preferred video quality</string>
     <string id="30052">Streaming protocol</string>
     <string id="30053">Download directory</string>
+
+    <string id="3000501">Aktuelles</string>
+    <string id="3000502">Dokumentationen</string>
+    <string id="3000503">Entdeckung</string>
+    <string id="3000504">Europa</string>
+    <string id="3000505">Geopolitik - Geschichte</string>
+    <string id="3000506">Gesellschaft</string>
+    <string id="3000507">Junior</string>
+    <string id="3000508">Andere</string>
+    <string id="3000509">Kino - Serien</string>
+    <string id="3000510">Kunst - Kultur</string>
+    <string id="3000511">Popkultur - Musik</string>
+    <string id="3000512">Umwelt - Wissensch</string>
 </strings>
