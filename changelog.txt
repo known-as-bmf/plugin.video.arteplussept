@@ -1,11 +1,11 @@
-v0.3
+v0.3.0
 - Added ability to browse by theme (thanks to https://github.com/zerty)
 
-v0.2
+v0.2.0
 - Fixed quality setting
 - Added ability to download videos
 
-v0.1
+v0.1.0
 - Initial version
 - Choose between french and german language for videos
 - Choose preferred video quality (High, Medium, Low)

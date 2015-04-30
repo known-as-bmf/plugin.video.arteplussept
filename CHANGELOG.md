@@ -1,13 +1,13 @@
-# Version 0.3
+# Version 0.3.0
 
 * Added ability to browse by theme (thanks to https://github.com/zerty)
 
-# Version 0.2
+# Version 0.2.0
 
 * Fixed quality setting
 * Added ability to download videos
 
-# Version 0.1
+# Version 0.1.0
 
 Initial version
 
