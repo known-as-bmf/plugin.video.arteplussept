@@ -16,9 +16,10 @@
 
     <!-- options -->
     <string id="30050">Language (Videos)</string>
-    <string id="30051">Preferred video quality</string>
+    <string id="30051">Stream video quality</string>
     <string id="30052">Streaming protocol</string>
     <string id="30053">Download directory</string>
+    <string id="30054">Download video quality</string>
 
     <!-- themes -->
     <string id="3000501">News</string>

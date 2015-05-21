@@ -1,3 +1,8 @@
+# Version 0.4.0
+
+* Fixed download procedure (got rid of simpledownloader for a more basic solution)
+* Added download quality setting
+
 # Version 0.3.0
 
 * Added ability to browse by theme (thanks to https://github.com/zerty)

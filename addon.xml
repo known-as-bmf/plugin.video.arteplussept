@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.arteplussept" name="Arte +7" version="0.3.0" provider-name="bmf">
+<addon id="plugin.video.arteplussept" name="Arte +7" version="0.4.0" provider-name="bmf">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.xbmcswift2" version="2.4.0"/>
-        <import addon="script.module.simple.downloader" version="1.9.4" />
     </requires>
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>

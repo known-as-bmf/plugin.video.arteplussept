@@ -19,17 +19,19 @@
 
 from xbmcswift2 import Plugin
 from xbmcswift2 import actions
-import SimpleDownloader as downloader
+import xbmc
+import os
+#import SimpleDownloader as downloader
 import json
 import urllib2
 
 base_url = 'http://www.arte.tv'
 
-categories = [('new', 30001),
-              ('selection', 30002),
+categories = [('new',         30001),
+              ('selection',   30002),
               ('most_viewed', 30003),
               ('last_chance', 30004),
-              ('themes', 30005)]
+              ('themes',      30005)]
 
 themes = [('ACT', 3000501),
           ('DOC', 3000502),
@@ -67,12 +69,13 @@ live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
 # emission : trigramme de l'emission (VMI TSG AJT JTE COU FUM KAR DCA MTR PNB PHI SUA TRA VOX XEN YOU
 
 plugin = Plugin()
-downloader = downloader.SimpleDownloader()
+#downloader = downloader.SimpleDownloader()
 
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
 quality = plugin.get_setting('quality', int)
 protocol = 'HBBTV' if plugin.get_setting('protocol', int) == 0 else 'RMP4'
-download_dir = plugin.get_setting('folder', str)
+download_folder = plugin.get_setting('download_folder', str)
+download_quality = plugin.get_setting('download_quality', int)
 
 
 @plugin.route('/')
@@ -146,20 +149,38 @@ def play(id):
 @plugin.route('/download/<id>', name='download')
 def download_file(id):
     data = load_json(id)
-    params = {
-        'url': data['video']['VSR'][quality]['VUR'].encode('utf-8'),
-        'download_path': download_dir,
-        'Title': data['video']['VTI'].encode('utf-8')
-    }
-    filename = id + data['video']['VST']['VNA'] + '.mp4'
-    downloader.download(filename.encode('utf-8'), params)
+    if download_folder:
+        url = None
+        for version in data['video']['VSR']:
+            if version['VQU'] == quality_map[download_quality]:
+                url = version['VUR']
+                break
+        if not url:
+            url = data['video']['VSR'][0]['VUR']
+        title = data['video']['VTI'].encode('utf-8')
+        filename = id + '_' + data['video']['VST']['VNA'] + os.extsep + 'mp4'
+
+        block_sz = 8192
+        f = open(os.path.join(download_folder, filename), 'wb')
+        u = urllib2.urlopen(url)
+        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Downloading', message=title, duration=5000))
+        while True:
+            buffer = u.read(block_sz)
+            if not buffer:
+                break
+            f.write(buffer)
+        f.close()
+        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Done downloading', message=title, duration=5000))
+    else:
+        # TODO: i18n
+        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Error', message='Please set download folder in settings.', duration=5000))
 
 
 @plugin.route('/live', name='play_live')
 def play_live():
     fetch_url = live_json.format(lang=language[0].upper())
     data = json.loads(get_url(fetch_url))
-    url = data['video']['VSR'][0]['VUR'].encode('utf-8')
+    url = data['video']['VSR'][0]['VUR']
     return plugin.play_video({
         'label': data['video']['VTI'].encode('utf-8'),
         'path': (url + ' live=1').encode('utf-8')
@@ -172,13 +193,13 @@ def create_item(id):
     url = None
     for version in data['video']['VSR']:
         if version['VQU'] == quality_map[quality]:
-            url = version['VUR'].encode('utf-8')
+            url = version['VUR']
             break
     if not url:
-        url = data['video']['VSR'][0]['VUR'].encode('utf-8')
+        url = data['video']['VSR'][0]['VUR']
     item = {
         'label': data['video']['VTI'].encode('utf-8'),
-        'path': url
+        'path': url.encode('utf-8')
     }
     return item
 

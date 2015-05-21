@@ -3,5 +3,6 @@
     <setting id="lang"     type="enum"   label="30050" values="FR|DE"     default="0"/>
     <setting id="quality"  type="enum"   label="30051" values="SQ (High)|EQ (Medium)|HQ (Low)" default="0"/>
     <setting id="protocol" type="enum"   label="30052" values="HTTP|RTMP" default="0"/>
-    <setting id="folder"   type="folder" label="30053" source="auto" option="writeable"/>
+    <setting id="download_folder"   type="folder" label="30053" source="auto" option="writeable"/>
+    <setting id="download_quality"  type="enum"   label="30054" values="SQ (High)|EQ (Medium)|HQ (Low)" default="0"/>
 </settings>
