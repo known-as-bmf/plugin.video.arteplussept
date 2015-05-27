@@ -21,7 +21,6 @@ from xbmcswift2 import Plugin
 from xbmcswift2 import actions
 import xbmc
 import os
-#import SimpleDownloader as downloader
 import json
 import urllib2
 
@@ -58,7 +57,7 @@ live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
 
 # http://www.arte.tv/guide/{lang}/plus7/par_dates.json?value={date}
 # lang : fr | de
-# date : date sous la forme yyy-mm-jj
+# date : date sous la forme yyyy-mm-jj
 
 # http://www.arte.tv/guide/{lang}/plus7/par_themes.json?value={genre}
 # lang  : fr | de
@@ -69,7 +68,6 @@ live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
 # emission : trigramme de l'emission (VMI TSG AJT JTE COU FUM KAR DCA MTR PNB PHI SUA TRA VOX XEN YOU
 
 plugin = Plugin()
-#downloader = downloader.SimpleDownloader()
 
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
 quality = plugin.get_setting('quality', int)
@@ -183,7 +181,7 @@ def play_live():
     url = data['video']['VSR'][0]['VUR']
     return plugin.play_video({
         'label': data['video']['VTI'].encode('utf-8'),
-        'path': (url + ' live=1').encode('utf-8')
+        'path': (url + ' live=1')
     })
 
 
@@ -199,7 +197,7 @@ def create_item(id):
         url = data['video']['VSR'][0]['VUR']
     item = {
         'label': data['video']['VTI'].encode('utf-8'),
-        'path': url.encode('utf-8')
+        'path': url
     }
     return item
 
