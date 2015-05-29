@@ -50,7 +50,7 @@ themes = [('ACT', 3000501),
 # lang     : F | D
 # protocol : HBBTV | RTMP
 # quality  : SQ (High) | EQ (Med) | HQ (Low)
-video_json = base_url + '/papi/tvguide/videos/stream/{lang}/{id}_PLUS7-{lang}/{protocol}/ALL.json'
+video_json = base_url + '/papi/tvguide/videos/stream/player/{lang}/{id}_PLUS7-{lang}/{protocol}/ALL.json'
 
 # http://www.arte.tv/papi/tvguide/videos/livestream/{lang}/
 # lang : F | D
@@ -74,6 +74,7 @@ user_agent = plugin.name + '/' + plugin.addon.getAddonInfo('version')
 print user_agent
 
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
+prefer_vost = plugin.get_setting('prefer_vost', bool)
 quality = plugin.get_setting('quality', int)
 protocol = 'HBBTV' if plugin.get_setting('protocol', int) == 0 else 'RMP4'
 download_folder = plugin.get_setting('download_folder', str)
@@ -150,29 +151,20 @@ def play(id):
 
 @plugin.route('/download/<id>', name='download')
 def download_file(id):
-    data = load_json(id)
     if download_folder:
-        url = None
-        for version in data['video']['VSR']:
-            if version['VQU'] == quality_map[download_quality]:
-                url = version['VUR']
-                break
-        if not url:
-            url = data['video']['VSR'][0]['VUR']
-        title = data['video']['VTI']
-        filename = id + '_' + data['video']['VST']['VNA'] + os.extsep + 'mp4'
-
+        video = create_item(id, True)
+        filename = id + '_' + video['label'] + os.extsep + 'mp4'
         block_sz = 8192
         f = open(os.path.join(download_folder, filename), 'wb')
-        u = urllib2.urlopen(url)
-        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Downloading', message=title, duration=5000))
+        u = urllib2.urlopen(video['path'])
+        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Downloading', message=filename, duration=5000))
         while True:
             buffer = u.read(block_sz)
             if not buffer:
                 break
             f.write(buffer)
         f.close()
-        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Done downloading', message=title, duration=5000))
+        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Done downloading', message=filename, duration=5000))
     else:
         # TODO: i18n
         xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Error', message='Please set download folder in settings.', duration=5000))
@@ -189,21 +181,38 @@ def play_live():
     })
 
 
-quality_map = {0: 'SQ', 1: 'EQ', 2: 'HQ'}
-def create_item(id):
+quality_map = {0: 'SQ', 1: 'EQ', 2: 'HQ', 3: 'MQ'}
+def create_item(id, dl=False):
     data = load_json(id)
-    url = None
-    for version in data['video']['VSR']:
-        if version['VQU'] == quality_map[quality]:
-            url = version['VUR']
+    filtered = []
+    video = None
+    # we try every quality (starting from the preferred one)
+    # if it is not found, try every other from highest to lowest
+    chosen_quality = download_quality if dl else quality
+    for q in [quality_map[chosen_quality]] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality_map[chosen_quality]]:
+        # vost preferred
+        if prefer_vost:
+            filtered = [item for item in data['videoJsonPlayer']['VSR'].values() if match(item, q, True)]
+        # no vost found or vost not preferred
+        if len(filtered) == 0:
+            filtered = [item for item in data['videoJsonPlayer']['VSR'].values() if match(item, q)]
+        # here len(filtered) sould be 1
+        if len(filtered) == 1:
+            video = filtered[0]
             break
-    if not url:
-        url = data['video']['VSR'][0]['VUR']
-    item = {
-        'label': data['video']['VTI'],
-        'path': url
+    return {
+        'label': data['videoJsonPlayer']['VST']['VNA'] if dl else data['videoJsonPlayer']['VTI'],
+        'path': video['url']
     }
-    return item
+
+
+# versionProg :
+#       1 = Version langue URL
+#       2 = Version inverse de langue URL
+#       3 = VO-STF VOSTF
+#       8 = VF-STMF ST sourds/mal
+def match(item, quality, vost=False):
+    return ((item['VQU'] == quality) and ((vost and item['versionProg'] == '3') or (not vost and item['versionProg'] == '1')))
 
 
 def load_json(id):
