@@ -45,6 +45,7 @@ themes = [('ACT', 3000501),
           ('CUL', 3000511),
           ('ENV', 3000512)]
 
+
 # http://www.arte.tv/papi/tvguide/videos/stream/{lang}/{id}_PLUS7-{lang}/{protocol}/{quality}.json
 # lang     : F | D
 # protocol : HBBTV | RTMP
@@ -68,6 +69,9 @@ live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
 # emission : trigramme de l'emission (VMI TSG AJT JTE COU FUM KAR DCA MTR PNB PHI SUA TRA VOX XEN YOU
 
 plugin = Plugin()
+
+user_agent = plugin.name + '/' + plugin.addon.getAddonInfo('version')
+print user_agent
 
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
 quality = plugin.get_setting('quality', int)
@@ -107,17 +111,17 @@ def list(json_url, theme=None):
     else:
         data = json.loads(get_url(json_url.format(lang=language)))
     items = [{
-        'label': video['title'].encode('utf-8'),
+        'label': video['title'],
         'path': plugin.url_for('play', id=str(video['em'])),
         'thumbnail': video['image_url'],
         'is_playable': True,
         'info_type': 'video',
         'info': {
-            'label': video['title'].encode('utf-8'),
-            'title': video['title'].encode('utf-8'),
+            'label': video['title'],
+            'title': video['title'],
             'duration': str(video['duration']),
-            'genre': video['video_channels'].encode('utf-8') if video['video_channels'] is not None else '',
-            'plot': video['desc'].encode('utf-8') if video['desc'] is not None else '',
+            'genre': video['video_channels'] if video['video_channels'] is not None else '',
+            'plot': video['desc'] if video['desc'] is not None else '',
             #'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
         },
         'properties': {
@@ -155,7 +159,7 @@ def download_file(id):
                 break
         if not url:
             url = data['video']['VSR'][0]['VUR']
-        title = data['video']['VTI'].encode('utf-8')
+        title = data['video']['VTI']
         filename = id + '_' + data['video']['VST']['VNA'] + os.extsep + 'mp4'
 
         block_sz = 8192
@@ -180,7 +184,7 @@ def play_live():
     data = json.loads(get_url(fetch_url))
     url = data['video']['VSR'][0]['VUR']
     return plugin.play_video({
-        'label': data['video']['VTI'].encode('utf-8'),
+        'label': data['video']['VTI'],
         'path': (url + ' live=1')
     })
 
@@ -196,7 +200,7 @@ def create_item(id):
     if not url:
         url = data['video']['VSR'][0]['VUR']
     item = {
-        'label': data['video']['VTI'].encode('utf-8'),
+        'label': data['video']['VTI'],
         'path': url
     }
     return item
@@ -208,11 +212,11 @@ def load_json(id):
 
 
 def get_url(url):
-    req = urllib2.Request(url)
-    response = urllib2.urlopen(req)
-    link = response.read()
-    response.close()
-    return link
+    request = urllib2.Request(url)
+    request.add_header('User-Agent', user_agent)
+    opener = urllib2.build_opener()
+    body = opener.open(request).read()
+    return body
 
 
 if __name__ == '__main__':
