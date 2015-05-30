@@ -4,7 +4,14 @@ Plugin Kodi (ex XBMC) permettant de voir les vidéos disponibles sur Arte +7
 
 # Installation
 
-First of all, download the plugin [here](https://github.com/known-as-bmf/plugin.video.arteplussept/archive/master.zip)
+You can either :
+1 Install a stable version directly from the official Kodi repositories (gotham or helix)
+2 Install the latest dev version by reading the "Manual installation" chapter
+
+
+# Manual installation
+
+Download the plugin [here](https://github.com/known-as-bmf/plugin.video.arteplussept/archive/master.zip)
 
 Then follow the steps bellow depending on your system and software version
 
