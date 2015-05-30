@@ -182,13 +182,13 @@ def play_live():
 
 
 quality_map = {0: 'SQ', 1: 'EQ', 2: 'HQ', 3: 'MQ'}
-def create_item(id, dl=False):
+def create_item(id, safe_title=False):
     data = load_json(id)
     filtered = []
     video = None
     # we try every quality (starting from the preferred one)
     # if it is not found, try every other from highest to lowest
-    chosen_quality = download_quality if dl else quality
+    chosen_quality = download_quality if safe_title else quality
     for q in [quality_map[chosen_quality]] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality_map[chosen_quality]]:
         # vost preferred
         if prefer_vost:
@@ -201,7 +201,7 @@ def create_item(id, dl=False):
             video = filtered[0]
             break
     return {
-        'label': data['videoJsonPlayer']['VST']['VNA'] if dl else data['videoJsonPlayer']['VTI'],
+        'label': data['videoJsonPlayer']['VST']['VNA'] if safe_title else data['videoJsonPlayer']['VTI'],
         'path': video['url']
     }
 
