@@ -19,32 +19,16 @@
 
 from xbmcswift2 import Plugin
 from xbmcswift2 import actions
+import requests
 import xbmc
 import os
 import json
 import urllib2
 
+
+plugin = Plugin()
+
 base_url = 'http://www.arte.tv'
-
-categories = [('new',         30001),
-              ('selection',   30002),
-              ('most_viewed', 30003),
-              ('last_chance', 30004),
-              ('themes',      30005)]
-
-themes = [('ACT', 3000501),
-          ('DOC', 3000502),
-          ('DEC', 3000503),
-          ('EUR', 3000504),
-          ('GEO', 3000505),
-          ('SOC', 3000506),
-          ('JUN', 3000507),
-          ('AUT', 3000508),
-          ('CIN', 3000509),
-          ('ART', 3000510),
-          ('CUL', 3000511),
-          ('ENV', 3000512)]
-
 
 # http://www.arte.tv/papi/tvguide/videos/stream/{lang}/{id}_PLUS7-{lang}/{protocol}/{quality}.json
 # lang     : F | D
@@ -68,10 +52,26 @@ live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
 # lang     : fr | de
 # emission : trigramme de l'emission (VMI TSG AJT JTE COU FUM KAR DCA MTR PNB PHI SUA TRA VOX XEN YOU
 
-plugin = Plugin()
+categories = [('new',         30001),
+              ('selection',   30002),
+              ('most_viewed', 30003),
+              ('last_chance', 30004),
+              ('themes',      30005)]
 
-user_agent = plugin.name + '/' + plugin.addon.getAddonInfo('version')
-print user_agent
+themes = [('ACT', 3000501),
+          ('DOC', 3000502),
+          ('DEC', 3000503),
+          ('EUR', 3000504),
+          ('GEO', 3000505),
+          ('SOC', 3000506),
+          ('JUN', 3000507),
+          ('AUT', 3000508),
+          ('CIN', 3000509),
+          ('ART', 3000510),
+          ('CUL', 3000511),
+          ('ENV', 3000512)]
+
+headers = {'user-agent': plugin.name + '/' + plugin.addon.getAddonInfo('version')}
 
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
 prefer_vost = plugin.get_setting('prefer_vost', bool)
@@ -104,13 +104,16 @@ def index():
 @plugin.route('/last_chance', name='show_last_chance',
               options={'json_url': base_url + '/guide/{lang}/plus7/derniere_chance.json'})
 @plugin.route('/themes/<theme>', name='show_theme',
-              options={'json_url': base_url + '/guide/{lang}/plus7/par_themes.json?value={theme}'})
+              options={'json_url': base_url + '/guide/{lang}/plus7/par_themes.json'})
 def list(json_url, theme=None):
     plugin.set_content('tvshows')
-    if theme is not None:
-        data = json.loads(get_url(json_url.format(lang=language, theme=theme)))
-    else:
-        data = json.loads(get_url(json_url.format(lang=language)))
+
+    payload = {}
+    if theme:
+        payload['value'] = theme
+
+    data = load_json(json_url.format(lang=language))
+
     items = [{
         'label': video['title'],
         'path': plugin.url_for('play', id=str(video['em'])),
@@ -121,8 +124,8 @@ def list(json_url, theme=None):
             'label': video['title'],
             'title': video['title'],
             'duration': str(video['duration']),
-            'genre': video['video_channels'] if video['video_channels'] is not None else '',
-            'plot': video['desc'] if video['desc'] is not None else '',
+            'genre': video['video_channels'] if video['video_channels'] else '',
+            'plot': video['desc'] if video['desc'] else '',
             #'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
         },
         'properties': {
@@ -172,8 +175,7 @@ def download_file(id):
 
 @plugin.route('/live', name='play_live')
 def play_live():
-    fetch_url = live_json.format(lang=language[0].upper())
-    data = json.loads(get_url(fetch_url))
+    data = load_json(live_json.format(lang=language[0].upper()))
     url = data['video']['VSR'][0]['VUR']
     return plugin.play_video({
         'label': data['video']['VTI'],
@@ -183,7 +185,7 @@ def play_live():
 
 quality_map = {0: 'SQ', 1: 'EQ', 2: 'HQ', 3: 'MQ'}
 def create_item(id, safe_title=False):
-    data = load_json(id)
+    data = load_json(video_json.format(id=id, lang=language[0].upper(), protocol=protocol))
     filtered = []
     video = None
     # we try every quality (starting from the preferred one)
@@ -215,17 +217,9 @@ def match(item, quality, vost=False):
     return ((item['VQU'] == quality) and ((vost and item['versionProg'] == '3') or (not vost and item['versionProg'] == '1')))
 
 
-def load_json(id):
-    fetch_url = video_json.format(id=id, lang=language[0].upper(), protocol=protocol)
-    return json.loads(get_url(fetch_url))
-
-
-def get_url(url):
-    request = urllib2.Request(url)
-    request.add_header('User-Agent', user_agent)
-    opener = urllib2.build_opener()
-    body = opener.open(request).read()
-    return body
+def load_json(url):
+    r = requests.get(url, headers=headers)
+    return r.json()
 
 
 if __name__ == '__main__':
