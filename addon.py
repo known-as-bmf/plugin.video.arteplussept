@@ -20,7 +20,6 @@
 from xbmcswift2 import Plugin
 from xbmcswift2 import actions
 import requests
-import xbmc
 import os
 import json
 import urllib2
@@ -112,29 +111,33 @@ def list(json_url, theme=None):
     if theme:
         payload['value'] = theme
 
-    data = load_json(json_url.format(lang=language))
+    data = load_json(json_url.format(lang=language), payload)
 
-    items = [{
-        'label': video['title'],
-        'path': plugin.url_for('play', id=str(video['em'])),
-        'thumbnail': video['image_url'],
-        'is_playable': True,
-        'info_type': 'video',
-        'info': {
+    items = []
+    for video in data['videos']:
+        item = {
             'label': video['title'],
-            'title': video['title'],
-            'duration': str(video['duration']),
-            'genre': video['video_channels'] if video['video_channels'] else '',
-            'plot': video['desc'] if video['desc'] else '',
-            #'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
-        },
-        'properties': {
-            'fanart_image': video['image_url'],
-        },
-        'context_menu': [
-            (plugin.get_string(30021), actions.background(plugin.url_for('download', id=str(video['em'])))),
-        ],
-    } for video in data['videos']]
+            'path': plugin.url_for('play', id=str(video['em'])),
+            'thumbnail': video['image_url'],
+            'is_playable': True,
+            'info_type': 'video',
+            'info': {
+                'label': video['title'],
+                'title': video['title'],
+                'duration': str(video['duration']),
+                'genre': video['video_channels'] if video['video_channels'] else '',
+                'plot': video['desc'] if video['desc'] else '',
+                #'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
+            },
+            'properties': {
+                'fanart_image': video['image_url'],
+            },
+            'context_menu': [
+                (plugin.get_string(30021), actions.background(plugin.url_for('download', id=str(video['em'])))),
+            ],
+        }
+        #item['context_menu'].append((plugin.get_string(30020), plugin.url_for('enqueue', item=item)))
+        items.append(item)
     return plugin.finish(items)
 
 
@@ -152,6 +155,11 @@ def play(id):
     return plugin.set_resolved_url(create_item(id))
 
 
+#@plugin.route('/enqueue/<item>', name='enqueue')
+#def enqueue(item):
+#    plugin.add_to_playlist([item])
+
+
 @plugin.route('/download/<id>', name='download')
 def download_file(id):
     if download_folder:
@@ -160,17 +168,16 @@ def download_file(id):
         block_sz = 8192
         f = open(os.path.join(download_folder, filename), 'wb')
         u = urllib2.urlopen(video['path'])
-        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Downloading', message=filename, duration=5000))
+        plugin.notify(filename, plugin.get_string(30007))
         while True:
             buffer = u.read(block_sz)
             if not buffer:
                 break
             f.write(buffer)
         f.close()
-        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Done downloading', message=filename, duration=5000))
+        plugin.notify(filename, plugin.get_string(30008))
     else:
-        # TODO: i18n
-        xbmc.executebuiltin('XBMC.Notification({title}, {message}, {duration})'.format(title='Error', message='Please set download folder in settings.', duration=5000))
+        plugin.notify(plugin.get_string(30010), plugin.get_string(30009))
 
 
 @plugin.route('/live', name='play_live')
@@ -217,8 +224,8 @@ def match(item, quality, vost=False):
     return ((item['VQU'] == quality) and ((vost and item['versionProg'] == '3') or (not vost and item['versionProg'] == '1')))
 
 
-def load_json(url):
-    r = requests.get(url, headers=headers)
+def load_json(url, params={}):
+    r = requests.get(url, params=params, headers=headers)
     return r.json()
 
 

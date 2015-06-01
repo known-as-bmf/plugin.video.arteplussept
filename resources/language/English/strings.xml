@@ -2,13 +2,18 @@
 <strings>
     <string id="30000">Arte +7</string>
 
-    <!-- menu items -->
+    <!-- menu items & misc messages -->
     <string id="30001">All the videos</string>
     <string id="30002">Selection</string>
     <string id="30003">Most viewed</string>
     <string id="30004">Last chance</string>
     <string id="30005">Themes</string>
     <string id="30006">Live</string>
+
+    <string id="30007">Downloading</string>
+    <string id="30008">Done downloading</string>
+    <string id="30009">Error</string>
+    <string id="30010">Please set a download folder in the settings</string>
 
     <!-- context menu -->
     <string id="30020">Add to queue</string>
