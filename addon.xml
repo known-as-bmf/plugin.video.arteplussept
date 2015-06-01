@@ -10,13 +10,29 @@
     </extension>
     <extension point="xbmc.addon.metadata">
         <platform>all</platform>
-        <summary lang="fr">Arte +7</summary>
-        <summary lang="de">Arte +7</summary>
-        <summary lang="en">Arte +7</summary>
+        <summary>Arte +7</summary>
         <language>fr de</language>
-        <description lang="fr">Regardez les vidéos de Arte +7</description>
-        <description lang="de">Sehen Sie Videos von Arte +7</description>
-        <description lang="en">Watch videos from Arte +7</description>
+        <description lang="fr">
+Regardez les vidéos de Arte +7
+Pour toute demande ou reporter un problème:
+https://github.com/known-as-bmf/plugin.video.arteplussept/issues
+Les contributions sont les bienvenues:
+https://github.com/known-as-bmf/plugin.video.arteplussept
+        </description>
+        <description lang="de">
+Sehen Sie Videos von Arte +7
+For feature requests / issues:
+https://github.com/known-as-bmf/plugin.video.arteplussept/issues
+Contributions are welcome:
+https://github.com/known-as-bmf/plugin.video.arteplussept
+        </description>
+        <description lang="en">
+Watch videos from Arte +7
+For feature requests / issues:
+https://github.com/known-as-bmf/plugin.video.arteplussept/issues
+Contributions are welcome:
+https://github.com/known-as-bmf/plugin.video.arteplussept
+        </description>
         <license>GPL v2+</license>
         <source>https://github.com/known-as-bmf/plugin.video.arteplussept.git</source>
         <!--<forum></forum>
