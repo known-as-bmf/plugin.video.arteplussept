@@ -119,7 +119,7 @@ def list_items(json_url, theme=None):
     for video in data['videos']:
         item = {
             'label': video['title'],
-            'path': plugin.url_for('play', id=str(video['em'])),
+            'path': plugin.url_for('play', vid=str(video['em'])),
             'thumbnail': video['image_url'],
             'is_playable': True,
             'info_type': 'video',
@@ -134,7 +134,7 @@ def list_items(json_url, theme=None):
                 'fanart_image': video['image_url'],
             },
             'context_menu': [
-                (plugin.get_string(30021), actions.background(plugin.url_for('download', id=str(video['em'])))),
+                (plugin.get_string(30021), actions.background(plugin.url_for('download', vid=str(video['em'])))),
             ],
         }
         # item['context_menu'].append((plugin.get_string(30020), plugin.url_for('enqueue', item=item)))
