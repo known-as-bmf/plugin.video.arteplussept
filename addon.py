@@ -21,7 +21,6 @@ from xbmcswift2 import Plugin
 from xbmcswift2 import actions
 import requests
 import os
-import json
 import urllib2
 
 
@@ -72,6 +71,9 @@ themes = [('ACT', 3000501),
 
 headers = {'user-agent': plugin.name + '/' + plugin.addon.getAddonInfo('version')}
 
+quality_map = {0: 'SQ', 1: 'EQ', 2: 'HQ', 3: 'MQ'}
+
+# Settings
 language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
 prefer_vost = plugin.get_setting('prefer_vost', bool)
 quality = plugin.get_setting('quality', int)
@@ -104,7 +106,7 @@ def index():
               options={'json_url': base_url + '/guide/{lang}/plus7/derniere_chance.json'})
 @plugin.route('/themes/<theme>', name='show_theme',
               options={'json_url': base_url + '/guide/{lang}/plus7/par_themes.json'})
-def list(json_url, theme=None):
+def list_items(json_url, theme=None):
     plugin.set_content('tvshows')
 
     payload = {}
@@ -127,7 +129,6 @@ def list(json_url, theme=None):
                 'duration': str(video['duration']),
                 'genre': video['video_channels'] if video['video_channels'] else '',
                 'plot': video['desc'] if video['desc'] else '',
-                #'aired': video['airdate_long'].encode('utf-8') if video['airdate_long'] is not None else '',
             },
             'properties': {
                 'fanart_image': video['image_url'],
@@ -136,7 +137,7 @@ def list(json_url, theme=None):
                 (plugin.get_string(30021), actions.background(plugin.url_for('download', id=str(video['em'])))),
             ],
         }
-        #item['context_menu'].append((plugin.get_string(30020), plugin.url_for('enqueue', item=item)))
+        # item['context_menu'].append((plugin.get_string(30020), plugin.url_for('enqueue', item=item)))
         items.append(item)
     return plugin.finish(items)
 
@@ -150,30 +151,30 @@ def show_themes():
     return plugin.finish(items)
 
 
-@plugin.route('/play/<id>', name='play')
-def play(id):
-    return plugin.set_resolved_url(create_item(id))
+@plugin.route('/play/<vid>', name='play')
+def play(vid):
+    return plugin.set_resolved_url(create_item(vid))
 
 
-#@plugin.route('/enqueue/<item>', name='enqueue')
-#def enqueue(item):
-#    plugin.add_to_playlist([item])
+# @plugin.route('/enqueue/<item>', name='enqueue')
+# def enqueue(item):
+#     plugin.add_to_playlist([item])
 
 
-@plugin.route('/download/<id>', name='download')
-def download_file(id):
+@plugin.route('/download/<vid>', name='download')
+def download_file(vid):
     if download_folder:
-        video = create_item(id, True)
-        filename = id + '_' + video['label'] + os.extsep + 'mp4'
+        video = create_item(vid, True)
+        filename = vid + '_' + video['label'] + os.extsep + 'mp4'
         block_sz = 8192
         f = open(os.path.join(download_folder, filename), 'wb')
         u = urllib2.urlopen(video['path'])
         plugin.notify(filename, plugin.get_string(30007))
         while True:
-            buffer = u.read(block_sz)
-            if not buffer:
+            buff = u.read(block_sz)
+            if not buff:
                 break
-            f.write(buffer)
+            f.write(buff)
         f.close()
         plugin.notify(filename, plugin.get_string(30008))
     else:
@@ -190,9 +191,8 @@ def play_live():
     })
 
 
-quality_map = {0: 'SQ', 1: 'EQ', 2: 'HQ', 3: 'MQ'}
-def create_item(id, safe_title=False):
-    data = load_json(video_json.format(id=id, lang=language[0].upper(), protocol=protocol))
+def create_item(vid, safe_title=False):
+    data = load_json(video_json.format(id=vid, lang=language[0].upper(), protocol=protocol))
     filtered = []
     video = None
     # we try every quality (starting from the preferred one)
@@ -220,11 +220,11 @@ def create_item(id, safe_title=False):
 #       2 = Version inverse de langue URL
 #       3 = VO-STF VOSTF
 #       8 = VF-STMF ST sourds/mal
-def match(item, quality, vost=False):
-    return ((item['VQU'] == quality) and ((vost and item['versionProg'] == '3') or (not vost and item['versionProg'] == '1')))
+def match(item, chosen_quality, vost=False):
+    return (item['VQU'] == chosen_quality) and ((vost and item['versionProg'] == '3') or (not vost and item['versionProg'] == '1'))
 
 
-def load_json(url, params={}):
+def load_json(url, params=None):
     r = requests.get(url, params=params, headers=headers)
     return r.json()
 
