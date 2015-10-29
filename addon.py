@@ -24,6 +24,7 @@ from xbmcswift2 import actions
 import requests
 import os
 import urllib2
+# import datetime
 
 
 plugin = Plugin()
@@ -40,43 +41,74 @@ video_json = base_url + '/papi/tvguide/videos/stream/player/{lang}/{id}_PLUS7-{l
 # lang : F | D
 live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
 
-# http://www.arte.tv/guide/{lang}/plus7/par_dates.json?value={date}
-# lang : fr | de
-# date : date sous la forme yyyy-mm-jj
+# http://www.arte.tv/papi/tvguide/videos/plus7/program/{lang}/{detailLevel}/{category}/{cluster}/{recommended}/{sort}/{limit}/{offset}/DE_FR.json
+# lang : F | D
+# detailLevel : L2 | L3 (the higher the most verbose)
+# category : categorie (HIS... see below)
+# cluster : emission (VMI... see below)
+# recommended : 1 | -1
+# sort : AIRDATE_DESC | AIRDATE_ASC | ALPHA | VIEWS | LAST_CHANCE
+# limit : n of results
+# offset : starts at 1
+#
+# cluster : emission
+# 28 Minutes                        VMI
+# 360° GEO                          TSG
+# ARTE Journal                      AJT
+# ARTE Junior                       JUN
+# ARTE Reportage                    JTE
+# Au cœur de la nuit                ACN
+# Cinéma sur ARTE                   FIL
+# Court-circuit                     COU
+# Cuisines des terroirs             CUI
+# Futuremag                         FUM
+# Karambolage                       KAR
+# Le Dessous des cartes             DCA
+# Maestro                           MAE
+# Metropolis                        MTR
+# Personne ne bouge !               PNB
+# Philosophie                       PHI
+# Square                            SUA
+# Tracks                            TRA
+# Vox Pop                           VOX
+# X:enius                           XEN
+# Yourope                           YOU
+#
+# category : categories
+# Actu & société                    ACT
+# Séries & fiction                  FIC
+# Cinéma                            CIN
+# Arts & spectacles classiques      ART
+# Culture pop                       CUL
+# Découverte                        DEC
+# Histoire                          HIS
+# Junior                            JUN
+listing_json = base_url + '/papi/tvguide/videos/plus7/program/{lang}/L2/{category}/{cluster}/{highlight}/{sort}/{limit}/{offset}/DE_FR.json'
 
-# http://www.arte.tv/guide/{lang}/plus7/par_themes.json?value={genre}
-# lang  : fr | de
-# genre : trigramme du genre (ACT DOC DEC EUR GEO SOC JUN AUT CIN ART CUL ENV)
+def get_menu_items():
+    return [(plugin.url_for('listing'),                                   30001), # new http://www.arte.tv/papi/tvguide/videos/plus7/program/F/L2/ALL/ALL/-1/AIRDATE_DESC/0/0/DE_FR.json
+            (plugin.url_for('listing', highlight='1', limit='6'),         30002), # selection http://www.arte.tv/papi/tvguide/videos/plus7/program/F/L2/ALL/ALL/1/AIRDATE_DESC/6/0/DE_FR.json
+            (plugin.url_for('listing', sort='VIEWS', limit='20'),         30003), # most_viewed http://www.arte.tv/papi/tvguide/videos/plus7/program/F/L2/ALL/ALL/-1/VIEWS/0/0/DE_FR.json
+            (plugin.url_for('listing', sort='LAST_CHANCE', limit='20'),   30004), # last chance http://www.arte.tv/papi/tvguide/videos/plus7/program/F/L2/ALL/ALL/-1/LAST_CHANCE/0/0/DE_FR.json
+            (plugin.url_for('categories'),                                30005)] # categories http://www.arte.tv/papi/tvguide/videos/plus7/program/F/L2/XXX/ALL/-1/AIRDATE_DESC/0/0/DE_FR.json
 
-# http://www.arte.tv/guide/{lang}/plus7/par_emissions.json?value={emission}
-# lang     : fr | de
-# emission : trigramme de l'emission (VMI TSG AJT JTE COU FUM KAR DCA MTR PNB PHI SUA TRA VOX XEN YOU
 
-categories = [('new',         30001),
-              ('selection',   30002),
-              ('most_viewed', 30003),
-              ('last_chance', 30004),
-              ('themes',      30005)]
-
-themes = [('ACT', 3000501),
-          ('DOC', 3000502),
-          ('DEC', 3000503),
-          ('EUR', 3000504),
-          ('GEO', 3000505),
-          ('SOC', 3000506),
-          ('JUN', 3000507),
-          ('AUT', 3000508),
-          ('CIN', 3000509),
-          ('ART', 3000510),
-          ('CUL', 3000511),
-          ('ENV', 3000512)]
+def get_categories():
+    return [('ACT', 3000501),
+            ('FIC', 3000502),
+            ('CIN', 3000503),
+            ('ART', 3000504),
+            ('CUL', 3000505),
+            ('DEC', 3000506),
+            ('HIS', 3000507),
+            ('JUN', 3000508)]
 
 headers = {'user-agent': plugin.name + '/' + plugin.addon.getAddonInfo('version')}
 
 quality_map = {0: 'SQ', 1: 'EQ', 2: 'HQ', 3: 'MQ'}
 
 # Settings
-language = 'fr' if plugin.get_setting('lang', int) == 0 else 'de'
+language = 'FR' if plugin.get_setting('lang', int) == 0 else 'DE'
 prefer_vost = plugin.get_setting('prefer_vost', bool)
 quality = plugin.get_setting('quality', int)
 protocol = 'HBBTV' if plugin.get_setting('protocol', int) == 0 else 'RMP4'
@@ -87,9 +119,9 @@ download_quality = plugin.get_setting('download_quality', int)
 @plugin.route('/')
 def index():
     items = [{
-        'label': plugin.get_string(value),
-        'path': plugin.url_for('show_' + key)
-    } for key, value in categories]
+        'label': plugin.get_string(sid),
+        'path': path
+    } for path, sid in get_menu_items()]
     items.append({
         'label': plugin.get_string(30006),
         'path': plugin.url_for('play_live'),
@@ -98,45 +130,48 @@ def index():
     return items
 
 
-@plugin.route('/new', name='show_new',
-              options={'json_url': base_url + '/guide/{lang}/plus7.json'})
-@plugin.route('/selection', name='show_selection',
-              options={'json_url': base_url + '/guide/{lang}/plus7/selection.json'})
-@plugin.route('/most_viewed', name='show_most_viewed',
-              options={'json_url': base_url + '/guide/{lang}/plus7/plus_vues.json'})
-@plugin.route('/last_chance', name='show_last_chance',
-              options={'json_url': base_url + '/guide/{lang}/plus7/derniere_chance.json'})
-@plugin.route('/themes/<theme>', name='show_theme',
-              options={'json_url': base_url + '/guide/{lang}/plus7/par_themes.json'})
-def list_items(json_url, theme=None):
+@plugin.route('/listing', name='listing')
+def show_listing():
     plugin.set_content('tvshows')
 
-    payload = {}
-    if theme:
-        payload['value'] = theme
+    # very ugly workaround ahead (plugin.request.args.XXX returns an array for unknown reason)
+    url = listing_json.format(lang=language[0],
+                              category=plugin.request.args.get('category', ['ALL'])[0],
+                              cluster=plugin.request.args.get('cluster', ['ALL'])[0],
+                              highlight=plugin.request.args.get('highlight', ['-1'])[0],
+                              sort=plugin.request.args.get('sort', ['AIRDATE_DESC'])[0],
+                              limit=plugin.request.args.get('limit', ['0'])[0],
+                              offset=plugin.request.args.get('offset', ['0'])[0])
 
-    data = load_json(json_url.format(lang=language), payload)
+    data = load_json(url)
+
+    listing_key = 'program{lang}List'.format(lang=language)
 
     items = []
-    for video in data['videos']:
+    for video in data[listing_key]:
+        vdo = video['VDO']
         item = {
-            'label': video['title'],
-            'path': plugin.url_for('play', vid=str(video['em'])),
-            'thumbnail': video['image_url'],
+            'label': vdo.get('VTI'),
+            'path': plugin.url_for('play', vid=str(vdo.get('VPI'))),
+            'thumbnail': vdo.get('VTU').get('IUR'),
             'is_playable': True,
             'info_type': 'video',
             'info': {
-                'label': video['title'],
-                'title': video['title'],
-                'duration': str(video['duration']),
-                'genre': video['video_channels'] if video['video_channels'] else '',
-                'plot': video['desc'] if video['desc'] else '',
+                'label': vdo.get('VTI'),
+                'title': vdo.get('VTI'),
+                'duration': str(vdo.get('VDU')),
+                'genre': vdo.get('VCG'),
+                'plot': vdo.get('VDE'),
+                'plotoutline': vdo.get('V7T'),
+                'year': vdo.get('productionYear'),
+                'director': vdo.get('PPD'),
+                #'aired': datetime.datetime.strptime(vdo.get('VDA')[:-6], '%d/%m/%Y %H:%M:%S').strftime('%Y-%m-%d') if vdo.get('VDA') else None
             },
             'properties': {
-                'fanart_image': video['image_url'],
+                'fanart_image': vdo.get('VTU').get('IUR'),
             },
             'context_menu': [
-                (plugin.get_string(30021), actions.background(plugin.url_for('download', vid=str(video['em'])))),
+                (plugin.get_string(30021), actions.background(plugin.url_for('download', vid=str(vdo.get('VPI'))))),
             ],
         }
         # item['context_menu'].append((plugin.get_string(30020), plugin.url_for('enqueue', item=item)))
@@ -144,12 +179,12 @@ def list_items(json_url, theme=None):
     return plugin.finish(items)
 
 
-@plugin.route('/show_themes', name='show_themes')
-def show_themes():
+@plugin.route('/categories', name='categories')
+def show_categories():
     items = [{
         'label': plugin.get_string(value),
-        'path': plugin.url_for('show_theme', theme=key)
-    } for key, value in themes]
+        'path': plugin.url_for('listing', sort='AIRDATE_DESC', category=key)
+    } for key, value in get_categories()]
     return plugin.finish(items)
 
 
