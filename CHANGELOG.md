@@ -1,3 +1,7 @@
+# Version 0.5.1
+
+* fixed download when RTMP playback is selected
+
 # Version 0.5.0
 
 * Switched to a new API

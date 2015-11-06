@@ -228,13 +228,16 @@ def play_live():
     })
 
 
-def create_item(vid, safe_title=False):
-    data = load_json(video_json.format(id=vid, lang=language[0].upper(), protocol=protocol))
+def create_item(vid, downloading=False):
+    chosen_protocol = protocol if not downloading else 'HBBTV'
+    chosen_quality = quality if not downloading else download_quality
+
+    data = load_json(video_json.format(id=vid, lang=language[0].upper(), protocol=chosen_protocol))
     filtered = []
     video = None
+
     # we try every quality (starting from the preferred one)
     # if it is not found, try every other from highest to lowest
-    chosen_quality = download_quality if safe_title else quality
     for q in [quality_map[chosen_quality]] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality_map[chosen_quality]]:
         # vost preferred
         if prefer_vost:
@@ -247,7 +250,7 @@ def create_item(vid, safe_title=False):
             video = filtered[0]
             break
     return {
-        'label': data['videoJsonPlayer']['VST']['VNA'] if safe_title else data['videoJsonPlayer']['VTI'],
+        'label': data['videoJsonPlayer']['VST']['VNA'] if downloading else data['videoJsonPlayer']['VTI'],
         'path': video['url']
     }
 
