@@ -176,7 +176,7 @@ def show_listing():
         }
         # item['context_menu'].append((plugin.get_string(30020), plugin.url_for('enqueue', item=item)))
         items.append(item)
-    return plugin.finish(items)
+    return plugin.finish(items, view_mode = 504)
 
 
 @plugin.route('/categories', name='categories')
