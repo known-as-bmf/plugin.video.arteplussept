@@ -10,10 +10,10 @@
     <string id="30005">Themen</string>
     <string id="30005">Live</string>
 
-    <string id="30007">Lädt herunter</string>
+    <string id="30007">Laedt herunter</string>
     <string id="30008">Fertig heruntergeladen</string>
     <string id="30009">Fehler</string>
-    <string id="30010">Bitte wählen Sie ein Downloadverzeichnis in den Einstellungen</string>
+    <string id="30010">Bitte waehlen Sie ein Downloadverzeichnis in den Einstellungen</string>
 
     <!-- context menu -->
     <string id="30020">Zur Warteschlange hinzufügen</string>
@@ -26,6 +26,7 @@
     <string id="30053">Streamingprotokol</string>
     <string id="30054">Downloadverzeichnis</string>
     <string id="30055">Videoqualität der Downloads</string>
+    <string id="30056">Video Informationen anzeigen</string>
 
     <!-- categories -->
     <string id="3000501">Aktuelles &amp; Gesellschaft</string>

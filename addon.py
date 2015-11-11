@@ -114,6 +114,7 @@ quality = plugin.get_setting('quality', int)
 protocol = 'HBBTV' if plugin.get_setting('protocol', int) == 0 else 'RMP4'
 download_folder = plugin.get_setting('download_folder', str)
 download_quality = plugin.get_setting('download_quality', int)
+view_mode = 504 if plugin.get_setting( "show_info", bool ) == True else None
 
 
 @plugin.route('/')
@@ -176,7 +177,7 @@ def show_listing():
         }
         # item['context_menu'].append((plugin.get_string(30020), plugin.url_for('enqueue', item=item)))
         items.append(item)
-    return plugin.finish(items)
+    return plugin.finish(items, view_mode = view_mode)
 
 
 @plugin.route('/categories', name='categories')
