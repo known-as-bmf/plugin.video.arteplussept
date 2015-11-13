@@ -1,6 +1,9 @@
 # Version 0.5.1
 
 * fixed download when RTMP playback is selected
+* fixed german translation (thanks to https://github.com/hstraub)
+* Added ability to browse by date
+* Added queuing system for videos via context menu
 
 # Version 0.5.0
 
