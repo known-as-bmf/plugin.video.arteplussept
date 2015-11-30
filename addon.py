@@ -1,4 +1,5 @@
-#!/usr/bin/python
+
+# coding=utf-8
 # -*- coding: utf-8 -*-
 #
 # plugin.video.arteplussept, Kodi add-on to watch videos from http://www.arte.tv/guide/fr/plus7/
@@ -167,7 +168,9 @@ def show_listing():
 
     items = []
     for video in data[listing_key]:
-        items.append(create_item(video['VDO']))
+        item = create_item(video.get('VDO'))
+        #item['info']['mpaa'] = video.get('mediaRating' + language[0])
+        items.append(item)
     return plugin.finish(items)
 
 
@@ -206,6 +209,7 @@ def download_file(vid):
         block_sz = 8192
         f = open(os.path.join(download_folder, filename), 'wb')
         u = urllib2.urlopen(video['path'])
+
         plugin.notify(filename, plugin.get_string(30010))
         while True:
             buff = u.read(block_sz)

@@ -1,3 +1,7 @@
+# Version 0.5.2
+
+* encoding fix (download notification)
+
 # Version 0.5.1
 
 * fixed download when RTMP playback is selected

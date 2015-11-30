@@ -1,3 +1,6 @@
+v0.5.2
+- encoding fix (download notification)
+
 v0.5.1
 - fixed download when RTMP playback is selected
 - fixed german translation (thanks to https://github.com/hstraub)
