@@ -27,6 +27,7 @@ import os
 import urllib2
 import time
 import datetime
+import math
 
 
 plugin = Plugin()
@@ -153,11 +154,13 @@ def show_listing():
 
     # very ugly workaround ahead (plugin.request.args.XXX returns an array for unknown reason)
     json_url = plugin.request.args.get('json', [listing_json])[0]
+
+    sort = plugin.request.args.get('sort', ['AIRDATE_DESC'])[0]
     url = json_url.format(lang=language[0],
                           category=plugin.request.args.get('category', ['ALL'])[0],
                           cluster=plugin.request.args.get('cluster', ['ALL'])[0],
                           highlight=plugin.request.args.get('highlight', ['-1'])[0],
-                          sort=plugin.request.args.get('sort', ['AIRDATE_DESC'])[0],
+                          sort=sort,
                           limit=plugin.request.args.get('limit', ['0'])[0],
                           offset=plugin.request.args.get('offset', ['0'])[0],
                           date=plugin.request.args.get('date', [''])[0])
@@ -168,7 +171,9 @@ def show_listing():
 
     items = []
     for video in data[listing_key]:
-        item = create_item(video.get('VDO'))
+        item = create_item(video.get('VDO'), {'show_airtime': plugin.request.args.get('date'),
+                                              'show_deletetime': sort == 'LAST_CHANCE',
+                                              'show_views': sort == 'VIEWS'})
         #item['info']['mpaa'] = video.get('mediaRating' + language[0])
         items.append(item)
     return plugin.finish(items)
@@ -232,17 +237,31 @@ def play_live():
     })
 
 
-def create_item(data):
-    airdate = None
+def create_item(data, options=None):
+    options = options or {}
+
     if data.get('VDA'): # airdate found
-            # workaround for datetime.strptime not working (NoneType ???)
-        try:
-            airdate = datetime.datetime.strptime(data.get('VDA')[:-6], '%d/%m/%Y %H:%M:%S')
-        except TypeError:
-            airdate = datetime.datetime.fromtimestamp(time.mktime(time.strptime(data.get('VDA')[:-6], '%d/%m/%Y %H:%M:%S')))
+        airdate = parse_date(data.get('VDA')[:-6])
+    if data.get('VRU'): # deletion found
+        deletiondate = parse_date(data.get('VRU')[:-6])
+
+    label = ''
+    # prefixes
+    if options.get('show_airtime'):
+        label += '[COLOR fffa481c]{d.hour:02}:{d.minute:02}[/COLOR] '.format(d=airdate)
+    if options.get('show_deletetime'):
+        label += '[COLOR ffff0000]{d:%a} {d:%d} {d.hour:02}:{d.minute:02}[/COLOR] '.format(d=deletiondate)
+    if options.get('show_views'):
+        label += '[COLOR ff00aae3]{v:>6}[/COLOR] '.format(v=parse_views(data.get('VVI')))
+
+    label += '[B]{title}[/B]'.format(title=data.get('VTI').encode('utf8'))
+
+    # suffixes
+    if data.get('VSU'):
+        label += ' - {subtitle}'.format(subtitle=data.get('VSU').encode('utf8'))
 
     item = {
-        'label': data.get('VTI'),
+        'label': label,
         'path': plugin.url_for('play', vid=str(data.get('VPI'))),
         'thumbnail': data.get('VTU').get('IUR'),
         'is_playable': True,
@@ -308,6 +327,30 @@ def match(item, chosen_quality, vost=False):
 def load_json(url, params=None):
     r = requests.get(url, params=params, headers=headers)
     return r.json()
+
+
+# cosmetic parse functions
+def parse_date(datestr):
+    date = None
+    # workaround for datetime.strptime not working (NoneType ???)
+    try:
+        date = datetime.datetime.strptime(datestr, '%d/%m/%Y %H:%M:%S')
+    except TypeError:
+        date = datetime.datetime.fromtimestamp(time.mktime(time.strptime(datestr, '%d/%m/%Y %H:%M:%S')))
+    return date
+
+
+def parse_views(viewsstr):
+    views = float(viewsstr)
+    human_readable_unit = ''
+    for unit in ['', 'K', 'M', 'B']:
+        div_views = (views / 1000)
+        if div_views >= 1.0:
+            views = div_views
+        else:
+            human_readable_unit = unit
+            break
+    return '{:.1f}'.format(views).rstrip('0').rstrip('.') + human_readable_unit
 
 
 if __name__ == '__main__':
