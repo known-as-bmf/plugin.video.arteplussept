@@ -169,6 +169,8 @@ def show_listing():
     listing_key = 'program{lang}List'.format(lang=language)
 
     items = []
+    if not data.get(listing_key):
+        return plugin.finish(items)
     for video in data[listing_key]:
         item = create_item(video.get('VDO'), {'show_airtime': plugin.request.args.get('date'),
                                               'show_deletetime': sort == 'LAST_CHANCE',
@@ -229,7 +231,7 @@ def download_file(vid):
 @plugin.route('/live', name='live')
 def play_live():
     data = load_json(live_json.format(lang=language[0].upper()))
-    url = data['video']['VSR'][1]['VUR']
+    url = data['video']['VSR'][0]['VUR']
     return plugin.set_resolved_url(url)#{
     #    'label': data['video']['VTI'],
     #    #'path': (url + ' live=1')
@@ -350,7 +352,7 @@ def parse_views(viewsstr):
         else:
             human_readable_unit = unit
             break
-    return '{:.1f}'.format(views).rstrip('0').rstrip('.') + human_readable_unit
+    return '{v:.1f}'.format(v=views).rstrip('0').rstrip('.') + human_readable_unit
 
 
 if __name__ == '__main__':
