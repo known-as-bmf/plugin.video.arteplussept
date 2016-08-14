@@ -271,7 +271,7 @@ def create_item(data, options=None):
         'info': {
             'label': data.get('VTI'),
             'title': data.get('VTI'),
-            'duration': str(data.get('VDU')),
+            'duration': str(data.get('VDU')*60),
             'genre': data.get('VCG'),
             'plot': data.get('VDE'),
             'plotoutline': data.get('V7T'),
