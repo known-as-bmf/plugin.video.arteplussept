@@ -98,14 +98,14 @@ def get_menu_items():
 
 
 def get_categories():
-    return [('ACT', 3000501),
-            ('FIC', 3000502),
-            ('CIN', 3000503),
-            ('ART', 3000504),
-            ('CUL', 3000505),
-            ('DEC', 3000506),
-            ('HIS', 3000507),
-            ('JUN', 3000508)]
+    return [('actu-societe', 3000501),
+            ('series-fiction', 3000502),
+            ('cinema', 3000503),
+            ('arts-spectacles-classiques', 3000504),
+            ('culture-pop', 3000505),
+            ('decouverte', 3000506),
+            ('histoire', 3000507),
+            ('junior', 3000508)]
 
 
 def get_dates():
