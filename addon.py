@@ -185,17 +185,23 @@ def show_listing():
         items.append(item)
     return plugin.finish(items)
 
+def get_last7days():
+    dates = [a[0] for a in get_dates()]
+    progs = []
+    for date in dates:
+        progs += get_listing(date)
+    return progs
 
-def get_listing():
-    today = get_dates()[0][0]
-    url = daily_json.format(date=today)
+def get_listing(date):
+    #today = get_dates()[0][0]
+    url = daily_json.format(date=date)
     data = load_json(url)
     return data['programs'] 
     
 @plugin.route('/listing', name='listing')
 #def show_listing():
 def get_items():
-    Programms = get_listing()
+    Programms = get_last7days()
     plugin.set_content('tvshows')
     items = []
     for prog in Programms:
