@@ -38,7 +38,8 @@ base_url = 'http://www.arte.tv'
 # protocol : HBBTV | RTMP
 # quality  : SQ (High) | EQ (Med) | HQ (Low)
 video_json = base_url + '/papi/tvguide/videos/stream/player/{lang}/{id}_PLUS7-{lang}/{protocol}/ALL.json'
-
+video_json = 'https://api.arte.tv/api/player/v1/config/{lang}/{id}'
+daily_json = 'https://www.arte.tv/hbbtvv2/services/web/index.php/OPA/v3/programs/{date}/de'
 # http://www.arte.tv/papi/tvguide/videos/livestream/{lang}/
 # lang : F | D
 live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
@@ -144,10 +145,15 @@ def index():
         'path': plugin.url_for('live'),
         'is_playable': True
     })
+    items.append({
+        'label': 'Penis',
+        'path': 'Penis',
+        'is_playable': True
+    })
     return items
 
 
-@plugin.route('/listing', name='listing')
+#@plugin.route('/listing', name='listing')
 def show_listing():
     plugin.set_content('tvshows')
 
@@ -179,6 +185,34 @@ def show_listing():
         items.append(item)
     return plugin.finish(items)
 
+
+def get_listing():
+    today = get_dates()[0][0]
+    url = daily_json.format(date=today)
+    data = load_json(url)
+    return data['programs'] 
+    
+@plugin.route('/listing', name='listing')
+#def show_listing():
+def get_items():
+    Programms = get_listing()
+    plugin.set_content('tvshows')
+    items = []
+    for prog in Programms:
+        programId = prog['program']['programId']
+        item = {
+            'label': prog['program']['title'],
+            'path': plugin.url_for('play', vid=programId),
+            'thumbnail': prog['program']['imageUrl'],
+            'is_playable': True,
+            'info_type': 'video',
+            'info': {
+                'label': 'penis',
+                }
+            }
+            
+        items.append(item)
+    return plugin.finish(items)
 
 @plugin.route('/dates', name='dates')
 def show_dates():
@@ -293,19 +327,15 @@ def create_video(vid, downloading=False):
     chosen_protocol = protocol if not downloading else 'HBBTV'
     chosen_quality = quality if not downloading else download_quality
 
-    data = load_json(video_json.format(id=vid, lang=language[0].upper(), protocol=chosen_protocol))
+    #data = load_json(video_json.format(id=vid, lang=language[0].upper(), protocol=chosen_protocol))
+    data = load_json(video_json.format(id=vid, lang=language.lower()))
     filtered = []
     video = None
 
     # we try every quality (starting from the preferred one)
     # if it is not found, try every other from highest to lowest
     for q in [quality_map[chosen_quality]] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality_map[chosen_quality]]:
-        # vost preferred
-        if prefer_vost:
-            filtered = [item for item in data['videoJsonPlayer']['VSR'].values() if match(item, q, True)]
-        # no vost found or vost not preferred
-        if len(filtered) == 0:
-            filtered = [item for item in data['videoJsonPlayer']['VSR'].values() if match(item, q)]
+        filtered = [item for item in data['videoJsonPlayer']['VSR'].values() if match2(item,q,language)]
         # here len(filtered) sould be 1
         if len(filtered) == 1:
             video = filtered[0]
@@ -316,6 +346,8 @@ def create_video(vid, downloading=False):
         'thumbnail': data['videoJsonPlayer']['VTU']['IUR']
     }
 
+def match2(item, quality, lan):
+    return (item['quality'] == quality) and (item['versionShortLibelle'] == lan)
 
 # versionProg :
 #       1 = Version langue URL
