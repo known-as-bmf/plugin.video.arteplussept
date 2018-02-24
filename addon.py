@@ -145,11 +145,6 @@ def index():
         'path': plugin.url_for('live'),
         'is_playable': True
     })
-    items.append({
-        'label': 'Penis',
-        'path': 'Penis',
-        'is_playable': True
-    })
     return items
 
 
@@ -213,7 +208,7 @@ def get_items():
             'is_playable': True,
             'info_type': 'video',
             'info': {
-                'label': 'penis',
+                'label': 'Todo',
                 }
             }
             
