@@ -73,9 +73,12 @@ def index():
     return items
 
 
-flatten = lambda l: [item for sublist in l for item in sublist]
+def flatten(l):
+  return [item for sublist in l for item in sublist]
+
+
 def get_last7days():
-    return flatten(map(lambda (date, _): get_day(date), get_dates()))
+    return flatten([get_day(date) for (date, _) in get_dates()])
 
 
 def get_day(date):
@@ -88,10 +91,9 @@ def get_day(date):
 def all_videos():
     plugin.set_content('tvshows')
 
-    programs = get_last7days()
-    playable_items = filter(lambda program: program.get('video') is not None, programs)
-    items = map(lambda program: create_item(program), playable_items)
-    # sort by airdate
+    # create list item & filter programs without 'video' (live streams ?)
+    items = [create_item(program) for program in get_last7days() if program.get('video') is not None]
+    # sort by airdate desc
     items.sort(key=lambda item: item['info']['aired'], reverse=True)
 
     return plugin.finish(items)
@@ -154,7 +156,7 @@ def create_item(data):
             # year is not correctly used by kodi :(
             # the aired year will be used by kodi for production year :(
             'year': int(video.get('productionYear')),
-            'country': map(lambda d: d['label'], video.get('productionCountries')),
+            'country': [country['label'] for country in video.get('productionCountries')],
             'director': video.get('director'),
             'aired': str(airdate)
         },
