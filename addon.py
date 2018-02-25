@@ -39,7 +39,7 @@ base_url = 'http://www.arte.tv'
 # quality  : SQ (High) | EQ (Med) | HQ (Low)
 video_json = base_url + '/papi/tvguide/videos/stream/player/{lang}/{id}_PLUS7-{lang}/{protocol}/ALL.json'
 video_json = 'https://api.arte.tv/api/player/v1/config/{lang}/{id}'
-daily_json = 'https://www.arte.tv/hbbtvv2/services/web/index.php/OPA/v3/programs/{date}/de'
+daily_json = 'https://www.arte.tv/hbbtvv2/services/web/index.php/OPA/v3/programs/{date}/{lang}'
 # http://www.arte.tv/papi/tvguide/videos/livestream/{lang}/
 # lang : F | D
 live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
@@ -188,8 +188,7 @@ def get_last7days():
     return progs
 
 def get_listing(date):
-    #today = get_dates()[0][0]
-    url = daily_json.format(date=date)
+    url = daily_json.format(date=date, lang=language.lower())
     data = load_json(url)
     return data['programs'] 
     
@@ -348,6 +347,8 @@ def create_video(vid, downloading=False):
     }
 
 def match2(item, quality, lan):
+    # "versionShortLibelle' is language of the stream 
+     #DE/FR for german/french, and e.g. DE-ES is german with spanish subtitles
     return (item['quality'] == quality) and (item['versionShortLibelle'] == lan)
 
 # versionProg :
