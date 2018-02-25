@@ -1,7 +1,7 @@
 v0.5.8
-- Can now use new api see Iss35,
-- Can get all videos for a day, allvideos for last 7 days 
-- Most other functions still broken
+- Can now use new api see issue #35,
+- Now gets all videos for last 7 days (can take a while)
+- Most other functions removed
 
 v0.5.4
 - updated dependency version
