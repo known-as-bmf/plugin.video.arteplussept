@@ -32,61 +32,8 @@ import datetime
 plugin = Plugin()
 
 base_url = 'http://www.arte.tv'
-
-# http://www.arte.tv/papi/tvguide/videos/stream/{lang}/{id}_PLUS7-{lang}/{protocol}/{quality}.json
-# lang     : F | D
-# protocol : HBBTV | RTMP
-# quality  : SQ (High) | EQ (Med) | HQ (Low)
-video_json = base_url + '/papi/tvguide/videos/stream/player/{lang}/{id}_PLUS7-{lang}/{protocol}/ALL.json'
 video_json = 'https://api.arte.tv/api/player/v1/config/{lang}/{id}'
 daily_json = base_url + '/hbbtvv2/services/web/index.php/OPA/v3/programs/{date}/{lang}'
-# http://www.arte.tv/papi/tvguide/videos/livestream/{lang}/
-# lang : F | D
-live_json = base_url + '/papi/tvguide/videos/livestream/{lang}/'
-
-# http://www.arte.tv/papi/tvguide/videos/plus7/program/{lang}/{detailLevel}/{category}/{cluster}/{recommended}/{sort}/{limit}/{offset}/DE_FR.json
-# lang : F | D
-# detailLevel : L2 | L3 (the higher the most verbose)
-# category : categorie (HIS... see below)
-# cluster : emission (VMI... see below)
-# recommended : 1 | -1
-# sort : AIRDATE_DESC | AIRDATE_ASC | ALPHA | VIEWS | LAST_CHANCE
-# limit : n of results
-# offset : starts at 1
-#
-# cluster : emission
-# 28 Minutes                        VMI
-# 360° GEO                          TSG
-# ARTE Journal                      AJT
-# ARTE Junior                       JUN
-# ARTE Reportage                    JTE
-# Au cœur de la nuit                ACN
-# Cinéma sur ARTE                   FIL
-# Court-circuit                     COU
-# Cuisines des terroirs             CUI
-# Futuremag                         FUM
-# Karambolage                       KAR
-# Le Dessous des cartes             DCA
-# Maestro                           MAE
-# Metropolis                        MTR
-# Personne ne bouge !               PNB
-# Philosophie                       PHI
-# Square                            SUA
-# Tracks                            TRA
-# Vox Pop                           VOX
-# X:enius                           XEN
-# Yourope                           YOU
-#
-# category : categories
-# Actu & société                    ACT
-# Séries & fiction                  FIC
-# Cinéma                            CIN
-# Arts & spectacles classiques      ART
-# Culture pop                       CUL
-# Découverte                        DEC
-# Histoire                          HIS
-# Junior                            JUN
-listing_json = base_url + '/papi/tvguide/videos/plus7/program/{lang}/L2/{category}/{cluster}/{highlight}/{sort}/{limit}/{offset}/DE_FR/{date}.json'
 
 headers = {'user-agent': plugin.name + '/' + plugin.addon.getAddonInfo('version')}
 
@@ -101,7 +48,7 @@ download_quality = plugin.get_setting('download_quality', int)
 
 
 def get_menu_items():
-    return [(plugin.url_for('all'), 30001)] # categories http://www.arte.tv/papi/tvguide/videos/plus7/program/F/L2/XXX/ALL/-1/AIRDATE_DESC/0/0/DE_FR.json
+    return [(plugin.url_for('all'), 30001)]
 
 
 def get_dates():
@@ -144,6 +91,8 @@ def all_videos():
     programs = get_last7days()
     playable_items = filter(lambda program: program.get('video') is not None, programs)
     items = map(lambda program: create_item(program), playable_items)
+    # sort by airdate
+    items.sort(key=lambda item: item['info']['aired'], reverse=True)
 
     return plugin.finish(items)
 
@@ -197,13 +146,15 @@ def create_item(data):
         'is_playable': True,
         'info_type': 'video',
         'info': {
-            'label': video.get('title'),
             'title': video.get('title'),
-            'duration': str(video.get('durationSeconds')),
+            'duration': int(video.get('durationSeconds')),
             'genre': video.get('genrePresse'),
             'plot': video.get('shortDescription'),
             'plotoutline': video.get('teaserText'),
-            'year': video.get('productionYear'),
+            # year is not correctly used by kodi :(
+            # the aired year will be used by kodi for production year :(
+            'year': int(video.get('productionYear')),
+            'country': map(lambda d: d['label'], video.get('productionCountries')),
             'director': video.get('director'),
             'aired': str(airdate)
         },
