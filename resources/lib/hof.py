@@ -55,3 +55,10 @@ def get_property(d, path, default=None):
         return sub_d.get(segment)
     segments = path.split('.')
     return reduce(walk, segments, d) or default
+
+
+def merge_dicts(*args):
+    result = {}
+    for d in args:
+        result.update(d)
+    return result

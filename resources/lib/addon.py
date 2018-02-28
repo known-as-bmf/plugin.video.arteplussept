@@ -40,8 +40,12 @@ languages = [
     {'short': 'es', 'long': 'es_ES'},
     {'short': 'pl', 'long': 'pl_PL'}
 ]
-language = languages[plugin.get_setting('lang', int)] or languages[0]
+qualities = ['SQ', 'EQ', 'HQ', 'MQ']
 
+# defaults to fr
+language = languages[plugin.get_setting('lang', int)] or languages[0]
+# defaults to SQ
+quality = qualities[plugin.get_setting('quality', int)] or qualities[0]
 
 # my imports
 import api
@@ -53,23 +57,41 @@ def index():
     return [mapper.map_index_item(app_name, config) for app_name, config in api.apps().iteritems()]
 
 
-@plugin.route('/app/<app_name>', name='app')
-def app(app_name):
+@plugin.route('/app/<app_name>/<teasers_path>', name='app')
+def app(app_name, teasers_path):
     filters = api.filters(app_name)
 
-    return [mapper.map_app_item(app_name, config) for config in filters]
+    return [mapper.map_app_item(config, teasers_path) for config in filters]
 
 
-@plugin.route('/app/<app_name>/teaser/<teaser>', name='teaser')
-def teaser(app_name, teaser):
-    teasers = api.teasers(app_name, language.get('short', 'fr'))
+@plugin.route('/teaser/<teaser>/<teasers_path>', name='teaser')
+def teaser(teasers_path, teaser):
+    teasers = api.teasers(teasers_path, language.get('short', 'fr'))
 
     return [mapper.map_teaser_item(item) for item in teasers.get(teaser)]
 
 
-@plugin.route('/listing/<url>', name='listing')
-def listing(url):
-    return [{'label': 'todo'}]
+@plugin.route('/collection/<collection_id>', name='collection')
+def collection(collection_id):
+    plugin.set_content('tvshows')
+    items = [mapper.map_video(item) for item in api.collection(
+        collection_id, language.get('short', 'fr'))]
+    return plugin.finish(items)
+
+
+@plugin.route('/videos/<path>', name='videos')
+def videos(path):
+    plugin.set_content('tvshows')
+    items = [mapper.map_video(item) for item in api.videos(
+        path, language.get('short', 'fr'))]
+    return plugin.finish(items)
+
+
+@plugin.route('/play/<kind>/<program_id>', name='play')
+def play(kind, program_id):
+    streams = api.streams(kind, program_id, language.get('short', 'fr'))
+
+    return plugin.set_resolved_url(mapper.map_playable(streams, quality))
 
 
 # plugin bootstrap

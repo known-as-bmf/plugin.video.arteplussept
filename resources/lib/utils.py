@@ -6,11 +6,12 @@ import hof
 
 
 def format_title_and_subtitle(title, subtitle=None):
-    label = '[B]{title}[/B]'.format(title=title)
+    label = u'[B]{title}[/B]'.format(title=title)
     # suffixes
-    if subtitle is not None:
-        label += ' - {subtitle}'.format(subtitle=subtitle)
-  return label
+    if subtitle:
+        label += u' - {subtitle}'.format(subtitle=subtitle)
+    return label
+
 
 def color_dict_to_hex(color):
     rgb_str_dict = hof.reject_dict(lambda v, k: k == 'a', color)
