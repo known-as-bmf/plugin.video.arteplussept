@@ -23,19 +23,22 @@ from xbmcswift2 import Plugin
 
 
 # global declarations
-## plugin stuff
+# plugin stuff
 plugin = Plugin()
-class PluginInformation:
-  name = plugin.name
-  version = plugin.addon.getAddonInfo('version')
 
-## settings stuff
+
+class PluginInformation:
+    name = plugin.name
+    version = plugin.addon.getAddonInfo('version')
+
+
+# settings stuff
 languages = [
-  {'short': 'fr', 'long': 'fr_FR'},
-  {'short': 'de', 'long': 'de_DE'},
-  {'short': 'en', 'long': 'en_GB'},
-  {'short': 'es', 'long': 'es_ES'},
-  {'short': 'pl', 'long': 'pl_PL'}
+    {'short': 'fr', 'long': 'fr_FR'},
+    {'short': 'de', 'long': 'de_DE'},
+    {'short': 'en', 'long': 'en_GB'},
+    {'short': 'es', 'long': 'es_ES'},
+    {'short': 'pl', 'long': 'pl_PL'}
 ]
 language = languages[plugin.get_setting('lang', int)] or languages[0]
 
@@ -47,32 +50,28 @@ import mapper
 
 @plugin.route('/')
 def index():
-  return [mapper.map_index_item(name, config) for name, config in api.apps().iteritems()]
+    return [mapper.map_index_item(app_name, config) for app_name, config in api.apps().iteritems()]
 
 
-@plugin.route('/app/<name>', name='app')
-def app(name):
-  filters = api.filters(name)
+@plugin.route('/app/<app_name>', name='app')
+def app(app_name):
+    filters = api.filters(app_name)
 
-  return [mapper.map_app_item(config) for config in filters]
-
-@plugin.route('/app/<name>/<sub>', name='sub_app')
-def sub_app(name, sub):
-  filters = api.filters(name)
-
-  return [mapper.map_app_item(config) for config in filters]
+    return [mapper.map_app_item(app_name, config) for config in filters]
 
 
-@plugin.route('/teasers/<name>', name='teasers')
-def teasers(name):
-  teasers = api.teasers(name, language.get('short', 'fr'))
+@plugin.route('/app/<app_name>/teaser/<teaser>', name='teaser')
+def teaser(app_name, teaser):
+    teasers = api.teasers(app_name, language.get('short', 'fr'))
+
+    return [mapper.map_teaser_item(item) for item in teasers.get(teaser)]
 
 
 @plugin.route('/listing/<url>', name='listing')
 def listing(url):
-  pass
+    return [{'label': 'todo'}]
 
 
 # plugin bootstrap
 if __name__ == '__main__':
-  plugin.run()
+    plugin.run()
