@@ -11,7 +11,7 @@ def map_index_item(app_name, config):
     }
 
 
-def map_app_item(config, teasers_path):
+def map_app_item(app_name, config, teasers_path):
     item = {
         'label': utils.localized_string(config.get('label'))
     }
@@ -19,7 +19,7 @@ def map_app_item(config, teasers_path):
     if(app_type == 'button'):
         item.update(_map_app_button(config, teasers_path))
     if(app_type == 'list'):
-        item.update(_map_app_list(config, teasers_path))
+        item.update(_map_app_list(app_name, config, teasers_path))
     return item
 
 
@@ -32,11 +32,23 @@ def _map_app_button(config, teasers_path):
         return {'path': plugin.url_for('videos', path=url)}
 
 
-def _map_app_list(config, teasers_path):
+def _map_app_list(app_name, config, teasers_path):
     teaser = hof.get_property(config, 'data.teasers')
     if teaser:
         return {'path': plugin.url_for('teaser', teasers_path=teasers_path, teaser=teaser)}
-    return {}
+    # rubrique
+    else:
+        return {'path': plugin.url_for('sub_app', app_name=app_name)}
+
+
+def map_sub_app_items(config):
+    sub_category = hof.find(lambda app: hof.get_property(app, 'data.content'), config) or {}
+    content = hof.get_property(sub_category, 'data.content')
+
+    return [{
+        'label': utils.localized_string(category.get('label')),
+        'path': plugin.url_for('videos', path=category.get('url'))
+    } for category in content]
 
 
 def map_teaser_item(config):

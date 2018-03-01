@@ -40,7 +40,8 @@ def collection(collection_id, lang):
 
 def videos(path, lang):
     url = _base_service + path + '/' + lang
-    return _load_json(url).get('videos', [])
+    videos = _load_json(url)
+    return videos.get('videos', videos.get('teasers', []))
 
 
 def streams(kind, program_id, lang):

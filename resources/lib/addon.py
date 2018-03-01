@@ -61,7 +61,14 @@ def index():
 def app(app_name, teasers_path):
     filters = api.filters(app_name)
 
-    return [mapper.map_app_item(config, teasers_path) for config in filters]
+    return [mapper.map_app_item(app_name, config, teasers_path) for config in filters]
+
+
+@plugin.route('/sub_app/<app_name>', name='sub_app')
+def sub_app(app_name):
+    filters = api.filters(app_name)
+
+    return mapper.map_sub_app_items(filters)
 
 
 @plugin.route('/teaser/<teaser>/<teasers_path>', name='teaser')
