@@ -29,7 +29,8 @@ def _map_app_button(config, teasers_path):
     if teaser:
         return {'path': plugin.url_for('teaser', teasers_path=teasers_path, teaser=teaser)}
     elif url:
-        return {'path': plugin.url_for('videos', path=url)}
+        # url contains a leading "/" we dont want
+        return {'path': plugin.url_for('videos', path=url[1:])}
 
 
 def _map_app_list(app_name, config, teasers_path):
