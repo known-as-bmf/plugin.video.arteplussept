@@ -13,6 +13,7 @@ _endpoints = {
     'apps': 'conf/apps/apps.json',
     'filters': 'conf/apps/{app}/filters.json',
     'collection': _base_service + 'OPA/v3/videos/collection/ANY/{collection_id}/{lang}',
+    'daily': _base_service + 'OPA/v3/programs/{date}/{lang}',
     'streams': _base_service + 'OPA/v3/streams/{program_id}/{kind}/{lang}'
 }
 
@@ -25,11 +26,6 @@ def apps():
 def filters(app_name):
     url = _endpoints['filters'].format(app=app_name)
     return _load_json(url)
-
-
-def teasers(teasers_path, lang):
-    url = _base_service + teasers_path + '/' + lang
-    return _load_json(url).get('teasers', [])
 
 
 def collection(collection_id, lang):

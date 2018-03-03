@@ -73,15 +73,15 @@ def sub_app(app_name):
 
 @plugin.route('/teaser/<teaser>/<teasers_path>', name='teaser')
 def teaser(teasers_path, teaser):
-    teasers = api.teasers(teasers_path, language.get('short', 'fr'))
+    teasers = api.videos(teasers_path, language.get('short', 'fr'))
 
-    return [mapper.map_teaser_item(item) for item in teasers.get(teaser)]
+    return [mapper.map_generic_item(item) for item in teasers.get(teaser)]
 
 
 @plugin.route('/collection/<collection_id>', name='collection')
 def collection(collection_id):
     plugin.set_content('tvshows')
-    items = [mapper.map_video(item) for item in api.collection(
+    items = [mapper.map_generic_item(item) for item in api.collection(
         collection_id, language.get('short', 'fr'))]
     return plugin.finish(items)
 
@@ -89,7 +89,7 @@ def collection(collection_id):
 @plugin.route('/videos/<path>', name='videos')
 def videos(path):
     plugin.set_content('tvshows')
-    items = [mapper.map_video(item) for item in api.videos(
+    items = [mapper.map_generic_item(item) for item in api.videos(
         path, language.get('short', 'fr'))]
     return plugin.finish(items)
 

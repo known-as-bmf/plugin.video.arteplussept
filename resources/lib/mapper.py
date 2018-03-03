@@ -43,7 +43,8 @@ def _map_app_list(app_name, config, teasers_path):
 
 
 def map_sub_app_items(config):
-    sub_category = hof.find(lambda app: hof.get_property(app, 'data.content'), config) or {}
+    sub_category = hof.find(lambda app: hof.get_property(
+        app, 'data.content'), config) or {}
     content = hof.get_property(sub_category, 'data.content')
 
     return [{
@@ -52,7 +53,7 @@ def map_sub_app_items(config):
     } for category in content]
 
 
-def map_teaser_item(config):
+def map_generic_item(config):
     programId = config.get('programId')
     is_item = programId is not None
 
@@ -63,7 +64,12 @@ def map_teaser_item(config):
         else:
             return {
                 'label': utils.format_title_and_subtitle(config.get('title'), config.get('subtitle')),
-                'path': plugin.url_for('collection', collection_id=programId)
+                'path': plugin.url_for('collection', collection_id=programId),
+                'thumbnail': config.get('imageUrl'),
+                'info': {
+                    'title': config.get('title'),
+                    'plotoutline': config.get('teaserText')
+                }
             }
     else:
         return {
