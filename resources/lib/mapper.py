@@ -58,7 +58,7 @@ def map_generic_item(config):
     is_item = programId is not None
 
     if is_item:
-        is_playlist = programId.startswith('RC-')
+        is_playlist = programId.startswith('RC-') or programId.startswith('PL-')
         if not is_playlist:
             return map_video(config)
         else:
