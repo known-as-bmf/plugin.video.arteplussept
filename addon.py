@@ -27,6 +27,7 @@ import os
 import urllib2
 import time
 import datetime
+import xbmcvfs
 
 
 plugin = Plugin()
@@ -115,7 +116,7 @@ def download_file(vid):
         video = create_video(vid, True)
         filename = vid + '_' + video['label'] + os.extsep + 'mp4'
         block_sz = 8192
-        f = open(os.path.join(download_folder, filename), 'wb')
+        f = xbmcvfs.File(os.path.join(download_folder, filename), 'wb')
         u = urllib2.urlopen(video['path'])
 
         plugin.notify(filename, plugin.get_string(30010))
