@@ -27,7 +27,7 @@ import os
 import urllib2
 import time
 import datetime
-
+import re
 
 plugin = Plugin()
 
@@ -192,8 +192,36 @@ def create_video(vid, downloading=False):
         if len(filtered) == 1:
             video = filtered[0]
             break
+
+    label = data.get('VTI')  # .encode('utf-8')
+    if 'subtitle' in data:
+        label += '_' + data.get('subtitle')  # .encode('utf-8')
+
+    label = label.lower()
+    label = re.sub(u'[àâä]', u'a', label)
+    label = re.sub(u'[éèêë]', u'e', label)
+    label = re.sub(u'[ìîï]', u'i', label)
+    label = re.sub(u'[øòôö]', u'o', label)
+    label = re.sub(u'[ùûü]', u'u', label)
+    label = re.sub(u'[ỳŷÿ]', u'y', label)
+    label = re.sub(u'[ç]', u'c', label)
+    label = re.sub(u'[æ]', u'ae', label)
+    label = re.sub(u'[&]', u'et', label)
+    label = re.sub(u'[œ]', u'oe', label)
+    label = re.sub(u'[ß]', u'ss', label)
+    label = re.sub(u'[ð]', u'z', label)
+    label = re.sub(u'[©]', u'-copyright-', label)
+    label = re.sub(u'[®]', u'-registered-', label)
+    label = re.sub(u'[€]', u'-euro-', label)
+    label = re.sub(u'[¥]', u'-yen-', label)
+    label = re.sub(u'[$]', u'-dollar-', label)
+    label = re.sub(u'[£]', u'-pound-', label)
+    label = re.sub(u'[][\{\}\(\)«»<>¬~\'´‘’`"“”,;:?¿!¡=+*÷×±%#|¦\/\\°º¹²³þÞ¶^¯¨·¸]', u'-', label)
+    label = re.sub(u'-+', u'-', label)
+    label = re.sub(u'[_ ]+', u'_', label)
+    label = label.strip('-_')
     return {
-        'label': data['caseProgram'] if downloading else None, #data['VTI'],
+        'label': label.encode('utf-8') if downloading else None, #data['VTI'],
         'path': video['url'],
         'thumbnail': data['VTU']['IUR']
     }
