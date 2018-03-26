@@ -62,3 +62,7 @@ def merge_dicts(*args):
     for d in args:
         result.update(d)
     return result
+
+
+def flatten(l):
+    return [item for sublist in l for item in sublist]

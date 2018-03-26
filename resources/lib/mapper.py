@@ -83,6 +83,9 @@ def map_video(config):
     kind = config.get('kind')
     duration = int(config.get('duration') or 0) * \
         60 or config.get('durationSeconds')
+    airdate = config.get('broadcastBegin')
+    if airdate is not None:
+        airdate = str(utils.parse_date(airdate))
 
     return {
         'label': utils.format_title_and_subtitle(config.get('title'), config.get('subtitle')),
@@ -101,7 +104,7 @@ def map_video(config):
             #'year': int(config.get('productionYear')),
             'country': [country.get('label') for country in config.get('productionCountries', [])],
             'director': config.get('director'),
-            #'aired': str(airdate)
+            'aired': airdate
         },
         'properties': {
             'fanart_image': config.get('imageUrl'),

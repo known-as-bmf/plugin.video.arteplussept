@@ -40,6 +40,12 @@ def videos(path, lang):
     return videos.get('videos', videos.get('teasers', []))
 
 
+def daily(date, lang):
+    url = _endpoints['daily'].format(date=date, lang=lang)
+    print "fetching " + url
+    return _load_json(url).get('programs', [])
+
+
 def streams(kind, program_id, lang):
     url = _endpoints['streams'] .format(
         kind=kind, program_id=program_id, lang=lang)

@@ -50,11 +50,19 @@ quality = qualities[plugin.get_setting('quality', int)] or qualities[0]
 # my imports
 import api
 import mapper
+import custom
 
 
 @plugin.route('/')
 def index():
-    return [mapper.map_index_item(app_name, config) for app_name, config in api.apps().iteritems()]
+    return custom.index_menus() + [mapper.map_index_item(app_name, config) for app_name, config in api.apps().iteritems()]
+
+
+@plugin.route('/broadcast', name='broadcast')
+def broadcast():
+    plugin.set_content('tvshows')
+    items =  custom.map_broadcast_item(custom.past_week_programs(language.get('short', 'fr')))
+    return plugin.finish(items)
 
 
 @plugin.route('/app/<app_name>/<teasers_path>', name='app')

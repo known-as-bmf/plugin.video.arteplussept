@@ -35,6 +35,8 @@ def localized_string(lang_dict, default=''):
 
 
 def parse_date(datestr):
+    # remove timezone info
+    datestr = datestr[0:25]
     date = None
     # workaround for datetime.strptime not working (NoneType ???)
     try:
@@ -43,3 +45,11 @@ def parse_date(datestr):
         date = datetime.datetime.fromtimestamp(time.mktime(
             time.strptime(datestr, '%a, %d %b %Y %H:%M:%S')))
     return date
+
+
+def past_week():
+    today = datetime.date.today()
+    one_day = datetime.timedelta(days=1)
+
+    for i in xrange(0, 8):  # TODO: find better interval
+        yield today - (one_day * i)
