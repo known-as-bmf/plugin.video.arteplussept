@@ -1,0 +1,55 @@
+import time
+import datetime
+
+from addon import language
+import hof
+
+
+def format_title_and_subtitle(title, subtitle=None):
+    label = u'[B]{title}[/B]'.format(title=title)
+    # suffixes
+    if subtitle:
+        label += u' - {subtitle}'.format(subtitle=subtitle)
+    return label
+
+
+def color_dict_to_hex(color):
+    rgb_str_dict = hof.reject_dict(lambda v, k: k == 'a', color)
+    rgb_dec_dict = hof.map_dict(lambda v, k: int(v), rgb_str_dict)
+
+    color_str = str(dec_bit_to_padded_hex(int(float(color['a']) * 0xFF)))
+    for c in ['r', 'g', 'b']:
+        color_str += dec_bit_to_padded_hex(rgb_dec_dict[c])
+    return color_str
+
+
+def dec_bit_to_padded_hex(bit):
+    """
+      bit: an int between 0x0 and 0xFF
+    """
+    return '{0:0{1}x}'.format(bit, 2)
+
+
+def localized_string(lang_dict, default=''):
+    return lang_dict.get(language.get('short', 'fr'), default)
+
+
+def parse_date(datestr):
+    # remove timezone info
+    datestr = datestr[0:25]
+    date = None
+    # workaround for datetime.strptime not working (NoneType ???)
+    try:
+        date = datetime.datetime.strptime(datestr, '%a, %d %b %Y %H:%M:%S')
+    except TypeError:
+        date = datetime.datetime.fromtimestamp(time.mktime(
+            time.strptime(datestr, '%a, %d %b %Y %H:%M:%S')))
+    return date
+
+
+def past_week():
+    today = datetime.date.today()
+    one_day = datetime.timedelta(days=1)
+
+    for i in xrange(0, 8):  # TODO: find better interval
+        yield today - (one_day * i)
