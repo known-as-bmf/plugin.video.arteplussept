@@ -4,78 +4,49 @@ import hof
 import utils
 
 
-def map_index_item(app_name, config):
+def map_categories_item(item):
     return {
-        'label': utils.localized_string(config.get('name')),
-        'path': plugin.url_for('app', app_name=app_name, teasers_path=config.get('data_url'))
+        'label': utils.colorize(item.get('title'), item.get('color')),
+        'path': plugin.url_for('category', category_code=item.get('code'))
     }
 
 
-def map_app_item(app_name, config, teasers_path):
-    item = {
-        'label': utils.localized_string(config.get('label'))
+def create_creative_item():
+    return {
+        'label': 'Creative I18N',
+        'path': plugin.url_for('creative')
     }
-    app_type = config.get('type')
-    if(app_type == 'button'):
-        item.update(_map_app_button(config, teasers_path))
-    if(app_type == 'list'):
-        item.update(_map_app_list(app_name, config, teasers_path))
-    return item
 
 
-def _map_app_button(config, teasers_path):
-    teaser = hof.get_property(config, 'data.teasers')
-    url = hof.get_property(config, 'data.url')
-    if teaser:
-        return {'path': plugin.url_for('teaser', teasers_path=teasers_path, teaser=teaser)}
-    elif url:
-        # url contains a leading "/" we dont want
-        return {'path': plugin.url_for('videos', path=url[1:])}
+def create_magazines_item():
+    return {
+        'label': 'Emissions I18N',
+        'path': plugin.url_for('magazines')
+    }
 
 
-def _map_app_list(app_name, config, teasers_path):
-    teaser = hof.get_property(config, 'data.teasers')
-    if teaser:
-        return {'path': plugin.url_for('teaser', teasers_path=teasers_path, teaser=teaser)}
-    # rubrique
+def map_category_item(item, category_code):
+    code = item.get('code')
+    if code:
+        path = plugin.url_for('sub_category_by_code', sub_category_code=code)
     else:
-        return {'path': plugin.url_for('sub_app', app_name=app_name)}
+        path = plugin.url_for(
+            'sub_category_by_title', category_code=category_code, sub_category_title=item.get('title'))
 
-
-def map_sub_app_items(config):
-    sub_category = hof.find(lambda app: hof.get_property(
-        app, 'data.content'), config) or {}
-    content = hof.get_property(sub_category, 'data.content')
-
-    return [{
-        'label': utils.localized_string(category.get('label')),
-        'path': plugin.url_for('videos', path=category.get('url'))
-    } for category in content]
+    return {
+        'label': item.get('title'),
+        'path': path
+    }
 
 
 def map_generic_item(config):
     programId = config.get('programId')
-    is_item = programId is not None
 
-    if is_item:
-        is_playlist = programId.startswith('RC-') or programId.startswith('PL-')
-        if not is_playlist:
-            return map_video(config)
-        else:
-            return {
-                'label': utils.format_title_and_subtitle(config.get('title'), config.get('subtitle')),
-                'path': plugin.url_for('collection', collection_id=programId),
-                'thumbnail': config.get('imageUrl'),
-                'info': {
-                    'title': config.get('title'),
-                    'plotoutline': config.get('teaserText')
-                }
-            }
+    is_playlist = programId.startswith('RC-') or programId.startswith('PL-')
+    if not is_playlist:
+        return map_video(config)
     else:
-        return {
-            'label': utils.localized_string(config.get('label')),
-            'path': plugin.url_for('videos', path=config.get('url'))
-        }
+        return map_playlist(config)
 
 
 def map_video(config):
@@ -108,6 +79,21 @@ def map_video(config):
         },
         'properties': {
             'fanart_image': config.get('imageUrl'),
+        }
+    }
+
+
+def map_playlist(config):
+    programId = config.get('programId')
+    kind = config.get('kind')
+
+    return {
+        'label': utils.format_title_and_subtitle(config.get('title'), config.get('subtitle')),
+        'path': plugin.url_for('collection', kind=kind, collection_id=programId),
+        'thumbnail': config.get('imageUrl'),
+        'info': {
+            'title': config.get('title'),
+            'plotoutline': config.get('teaserText')
         }
     }
 

@@ -4,6 +4,18 @@ import datetime
 from addon import language
 import hof
 
+"""
+color: a hex color string (RRGGBB or #RRGGBB) or None
+"""
+
+
+def colorize(text, color):
+    if not color:
+        return text
+    if color.startswith('#'):
+        color = color[1:]
+    return '[COLOR ff' + color + ']' + text + '[/COLOR]'
+
 
 def format_title_and_subtitle(title, subtitle=None):
     label = u'[B]{title}[/B]'.format(title=title)
@@ -11,27 +23,6 @@ def format_title_and_subtitle(title, subtitle=None):
     if subtitle:
         label += u' - {subtitle}'.format(subtitle=subtitle)
     return label
-
-
-def color_dict_to_hex(color):
-    rgb_str_dict = hof.reject_dict(lambda v, k: k == 'a', color)
-    rgb_dec_dict = hof.map_dict(lambda v, k: int(v), rgb_str_dict)
-
-    color_str = str(dec_bit_to_padded_hex(int(float(color['a']) * 0xFF)))
-    for c in ['r', 'g', 'b']:
-        color_str += dec_bit_to_padded_hex(rgb_dec_dict[c])
-    return color_str
-
-
-def dec_bit_to_padded_hex(bit):
-    """
-      bit: an int between 0x0 and 0xFF
-    """
-    return '{0:0{1}x}'.format(bit, 2)
-
-
-def localized_string(lang_dict, default=''):
-    return lang_dict.get(language.get('short', 'fr'), default)
 
 
 def parse_date(datestr):
