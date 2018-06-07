@@ -44,70 +44,68 @@ qualities = ['SQ', 'EQ', 'HQ', 'MQ']
 
 # defaults to fr
 language = languages[plugin.get_setting('lang', int)] or languages[0]
+short_language = language.get('short')
 # defaults to SQ
 quality = qualities[plugin.get_setting('quality', int)] or qualities[0]
 
 # my imports
-import api
-import mapper
-import custom
+import view
 
 
-@plugin.route('/')
+@plugin.route('/', name='index')
 def index():
-    return custom.index_menus() + [mapper.map_index_item(app_name, config) for app_name, config in api.apps().iteritems()]
+    return view.build_categories(short_language)
 
 
-@plugin.route('/broadcast', name='broadcast')
-def broadcast():
+@plugin.route('/category/<category_code>', name='category')
+def category(category_code):
+    return view.build_category(category_code, short_language)
+
+
+@plugin.route('/creative', name='creative')
+def creative():
+    return []
+
+
+@plugin.route('/magazines', name='magazines')
+def magazines():
     plugin.set_content('tvshows')
-    items =  custom.map_broadcast_item(custom.past_week_programs(language.get('short', 'fr')))
-    return plugin.finish(items)
+    return plugin.finish(view.build_magazines(short_language))
 
 
-@plugin.route('/app/<app_name>/<teasers_path>', name='app')
-def app(app_name, teasers_path):
-    filters = api.filters(app_name)
-
-    return [mapper.map_app_item(app_name, config, teasers_path) for config in filters]
-
-
-@plugin.route('/sub_app/<app_name>', name='sub_app')
-def sub_app(app_name):
-    filters = api.filters(app_name)
-
-    return mapper.map_sub_app_items(filters)
-
-
-@plugin.route('/teaser/<teaser>/<teasers_path>', name='teaser')
-def teaser(teasers_path, teaser):
-    teasers = api.videos(teasers_path, language.get('short', 'fr'))
-
-    return [mapper.map_generic_item(item) for item in teasers.get(teaser)]
-
-
-@plugin.route('/collection/<collection_id>', name='collection')
-def collection(collection_id):
+@plugin.route('/sub_category/<sub_category_code>', name='sub_category_by_code')
+def sub_category_by_code(sub_category_code):
     plugin.set_content('tvshows')
-    items = [mapper.map_generic_item(item) for item in api.collection(
-        collection_id, language.get('short', 'fr'))]
-    return plugin.finish(items)
+    return plugin.finish(view.build_sub_category_by_code(sub_category_code, short_language))
 
 
-@plugin.route('/videos/<path>', name='videos')
-def videos(path):
+@plugin.route('/sub_category/<category_code>/<sub_category_title>', name='sub_category_by_title')
+def sub_category_by_title(category_code, sub_category_title):
     plugin.set_content('tvshows')
-    items = [mapper.map_generic_item(item) for item in api.videos(
-        path, language.get('short', 'fr'))]
-    return plugin.finish(items)
+    return plugin.finish(view.build_sub_category_by_title(category_code, sub_category_title, short_language))
+
+
+@plugin.route('/collection/<kind>/<collection_id>', name='collection')
+def collection(kind, collection_id):
+    plugin.set_content('tvshows')
+    return plugin.finish(view.build_mixed_collection(kind, collection_id, short_language))
 
 
 @plugin.route('/play/<kind>/<program_id>', name='play')
 def play(kind, program_id):
-    streams = api.streams(kind, program_id, language.get('short', 'fr'))
+    return plugin.set_resolved_url(view.build_stream_url(kind, program_id, short_language, quality))
 
-    return plugin.set_resolved_url(mapper.map_playable(streams, quality))
 
+"""
+
+@plugin.route('/broadcast', name='broadcast')
+def broadcast():
+    plugin.set_content('tvshows')
+    items = custom.map_broadcast_item(
+        custom.past_week_programs(language.get('short', 'fr')))
+    return plugin.finish(items)
+
+"""
 
 # plugin bootstrap
 if __name__ == '__main__':
