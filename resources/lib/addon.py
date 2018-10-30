@@ -37,9 +37,9 @@ languages = ['fr', 'de', 'en', 'es', 'pl']
 qualities = ['SQ', 'EQ', 'HQ']
 
 # defaults to fr
-language = plugin.get_setting('lang', int, languages) or languages[0]
+language = plugin.get_setting('lang', choices=languages) or languages[0]
 # defaults to SQ
-quality = plugin.get_setting('quality', int, qualities) or qualities[0]
+quality = plugin.get_setting('quality', choices=qualities) or qualities[0]
 
 # my imports
 import view
