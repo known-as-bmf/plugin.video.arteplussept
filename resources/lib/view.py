@@ -43,3 +43,9 @@ def build_mixed_collection(kind, collection_id, lang):
 
 def build_stream_url(kind, program_id, lang, quality):
     return mapper.map_playable(api.streams(kind, program_id, lang), quality)
+
+
+def build_weekly(lang):
+    programs = hof.flatten([api.daily(date, lang) for date in utils.past_week()])
+
+    # filter clips ?

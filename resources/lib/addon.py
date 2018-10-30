@@ -89,6 +89,12 @@ def play(kind, program_id):
     return plugin.set_resolved_url(view.build_stream_url(kind, program_id, language, quality))
 
 
+@plugin.route('/weekly', name='weekly')
+def weekly():
+    plugin.set_content('tvshows')
+    return plugin.finish(view.build_weekly(language))
+
+
 """
 
 @plugin.route('/broadcast', name='broadcast')
