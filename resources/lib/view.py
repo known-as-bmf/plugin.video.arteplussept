@@ -6,13 +6,32 @@ import utils
 
 
 def build_categories(lang):
-    categories = [mapper.map_categories_item(
-        item) for item in api.categories(lang)]
+    categories = []
+    categories.append(mapper.create_newest_item())
+    categories.append(mapper.create_most_viewed_item())
+    categories.append(mapper.create_last_chance_item())
+    categories.extend([mapper.map_categories_item(
+        item) for item in api.categories(lang)])
     categories.append(mapper.create_creative_item())
     categories.append(mapper.create_magazines_item())
     categories.append(mapper.create_week_item())
 
     return categories
+
+
+def build_newest(lang):
+    return [mapper.map_generic_item(item) for
+            item in api.special_categories('MOST_RECENT', lang)]
+
+
+def build_most_viewed(lang):
+    return [mapper.map_generic_item(item) for
+            item in api.special_categories('MOST_VIEWED', lang)]
+
+
+def build_last_chance(lang):
+    return [mapper.map_generic_item(item) for
+            item in api.special_categories('LAST_CHANCE', lang)]
 
 
 def build_magazines(lang):

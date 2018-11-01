@@ -17,3 +17,15 @@ msgstr "Sprache (Videos)"
 msgctxt "#30052"
 msgid "Stream video quality"
 msgstr "Qualität des Videostreams"
+
+msgctxt "#30005"
+msgid "Most recent"
+msgstr "Neuste"
+
+msgctxt "#30006"
+msgid "Most viewed"
+msgstr "Am meisten gesehen"
+
+msgctxt "#30007"
+msgid "Last chance"
+msgstr "Letzte chance"

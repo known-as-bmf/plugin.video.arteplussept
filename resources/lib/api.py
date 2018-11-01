@@ -30,6 +30,14 @@ def magazines(lang):
     return _load_json(url).get('magazines', {})
 
 
+def special_categories(name, lang):
+    url = _endpoints['category'].format(category_code=name, lang=lang)
+    cat = _load_json(url).get('category', [])
+    if cat:
+        return cat[0].get('teasers', [])
+    return []
+
+
 def category(category_code, lang):
     url = _endpoints['category'].format(category_code=category_code, lang=lang)
     return _load_json(url).get('category', {})

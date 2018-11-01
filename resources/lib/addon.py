@@ -66,6 +66,24 @@ def magazines():
     return plugin.finish(view.build_magazines(language))
 
 
+@plugin.route('/newest', name='newest')
+def newest():
+    plugin.set_content('tvshows')
+    return plugin.finish(view.build_newest(language))
+
+
+@plugin.route('/most_viewed', name='most_viewed')
+def most_viewed():
+    plugin.set_content('tvshows')
+    return plugin.finish(view.build_most_viewed(language))
+
+
+@plugin.route('/last_chance', name='last_chance')
+def last_chance():
+    plugin.set_content('tvshows')
+    return plugin.finish(view.build_last_chance(language))
+
+
 @plugin.route('/sub_category/<sub_category_code>', name='sub_category_by_code')
 def sub_category_by_code(sub_category_code):
     plugin.set_content('tvshows')

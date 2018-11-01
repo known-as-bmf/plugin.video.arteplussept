@@ -32,6 +32,27 @@ def create_week_item():
     }
 
 
+def create_newest_item():
+    return {
+        'label': plugin.addon.getLocalizedString(30005),
+        'path': plugin.url_for('newest')
+    }
+
+
+def create_most_viewed_item():
+    return {
+        'label': plugin.addon.getLocalizedString(30006),
+        'path': plugin.url_for('most_viewed')
+    }
+
+
+def create_last_chance_item():
+    return {
+        'label': plugin.addon.getLocalizedString(30007),
+        'path': plugin.url_for('last_chance')
+    }
+
+
 def map_category_item(item, category_code):
     code = item.get('code')
     title = item.get('title')
