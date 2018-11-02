@@ -21,17 +21,17 @@ def build_categories(lang):
 
 def build_newest(lang):
     return [mapper.map_generic_item(item) for
-            item in api.special_categories('MOST_RECENT', lang)]
+            item in api.home_categories('mostRecent', lang)]
 
 
 def build_most_viewed(lang):
     return [mapper.map_generic_item(item) for
-            item in api.special_categories('MOST_VIEWED', lang)]
+            item in api.home_categories('mostViewed', lang)]
 
 
 def build_last_chance(lang):
     return [mapper.map_generic_item(item) for
-            item in api.special_categories('LAST_CHANCE', lang)]
+            item in api.home_categories('lastChance', lang)]
 
 
 def build_magazines(lang):

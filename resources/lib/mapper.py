@@ -98,7 +98,7 @@ def map_video(config):
             'title': config.get('title'),
             'duration': duration,
             'genre': config.get('genrePresse'),
-            'plot': config.get('shortDescription'),
+            'plot': config.get('shortDescription') or config.get('fullDescription'),
             'plotoutline': config.get('teaserText'),
             # year is not correctly used by kodi :(
             # the aired year will be used by kodi for production year :(
