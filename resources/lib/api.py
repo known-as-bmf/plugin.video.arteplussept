@@ -8,32 +8,29 @@ _base_headers = {
     'user-agent': PluginInformation.name + '/' + PluginInformation.version
 }
 _endpoints = {
-    'categories': '/EMAC/teasers/categories/v2/{lang}',
+    'categories': '/EMAC/teasers/{type}/v2/{lang}',
     'category': '/EMAC/teasers/category/v2/{category_code}/{lang}',
     'subcategory': '/OPA/v3/videos/subcategory/{sub_category_code}/page/1/limit/100/{lang}',
     'magazines': '/OPA/v3/magazines/{lang}',
     'collection': '/OPA/v3/videos/collection/{kind}/{collection_id}/{lang}',
     'streams': '/OPA/v3/streams/{program_id}/{kind}/{lang}',
-    'home': '/EMAC/teasers/home/v2/{lang}',
-
-
     'daily': '/OPA/v3/programs/{date}/{lang}'
 }
 
 
 def categories(lang):
-    url = _endpoints['categories'].format(lang=lang)
+    url = _endpoints['categories'].format(type='categories', lang=lang)
     return _load_json(url).get('categories', {})
+
+
+def home_category(name, lang):
+    url = _endpoints['categories'].format(type='home', lang=lang)
+    return _load_json(url).get('teasers', {}).get(name, [])
 
 
 def magazines(lang):
     url = _endpoints['magazines'].format(lang=lang)
     return _load_json(url).get('magazines', {})
-
-
-def home_categories(name, lang):
-    url = _endpoints['home'].format(category_code='home', lang=lang)
-    return _load_json(url).get('teasers', {}).get(name, [])
 
 
 def category(category_code, lang):
