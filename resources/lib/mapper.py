@@ -86,7 +86,7 @@ def map_video(config):
         60 or config.get('durationSeconds')
     airdate = config.get('broadcastBegin')
     if airdate is not None:
-        airdate = str(utils.parse_date(airdate))
+        airdate = str(utils.parse_localized_date(airdate,'en_US.UTF-8'))
 
     return {
         'label': utils.format_title_and_subtitle(config.get('title'), config.get('subtitle')),

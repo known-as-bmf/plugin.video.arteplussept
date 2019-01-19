@@ -1,5 +1,6 @@
 import time
 import datetime
+import locale
 from HTMLParser import HTMLParser
 
 from addon import language
@@ -41,6 +42,19 @@ def parse_date(datestr):
     except TypeError:
         date = datetime.datetime.fromtimestamp(time.mktime(
             time.strptime(datestr, '%a, %d %b %Y %H:%M:%S')))
+    return date
+
+
+def parse_localized_date(datestr,loc):
+    date = None
+    # get current locale
+    cur = locale.getlocale(locale.LC_TIME)
+    locale.setlocale(locale.LC_TIME,loc)
+    try:
+        date = parse_date(datestr)
+        locale.setlocale(locale.LC_TIME,cur)
+    except:
+        locale.setlocale(locale.LC_TIME,cur)
     return date
 
 
