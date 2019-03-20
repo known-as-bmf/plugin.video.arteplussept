@@ -54,14 +54,15 @@ def create_last_chance_item():
 
 
 def map_category_item(item, category_code):
-    code = item.get('code')
+    # code = item.get('code')
     title = item.get('title')
 
-    if code:
-        path = plugin.url_for('sub_category_by_code', sub_category_code=code)
-    else:
-        path = plugin.url_for('sub_category_by_title', category_code=category_code,
-                              sub_category_title=utils.sanitize_string(title))
+    # if code:
+    #     path = plugin.url_for('sub_category_by_code',
+    #                           category_code=category_code, sub_category_code=code)
+    # else:
+    path = plugin.url_for('sub_category_by_title',
+                            category_code=category_code, sub_category_title=utils.sanitize_string(title))
 
     return {
         'label': title,
@@ -102,7 +103,7 @@ def map_video(config):
             'plotoutline': config.get('teaserText'),
             # year is not correctly used by kodi :(
             # the aired year will be used by kodi for production year :(
-            #'year': int(config.get('productionYear')),
+            # 'year': int(config.get('productionYear')),
             'country': [country.get('label') for country in config.get('productionCountries', [])],
             'director': config.get('director'),
             'aired': airdate
