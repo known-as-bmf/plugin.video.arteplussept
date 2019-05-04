@@ -2,6 +2,7 @@ from addon import plugin
 
 import hof
 import utils
+import re
 
 
 def map_categories_item(item):
@@ -128,17 +129,27 @@ def map_playlist(config):
         }
     }
 
-
-def map_playable(streams, quality):
+def map_playable(streams, quality, STOV, STOVAudioPatterns):
     stream = None
     for q in [quality] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality]:
-        stream = hof.find(lambda s: match(s, q), streams)
+        if STOV:
+            for p in STOVAudioPatterns:
+                stream = hof.find(lambda s: matchAudioCode(s, q, p), streams)
+                if stream:
+                    break
+
+        if not( stream ):
+            stream = hof.find(lambda s: match(s, q), streams)
+        
         if stream:
             break
+
     return {
         'path': stream.get('url')
     }
 
+def matchAudioCode(item, quality, codePattern):
+    return item.get('quality') == quality and codePattern.match(item.get('audioCode'))
 
 def match(item, quality):
     return item.get('quality') == quality and item.get('audioSlot') == 1

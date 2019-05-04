@@ -21,6 +21,8 @@
 #
 from xbmcswift2 import Plugin
 
+import re
+
 
 # global declarations
 # plugin stuff
@@ -31,15 +33,23 @@ class PluginInformation:
     name = plugin.name
     version = plugin.addon.getAddonInfo('version')
 
-
 # settings stuff
 languages = ['fr', 'de', 'en', 'es', 'pl']
+STOVAudioCodePatterns = {
+    'fr' : [ re.compile('VO.*-STF') ],
+    'de' : [ re.compile('VO.*-STA') ],
+    'en' : [ re.compile('VO-.*'), re.compile('VO.*-STE\\[ENG\\]') ],
+    'es' : [ re.compile('VOE\\[ESP\\]-.*'), re.compile('VO.*-STE\\[ESP\\]') ],
+    'pl' : [ re.compile('VOE\\[POL\\]-.*'), re.compile('VO.*-STE\\[POL\\]') ]
+    }
 qualities = ['SQ', 'EQ', 'HQ']
 
 # defaults to fr
 language = plugin.get_setting('lang', choices=languages) or languages[0]
 # defaults to SQ
 quality = plugin.get_setting('quality', choices=qualities) or qualities[0]
+# defaults to false
+stov = plugin.get_setting('stov', bool) or False
 
 # my imports
 import view
@@ -104,7 +114,7 @@ def collection(kind, collection_id):
 
 @plugin.route('/play/<kind>/<program_id>', name='play')
 def play(kind, program_id):
-    return plugin.set_resolved_url(view.build_stream_url(kind, program_id, language, quality))
+    return plugin.set_resolved_url(view.build_stream_url(kind, program_id, language, quality, stov, STOVAudioCodePatterns[language]))
 
 
 @plugin.route('/weekly', name='weekly')

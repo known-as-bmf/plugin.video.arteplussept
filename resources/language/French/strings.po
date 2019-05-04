@@ -17,3 +17,8 @@ msgstr "Langage (Vidéos)"
 msgctxt "#30052"
 msgid "Stream video quality"
 msgstr "Qualité vidéo préferée"
+
+msgctxt "#30053"
+msgid "Enable Subbed Version"
+msgstr "VOST"
+

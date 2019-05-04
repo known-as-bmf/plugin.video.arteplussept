@@ -18,6 +18,10 @@ msgctxt "#30052"
 msgid "Stream video quality"
 msgstr "Qualität des Videostreams"
 
+msgctxt "#30053"
+msgid "Original Subbed Version"
+msgstr "Original Subbed Version"
+
 msgctxt "#30005"
 msgid "Most recent"
 msgstr "Neuste"

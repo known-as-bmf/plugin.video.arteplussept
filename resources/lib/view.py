@@ -62,8 +62,8 @@ def build_mixed_collection(kind, collection_id, lang):
     return [mapper.map_generic_item(item) for item in api.collection(kind, collection_id, lang)]
 
 
-def build_stream_url(kind, program_id, lang, quality):
-    return mapper.map_playable(api.streams(kind, program_id, lang), quality)
+def build_stream_url(kind, program_id, lang, quality, STOV, STOVaudioCodePatterns):
+    return mapper.map_playable(api.streams(kind, program_id, lang), quality, STOV, STOVaudioCodePatterns)
 
 
 _useless_kinds = [ 'CLIP', 'MANUAL_CLIP', 'TRAILER' ]
