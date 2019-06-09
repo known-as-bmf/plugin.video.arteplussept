@@ -33,7 +33,7 @@ class PluginInformation:
 
 
 # settings stuff
-languages = ['fr', 'de', 'en', 'es', 'pl']
+languages = ['fr', 'de', 'en', 'es', 'pl', 'it']
 qualities = ['SQ', 'EQ', 'HQ']
 
 # defaults to fr

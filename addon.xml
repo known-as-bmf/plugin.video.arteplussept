@@ -11,7 +11,7 @@
     <extension point="xbmc.addon.metadata">
         <platform>all</platform>
         <summary lang="en">Arte +7</summary>
-        <language>fr de en</language>
+        <language>fr de en it</language>
         <description lang="fr">
 Regardez les vidéos de Arte +7
 Pour toute demande ou reporter un problème:
@@ -31,6 +31,13 @@ Watch videos from Arte +7
 For feature requests / issues:
 https://github.com/known-as-bmf/plugin.video.arteplussept/issues
 Contributions are welcome:
+https://github.com/known-as-bmf/plugin.video.arteplussept
+        </description>
+        <description lang="it">
+Guarda video da Arte +7
+Per richiedere nuove funzionalità o segnalare problemi:
+https://github.com/known-as-bmf/plugin.video.arteplussept/issues
+Nuovi contributi sono ben accetti:
 https://github.com/known-as-bmf/plugin.video.arteplussept
         </description>
         <license>MIT</license>
