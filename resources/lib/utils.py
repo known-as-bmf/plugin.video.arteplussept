@@ -34,13 +34,15 @@ def sanitize_string(str):
 def parse_date(datestr):
     # remove timezone info
     datestr = datestr[0:25]
+    #remove weekday since it is language dependent
+    datestr = datestr.split(", ")[1]
     date = None
     # workaround for datetime.strptime not working (NoneType ???)
     try:
-        date = datetime.datetime.strptime(datestr, '%a, %d %b %Y %H:%M:%S')
+        date = datetime.datetime.strptime(datestr, '%d %b %Y %H:%M:%S')
     except TypeError:
         date = datetime.datetime.fromtimestamp(time.mktime(
-            time.strptime(datestr, '%a, %d %b %Y %H:%M:%S')))
+            time.strptime(datestr, '%d %b %Y %H:%M:%S')))
     return date
 
 
