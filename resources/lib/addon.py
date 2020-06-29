@@ -32,27 +32,21 @@ class PluginInformation:
     version = plugin.addon.getAddonInfo('version')
 
 
-# settings stuff
-languages = ['fr', 'de', 'en', 'es', 'pl', 'it']
-qualities = ['SQ', 'EQ', 'HQ']
-
-# defaults to fr
-language = plugin.get_setting('lang', choices=languages) or languages[0]
-# defaults to SQ
-quality = plugin.get_setting('quality', choices=qualities) or qualities[0]
-
 # my imports
 import view
+from settings import Settings
+
+settings = Settings(plugin)
 
 
 @plugin.route('/', name='index')
 def index():
-    return view.build_categories(language)
+    return view.build_categories(settings)
 
 
 @plugin.route('/category/<category_code>', name='category')
 def category(category_code):
-    return view.build_category(category_code, language)
+    return view.build_category(category_code, settings)
 
 
 @plugin.route('/creative', name='creative')
@@ -63,54 +57,61 @@ def creative():
 @plugin.route('/magazines', name='magazines')
 def magazines():
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_magazines(language))
+    return plugin.finish(view.build_magazines(settings))
 
 
 @plugin.route('/newest', name='newest')
 def newest():
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_newest(language))
+    return plugin.finish(view.build_newest(settings))
 
 
 @plugin.route('/most_viewed', name='most_viewed')
 def most_viewed():
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_most_viewed(language))
+    return plugin.finish(view.build_most_viewed(settings))
 
 
 @plugin.route('/last_chance', name='last_chance')
 def last_chance():
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_last_chance(language))
+    return plugin.finish(view.build_last_chance(settings))
 
 
 @plugin.route('/sub_category/<sub_category_code>', name='sub_category_by_code')
 def sub_category_by_code(sub_category_code):
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_sub_category_by_code(sub_category_code, language))
+    return plugin.finish(view.build_sub_category_by_code(sub_category_code, settings))
 
 
 @plugin.route('/sub_category/<category_code>/<sub_category_title>', name='sub_category_by_title')
 def sub_category_by_title(category_code, sub_category_title):
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_sub_category_by_title(category_code, sub_category_title, language))
+    return plugin.finish(view.build_sub_category_by_title(category_code, sub_category_title, settings))
 
 
 @plugin.route('/collection/<kind>/<collection_id>', name='collection')
 def collection(kind, collection_id):
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_mixed_collection(kind, collection_id, language))
+    return plugin.finish(view.build_mixed_collection(kind, collection_id, settings))
+
+
+@plugin.route('/streams/<program_id>', name='streams')
+def streams(program_id):
+    plugin.set_content('tvshows')
+    return plugin.finish(view.build_video_streams(program_id, settings))
 
 
 @plugin.route('/play/<kind>/<program_id>', name='play')
-def play(kind, program_id):
-    return plugin.set_resolved_url(view.build_stream_url(kind, program_id, language, quality))
+@plugin.route('/play/<kind>/<program_id>/<audio_slot>', name='play_specific')
+def play(kind, program_id, audio_slot='1'):
+    return plugin.set_resolved_url(view.build_stream_url(kind, program_id, int(audio_slot), settings))
 
 
 @plugin.route('/weekly', name='weekly')
 def weekly():
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_weekly(language))
+    return plugin.finish(view.build_weekly(settings))
 
 
 """

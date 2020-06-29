@@ -13,6 +13,9 @@ _endpoints = {
     'subcategory': '/OPA/v3/videos/subcategory/{sub_category_code}/page/1/limit/100/{lang}',
     'magazines': '/OPA/v3/magazines/{lang}',
     'collection': '/OPA/v3/videos/collection/{kind}/{collection_id}/{lang}',
+    # program details
+    'video': '/OPA/v3/videos/{program_id}/{lang}',
+    # program streams
     'streams': '/OPA/v3/streams/{program_id}/{kind}/{lang}',
     'daily': '/OPA/v3/programs/{date}/{lang}'
 }
@@ -48,6 +51,12 @@ def collection(kind, collection_id, lang):
     url = _endpoints['collection'].format(kind=kind,
                                           collection_id=collection_id, lang=lang)
     return _load_json(url).get('videos', [])
+
+
+def video(program_id, lang):
+    url = _endpoints['video'] .format(
+        program_id=program_id, lang=lang)
+    return _load_json(url).get('videos', [])[0]
 
 
 def streams(kind, program_id, lang):
