@@ -2,7 +2,7 @@ import time
 import datetime
 from HTMLParser import HTMLParser
 
-from addon import language
+
 import hof
 
 p = HTMLParser()
@@ -32,10 +32,9 @@ def sanitize_string(str):
 
 
 def parse_date(datestr):
-    # remove timezone info
-    datestr = datestr[0:25]
-    #remove weekday since it is language dependent
-    datestr = datestr.split(", ")[1]
+    # remove weekday & timezone
+    datestr = str.join(' ', datestr.split(None)[1:5])
+
     date = None
     # workaround for datetime.strptime not working (NoneType ???)
     try:
