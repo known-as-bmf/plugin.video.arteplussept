@@ -12,7 +12,7 @@ _endpoints = {
     'category': '/EMAC/teasers/category/v2/{category_code}/{lang}',
     'subcategory': '/OPA/v3/videos/subcategory/{sub_category_code}/page/1/limit/100/{lang}',
     'magazines': '/OPA/v3/magazines/{lang}',
-    'collection': '/OPA/v3/videos/collection/{kind}/{collection_id}/{lang}',
+    'collection': '/EMAC/teasers/collection/v2/{collection_id}/{lang}',
     # program details
     'video': '/OPA/v3/videos/{program_id}/{lang}',
     # program streams
@@ -50,7 +50,7 @@ def subcategory(sub_category_code, lang):
 def collection(kind, collection_id, lang):
     url = _endpoints['collection'].format(kind=kind,
                                           collection_id=collection_id, lang=lang)
-    return _load_json(url).get('videos', [])
+    return _load_json(url).get('subCollections', [])[0].get('videos', [])
 
 
 def video(program_id, lang):
