@@ -1,6 +1,8 @@
 from collections import OrderedDict
 import requests
 
+import hof
+
 from addon import PluginInformation
 
 _base_api_url = 'http://www.arte.tv/hbbtvv2/services/web/index.php'
@@ -50,7 +52,8 @@ def subcategory(sub_category_code, lang):
 def collection(kind, collection_id, lang):
     url = _endpoints['collection'].format(kind=kind,
                                           collection_id=collection_id, lang=lang)
-    return _load_json(url).get('subCollections', [])[0].get('videos', [])
+    subCollections = _load_json(url).get('subCollections', [])
+    return hof.flat_map(lambda subCollections: subCollections.get('videos', []), subCollections)
 
 
 def video(program_id, lang):

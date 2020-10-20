@@ -66,3 +66,7 @@ def merge_dicts(*args):
 
 def flatten(l):
     return [item for sublist in l for item in sublist]
+
+
+def flat_map(f, lst):
+    return [item for list_item in lst for item in f(list_item)]
