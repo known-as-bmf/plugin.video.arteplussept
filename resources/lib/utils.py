@@ -1,7 +1,7 @@
 import time
 import datetime
-from HTMLParser import HTMLParser
-
+from html.parser import HTMLParser
+import urllib.parse
 
 import hof
 
@@ -27,8 +27,12 @@ def format_title_and_subtitle(title, subtitle=None):
     return label
 
 
-def sanitize_string(str):
-    return str.encode('ascii', errors='replace')
+def encode_string(str):
+    return urllib.parse.quote_plus(str, encoding='utf-8', errors='replace')
+
+
+def decode_string(str):
+    return urllib.parse.unquote_plus(str, encoding='utf-8', errors='replace')
 
 
 def parse_date(datestr):

@@ -52,8 +52,9 @@ def build_sub_category_by_code(sub_category_code, settings):
 
 def build_sub_category_by_title(category_code, sub_category_title, settings):
     category = api.category(category_code, settings.language)
-    sub_category = hof.find(lambda i: utils.sanitize_string(
-        i.get('title')) == sub_category_title, category)
+    unquoted_title = utils.decode_string(sub_category_title)
+
+    sub_category = hof.find(lambda i: i.get('title') == unquoted_title, category)
 
     return [mapper.map_generic_item(item, settings.show_video_streams) for item in sub_category.get('teasers')]
 

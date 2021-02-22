@@ -62,7 +62,7 @@ def map_category_item(item, category_code):
     #                           category_code=category_code, sub_category_code=code)
     # else:
     path = plugin.url_for('sub_category_by_title',
-                          category_code=category_code, sub_category_title=utils.sanitize_string(title))
+                          category_code=category_code, sub_category_title=utils.encode_string(title))
 
     return {
         'label': title,
