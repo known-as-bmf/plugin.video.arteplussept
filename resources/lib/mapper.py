@@ -138,8 +138,8 @@ def map_streams(item, streams, quality):
     # TODO: filter streams by quality
     filtered_streams = None
     for q in [quality] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality]:
-        filtered_streams = filter(
-            lambda s: s.get('quality') == quality, streams)
+        filtered_streams = list(filter(
+            lambda s: s.get('quality') == quality, streams))
         if len(filtered_streams) > 0:
             break
 
