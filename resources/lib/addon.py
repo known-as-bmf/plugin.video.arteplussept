@@ -49,9 +49,9 @@ def category(category_code):
     return view.build_category(category_code, settings)
 
 
-@plugin.route('/creative', name='creative')
-def creative():
-    return []
+# @plugin.route('/creative', name='creative')
+# def creative():
+#     return []
 
 
 @plugin.route('/magazines', name='magazines')

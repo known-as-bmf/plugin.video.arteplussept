@@ -11,11 +11,11 @@ def map_categories_item(item):
     }
 
 
-def create_creative_item():
-    return {
-        'label': 'Creative I18N',
-        'path': plugin.url_for('creative')
-    }
+# def create_creative_item():
+#     return {
+#         'label': 'Creative I18N',
+#         'path': plugin.url_for('creative')
+#     }
 
 
 def create_magazines_item():

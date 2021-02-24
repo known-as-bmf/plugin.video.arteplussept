@@ -13,7 +13,7 @@ def build_categories(settings):
     ]
     categories.extend([mapper.map_categories_item(
         item) for item in api.categories(settings.language)])
-    categories.append(mapper.create_creative_item())
+    # categories.append(mapper.create_creative_item())
     categories.append(mapper.create_magazines_item())
     categories.append(mapper.create_week_item())
 
