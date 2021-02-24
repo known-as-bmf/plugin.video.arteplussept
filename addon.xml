@@ -41,10 +41,14 @@ Nuovi contributi sono ben accetti:
 https://github.com/known-as-bmf/plugin.video.arteplussept
         </description>
         <license>MIT</license>
-        <source>https://github.com/known-as-bmf/plugin.video.arteplussept.git</source>
+        <source>https://github.com/known-as-bmf/plugin.video.arteplussept</source>
         <!--<forum></forum>
         <email></email>-->
-        <website>http://www.arte.tv</website>
+        <website>https://www.arte.tv/fr/</website>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+        </assets>
         <news>
         v1.1.0
         - API fixes
