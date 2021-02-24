@@ -33,3 +33,11 @@ msgstr "Am meisten gesehen"
 msgctxt "#30007"
 msgid "Last chance"
 msgstr "Letzte chance"
+
+msgctxt "#30008"
+msgid "Magazines A-Z"
+msgstr "Sendungen A-Z"
+
+msgctxt "#30009"
+msgid "This week"
+msgstr "Diese Woche"

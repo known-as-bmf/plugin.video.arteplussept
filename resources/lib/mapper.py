@@ -20,14 +20,14 @@ def create_creative_item():
 
 def create_magazines_item():
     return {
-        'label': 'Emissions I18N',
+        'label': plugin.addon.getLocalizedString(30008),
         'path': plugin.url_for('magazines')
     }
 
 
 def create_week_item():
     return {
-        'label': 'Semaine I18N',
+        'label': plugin.addon.getLocalizedString(30009),
         'path': plugin.url_for('weekly')
     }
 

@@ -33,3 +33,11 @@ msgstr ""
 msgctxt "#30007"
 msgid "Last chance"
 msgstr ""
+
+msgctxt "#30008"
+msgid "Magazines A-Z"
+msgstr ""
+
+msgctxt "#30009"
+msgid "This week"
+msgstr ""
