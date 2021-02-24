@@ -53,5 +53,5 @@ def past_week():
     today = datetime.date.today()
     one_day = datetime.timedelta(days=1)
 
-    for i in xrange(0, 8):  # TODO: find better interval
+    for i in range(0, 8):  # TODO: find better interval
         yield today - (one_day * i)
