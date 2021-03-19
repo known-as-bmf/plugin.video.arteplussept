@@ -1,5 +1,6 @@
 import time
 import datetime
+import locale
 import html
 import urllib.parse
 
@@ -40,10 +41,16 @@ def parse_date(datestr):
     date = None
     # workaround for datetime.strptime not working (NoneType ???)
     try:
+        # set LC_TIME to ISO C to work with different locales
+        lctime = locale.getlocale(locale.LC_TIME)
+        locale.setlocale(locale.LC_TIME, "C")
         date = datetime.datetime.strptime(datestr, '%d %b %Y %H:%M:%S')
     except TypeError:
         date = datetime.datetime.fromtimestamp(time.mktime(
             time.strptime(datestr, '%d %b %Y %H:%M:%S')))
+    finally:
+        # reset LC_TIME
+        locale.setlocale(locale.LC_TIME, lctime)
     return date
 
 
