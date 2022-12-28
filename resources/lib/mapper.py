@@ -18,6 +18,20 @@ def map_categories_item(item):
 #     }
 
 
+def create_favorites_item():
+    return {
+        'label': plugin.addon.getLocalizedString(30010),
+        'path': plugin.url_for('favorites')
+    }
+
+
+def create_last_viewed_item():
+    return {
+        'label': plugin.addon.getLocalizedString(30011),
+        'path': plugin.url_for('last_viewed')
+    }
+
+
 def create_magazines_item():
     return {
         'label': plugin.addon.getLocalizedString(30008),
@@ -80,6 +94,7 @@ def map_generic_item(item, show_video_streams):
         return map_playlist(item)
 
 
+# Create a video menu item from a json returned by Arte HBBTV API
 def map_video(item, show_video_streams):
     programId = item.get('programId')
     kind = item.get('kind')
@@ -110,6 +125,100 @@ def map_video(item, show_video_streams):
         },
         'properties': {
             'fanart_image': item.get('imageUrl'),
+        }
+    }
+
+# Create a video menu item from a json returned by Arte TV API
+# Source data example, unable to find public documentation
+# {
+#   "type": "teaser",
+#   "id": "079395-000-A_fr",
+#   "kind": "SHOW",
+#   "programId": "079395-000-A",
+#   "language": "fr",
+#   "url": "https://www.arte.tv/fr/videos/079395-000-A/maitriser-l-energie-des-etoiles-la-revolution-de-demain/",
+#   "title": "Maîtriser l'énergie des étoiles, la révolution de demain",
+#   "subtitle": null,
+#   "images": [
+#     {
+#       "url": "https://api-cdn.arte.tv/img/v2/image/te28ppavJQNmHtpNndKqUG/1920x1080?type=TEXT", "format": "landscape", "width": 1920, "height": 1080,
+#       "alternateResolutions": [
+#         { "url": "https://api-cdn.arte.tv/img/v2/image/te28ppavJQNmHtpNndKqUG/1920x1080?type=TEXT", "width": 1920, "height": 1080, "imageSize": "1920x1080" }
+#       ]
+#     }
+#   ],
+#   "markings": [],
+#   "geoblocking": null,
+#   "warning": null,
+#   "description": "La technique de la fusion nucléaire revient régulièrement sur le devant de la scène. Face au défi de la transition énergétique, elle pourrait représenter une puissante alternative,aussi puissante que l'énergie du soleil dont elle entend s'inspirer. Sans déchets radioactifs, sans extractions polluantes, durable, elle est encore à ce stade un chantier pour la science et un gouffre financier. Explications.",
+#   "shortDescription": "La technique de la fusion nucléaire revient régulièrement sur le devant de la scène. Face au défi de la transition énergétique, elle pourrait représenter une puissante alternative,aussi puissante que l'énergie du soleil dont elle entend s'inspirer. Sans déchets radioactifs, sans extractions polluantes, durable, elle est encore à ce stade un chantier pour la science et un gouffre financier. Explications.",
+#   "beginsAt": "2022-07-01T03:00:00Z",
+#   "expireAt": "2023-06-30T03:00:00Z",
+#   "availability": { "type": "VOD", "start": "2022-07-01T03:00:00Z", "end": "2023-06-30T03:00:00Z", "hasVideoStreams": true, "broadcastBegin": null, "displayDate": "2022-07-01T03:00:00Z" },
+#   "duration": 52,
+#   "durationSeconds": 3114,
+#   "video_url": "/api/1/player/079395-000-A",
+#   "player": {
+#     "config": "https://api.arte.tv/api/player/v2/config/fr/079395-000-A"
+#   },
+#   "playable": true,
+#   "stickers": [
+#     { "code": "PLAYABLE", "label": "PLAYABLE"}
+#   ],
+#   "durationLabel": null,
+#   "available": true,
+#   "trackingPixel": "https://www.arte.tv/ct/?language=fr&support=web&pageid={HOME}&zonename=myarte_favorites&zoneid=myarte_favorites&teasertitle=Maitriser-l-energie-des-etoiles-la-revolution-de-demain&teaserid=079395-000-A&programid=079395-000-A&position=17",
+#   "lastviewed": { "is": true, "timecode": 0, "progress": 0 },
+#   "favorite": { "is": true }
+# }
+# Destination object : https://romanvm.github.io/Kodistubs/_autosummary/xbmcgui.html#xbmcgui.ListItem.setInfo
+def map_artetv_video(item):
+    programId = item.get('programId')
+    kind = item.get('kind')
+    duration = int(item.get('duration') or 0) * \
+        60 or item.get('durationSeconds')
+    airdate = item.get('beginsAt') # broadcastBegin
+    if airdate is not None:
+        airdate = str(utils.parse_artetv_date(airdate))
+
+    fanartUrl = ""
+    thumbnailUrl = ""
+    if item.get('images') and item.get('images')[0] and item.get('images')[0].get('url'):
+        # Remove query param type=TEXT to avoid title embeded in image
+        fanartUrl = item.get('images')[0].get('url').replace('?type=TEXT', '')
+        thumbnailUrl = fanartUrl
+        # Set same image for fanart and thumbnail to spare network bandwidth
+        # and business logic easier to maintain
+        #if item.get('images')[0].get('alternateResolutions'):
+        #    smallerImage = item.get('images')[0].get('alternateResolutions')[3]
+        #    if smallerImage and smallerImage.get('url'):
+        #        thumbnailUrl = smallerImage.get('url').replace('?type=TEXT', '')
+    playcount = 0
+    if item.get('lastviewed') and item.get('lastviewed').get('progress'):
+        playcount = item.get('lastviewed').get('progress')
+
+    return {
+        'label': utils.format_title_and_subtitle(item.get('title'), item.get('subtitle')),
+        'path': plugin.url_for('play', kind=kind, program_id=programId),
+        'thumbnail': thumbnailUrl,
+        'is_playable': item.get('playable'), # not show_video_streams
+        'info_type': 'video',
+        'info': {
+            'title': item.get('title'),
+            'duration': duration,
+            #'genre': item.get('genrePresse'),
+            'plot': item.get('description'),
+            'plotoutline': item.get('shortDescription'),
+            # year is not correctly used by kodi :(
+            # the aired year will be used by kodi for production year :(
+            # 'year': int(config.get('productionYear')),
+            #'country': [country.get('label') for country in item.get('productionCountries', [])],
+            #'director': item.get('director'),
+            #'aired': airdate
+            'playcount': playcount
+        },
+        'properties': {
+            'fanart_image': fanartUrl,
         }
     }
 

@@ -42,6 +42,15 @@ def parse_date(datestr):
     return date
 
 
+def parse_artetv_date(datestr):
+    date = None
+    try:
+        date = datetime.datetime.strptime(datestr, '%Y-%m-%dT%H:%M:%S%z') # 2022-07-01T03:00:00Z
+    except TypeError:
+        date = None
+    return date
+
+
 def past_week():
     today = datetime.date.today()
     one_day = datetime.timedelta(days=1)
