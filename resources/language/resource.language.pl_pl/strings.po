@@ -1,0 +1,75 @@
+# Kodi Media Center language file
+# Addon Name: Arte +7
+# Addon id: plugin.video.arteplussept
+# Addon Provider: bmf
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30044"
+msgid "General"
+msgstr "Głowny"
+
+msgctxt "#30045"
+msgid "Profile"
+msgstr "Profil"
+
+msgctxt "#30050"
+msgid "Language (Videos)"
+msgstr "Język"
+
+msgctxt "#30052"
+msgid "Stream video quality"
+msgstr "Jakość wideo"
+
+msgctxt "#30053"
+msgid "Show video stream options"
+msgstr "Pokaz opcje wideo"
+
+msgctxt "#30054"
+msgid "Email"
+msgstr "E-mail"
+
+msgctxt "#30055"
+msgid "Password"
+msgstr "Hasło"
+
+msgctxt "#30005"
+msgid "Most recent"
+msgstr "Najnowsze"
+
+msgctxt "#30006"
+msgid "Most viewed"
+msgstr "Najczęściej oglądane"
+
+msgctxt "#30007"
+msgid "Last chance"
+msgstr "Opuszczajace oferte"
+
+msgctxt "#30008"
+msgid "Magazines A-Z"
+msgstr "Reportaże"
+
+msgctxt "#30009"
+msgid "This week"
+msgstr "W tym tygodniu"
+
+msgctxt "#30010"
+msgid "My list"
+msgstr "Moja lista"
+
+msgctxt "#30011"
+msgid "My history"
+msgstr "Ostatnio ogladane"
+
+msgctxt "#30020"
+msgid "Unable to authenticate"
+msgstr "Nie można uwierzytelnić"
+
+msgctxt "#30021"
+msgid "Email or password missing"
+msgstr "Brak e-mail lub hasła"

@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # https://xbmcswift2.readthedocs.io/en/latest/api.html
-# https://github.com/jbeluch/xbmcswift2
+# https://github.com/XBMC-Addons/script.module.xbmcswift2
 from xbmcswift2 import Plugin
 
 

@@ -1,3 +1,8 @@
+# Version 1.1.3
+
+- Added Polish translation
+- Added My list and My history content from Arte TV profile
+
 # Version 1.1.2
 
 - better date / locale handling & prevent crash when http error
