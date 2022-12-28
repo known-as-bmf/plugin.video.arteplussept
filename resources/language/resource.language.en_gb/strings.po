@@ -10,6 +10,14 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "#30044"
+msgid "General"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Profile"
+msgstr ""
+
 msgctxt "#30050"
 msgid "Language (Videos)"
 msgstr ""
@@ -20,6 +28,14 @@ msgstr ""
 
 msgctxt "#30053"
 msgid "Show video stream options"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Email"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Password"
 msgstr ""
 
 msgctxt "#30005"
@@ -40,4 +56,20 @@ msgstr ""
 
 msgctxt "#30009"
 msgid "This week"
+msgstr ""
+
+msgctxt "#30010"
+msgid "My list"
+msgstr ""
+
+msgctxt "#30011"
+msgid "My history"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Unable to authenticate"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Email or password missing"
 msgstr ""
