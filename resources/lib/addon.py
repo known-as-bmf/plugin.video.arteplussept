@@ -43,12 +43,17 @@ settings = Settings(plugin)
 
 @plugin.route('/', name='index')
 def index():
-    return view.build_categories(settings)
+    return view.build_categories(plugin.get_storage('most_viewed_categories', TTL=60), settings)
 
 
-@plugin.route('/category/<category_code>', name='category')
-def category(category_code):
-    return view.build_category(category_code, settings)
+@plugin.route('/api_category/<category_code>', name='api_category')
+def api_category(category_code):
+    return view.build_api_category(category_code, settings)
+
+
+@plugin.route('/cached_category/<category_code>', name='cached_category')
+def cached_category(category_code):
+    return view.get_cached_category(category_code, plugin.get_storage('most_viewed_categories', TTL=60))
 
 
 # @plugin.route('/creative', name='creative')

@@ -1,13 +1,32 @@
 from addon import plugin
+from xbmcswift2 import xbmc
 
 import hof
 import utils
 
+def map_categories(api_categories, show_video_streams, most_viewed_categories):
+    categories = []
+    for item in api_categories:
+        # categories have code MOST_VIEWED, when content is returned in teasers
+        # and not available in sub API call
+        if item.get('code') == "MOST_VIEWED":
+            cat_code = "MOST_VIEWED_{id}".format(id=(len(most_viewed_categories) or 0))
+            item['code'] = cat_code
+            if item.get('teasers'):
+                # build cached categories
+                most_viewed_categories[cat_code]=[map_generic_item(teaser, show_video_streams)
+                        for teaser in item.get('teasers')]
+                categories.append(map_categories_item(item, 'cached_category'))
+            else:
+                xbmc.log("category \"{cat_title}\" will be ignored, because it contains no teaser".format(cat_title=item.get('title')))
+        else:
+            categories.append(map_categories_item(item, 'api_category'))
+    return categories
 
-def map_categories_item(item):
+def map_categories_item(item, category_rule):
     return {
         'label': utils.colorize(item.get('title'), item.get('color')),
-        'path': plugin.url_for('category', category_code=item.get('code'))
+        'path': plugin.url_for(category_rule, category_code=item.get('code'))
     }
 
 
@@ -68,13 +87,7 @@ def create_last_chance_item():
 
 
 def map_category_item(item, category_code):
-    # code = item.get('code')
     title = item.get('title')
-
-    # if code:
-    #     path = plugin.url_for('sub_category_by_code',
-    #                           category_code=category_code, sub_category_code=code)
-    # else:
     path = plugin.url_for('sub_category_by_title',
                           category_code=category_code, sub_category_title=utils.encode_string(title))
 

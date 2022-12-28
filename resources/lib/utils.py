@@ -1,6 +1,6 @@
 import datetime
 import dateutil.parser
-import xbmc
+from xbmcswift2 import xbmc
 import html
 import urllib.parse
 
