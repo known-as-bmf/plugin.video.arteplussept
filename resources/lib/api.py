@@ -1,6 +1,6 @@
 from collections import OrderedDict
 import requests
-import xbmc
+from xbmcswift2 import xbmc
 
 import hof
 
@@ -16,7 +16,7 @@ _endpoints = {
     'categories': '/EMAC/teasers/{type}/v2/{lang}',
     'category': '/EMAC/teasers/category/v2/{category_code}/{lang}',
     'subcategory': '/OPA/v3/videos/subcategory/{sub_category_code}/page/1/limit/100/{lang}',
-    'magazines': '/OPA/v3/magazines/{lang}',
+    # 'magazines': '/OPA/v3/magazines/{lang}', # moved to arte tv api
     'collection': '/EMAC/teasers/collection/v2/{collection_id}/{lang}',
     # program details
     'video': '/OPA/v3/videos/{program_id}/{lang}',
@@ -32,6 +32,7 @@ _artetv_endpoints = {
     'token': '/sso/v3/token', # POST
     'favorites': '/sso/v3/favorites/{lang}?page={page}&limit={limit}', #GET
     'last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', #GET
+    'magazines': '/sso/v3/magazines/{lang}?page={page}&limit={limit}', #GET
     'live': '/player/v2/config/{lang}/LIVE', #GET
 }
 _artetv_headers = {
@@ -65,11 +66,6 @@ def home_category(name, lang):
     return _load_json(url).get('teasers', {}).get(name, [])
 
 
-def magazines(lang):
-    url = _endpoints['magazines'].format(lang=lang)
-    return _load_json(url).get('magazines', {})
-
-
 def category(category_code, lang):
     url = _endpoints['category'].format(category_code=category_code, lang=lang)
     return _load_json(url).get('category', {})
@@ -98,6 +94,11 @@ def streams(kind, program_id, lang):
     url = _endpoints['streams'] .format(
         kind=kind, program_id=program_id, lang=lang)
     return _load_json(url).get('videoStreams', [])
+
+
+def magazines(lang):
+    url = _artetv_url + _artetv_endpoints['magazines'].format(lang=lang, page='1', limit='50')
+    return _load_json_full_url(url, _artetv_headers).get('data')
 
 
 def daily(date, lang):
