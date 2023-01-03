@@ -6,6 +6,7 @@ import utils
 
 def build_categories(most_viewed_categories, settings):
     categories = [
+        mapper.map_live_video(api.live_video(settings.language)),
         mapper.create_favorites_item(),
         mapper.create_last_viewed_item(),
         mapper.create_newest_item(),

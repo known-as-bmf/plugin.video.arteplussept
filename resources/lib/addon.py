@@ -120,6 +120,9 @@ def streams(program_id):
     plugin.set_content('tvshows')
     return plugin.finish(view.build_video_streams(program_id, settings))
 
+@plugin.route('/play_live/<streamUrl>', name='play_live')
+def play_live(streamUrl):
+    return plugin.set_resolved_url({'path': streamUrl})
 
 @plugin.route('/play/<kind>/<program_id>', name='play')
 @plugin.route('/play/<kind>/<program_id>/<audio_slot>', name='play_specific')

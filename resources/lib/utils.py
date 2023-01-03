@@ -5,6 +5,11 @@ import html
 import urllib.parse
 
 
+def format_live_title_and_subtitle(title, subtitle=None):
+    label = u'[COLOR ffffa500]LIVE[/COLOR] - '
+    label += format_title_and_subtitle(title, subtitle)
+    return label
+
 def colorize(text, color):
     """
     color: a hex color string (RRGGBB or #RRGGBB) or None
