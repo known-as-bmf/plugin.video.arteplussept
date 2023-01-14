@@ -133,6 +133,7 @@ def _load_json_personal_content(plugin, url, usr, pwd, hdrs=_artetv_headers):
 def token(plugin, username="", password=""):
     # unable to authenticate if either username or password are empty
     if not username and not password:
+        plugin.notify(msg=plugin.addon.getLocalizedString(30022), image='info')
         return None
     # inform that setings are incomplete
     if not username or not password:

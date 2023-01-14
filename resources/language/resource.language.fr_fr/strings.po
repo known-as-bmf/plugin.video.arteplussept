@@ -73,3 +73,7 @@ msgstr "Impossible de s'authentifier"
 msgctxt "#30021"
 msgid "Email or password missing"
 msgstr "E-mail ou mot de passe manquant"
+
+msgctxt "#30022"
+msgid "Update your profile in settings to fetch this content"
+msgstr "Mettez à jour votre profil dans la configuration pour télécharger ce contenu"

@@ -73,3 +73,7 @@ msgstr "Nie można uwierzytelnić"
 msgctxt "#30021"
 msgid "Email or password missing"
 msgstr "Brak e-mail lub hasła"
+
+msgctxt "#30022"
+msgid "Update your profile in settings to fetch this content"
+msgstr "Zaktualizuj swój profil w ustawieniach, aby pobrać tę zawartość"
