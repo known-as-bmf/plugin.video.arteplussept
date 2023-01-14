@@ -4,6 +4,7 @@
 #
 # plugin.video.arteplussept, Kodi add-on to watch videos from http://www.arte.tv/guide/fr/plus7/
 # Copyright (C) 2015  known-as-bmf
+# Copyright (C) 2023  thomas-ernest
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License

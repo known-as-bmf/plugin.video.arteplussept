@@ -1,3 +1,9 @@
+# Version 1.1.4
+
+- Added Live stream in root menu
+- Got "Magazines A-Z" content from Arte TV instead of HBB TV API.
+- Fixed empty categories - discrepencies with Arte TV - Bug #79
+
 # Version 1.1.3
 
 - Added Polish translation
