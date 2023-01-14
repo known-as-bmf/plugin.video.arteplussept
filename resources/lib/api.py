@@ -27,11 +27,12 @@ _endpoints = {
 
 
 # Arte TV API - Used on Arte TV website
-_artetv_url = 'https://api.arte.tv/api/sso/v3'
+_artetv_url = 'https://api.arte.tv/api'
 _artetv_endpoints = {
-    'token': '/token', # POST
-    'favorites': '/favorites/{lang}?page={page}&limit={limit}', #GET
-    'last_viewed': '/lastvieweds/{lang}?page={page}&limit={limit}' #GET
+    'token': '/sso/v3/token', # POST
+    'favorites': '/sso/v3/favorites/{lang}?page={page}&limit={limit}', #GET
+    'last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', #GET
+    'live': '/player/v2/config/{lang}/LIVE', #GET
 }
 _artetv_headers = {
     'authorization': 'I6k2z58YGO08P1X0E8A7VBOjDxr8Lecg', # required to use token endpoint
@@ -48,6 +49,10 @@ def favorites(plugin, lang, usr, pwd):
 def last_viewed(plugin, lang, usr, pwd):
     url = _artetv_url + _artetv_endpoints['last_viewed'].format(lang=lang, page='1', limit='50')
     return _load_json_personal_content(plugin, url, usr, pwd)
+
+def live_video(lang):
+    url = _artetv_url + _artetv_endpoints['live'].format(lang=lang)
+    return _load_json_full_url(url, None).get('data', {})
 
 
 def categories(lang):

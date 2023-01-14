@@ -236,6 +236,54 @@ def map_artetv_video(item):
     }
 
 
+def map_live_video(item):
+    programId = item.get('id')
+    attr = item.get('attributes')
+    print(item)
+    meta = attr.get('metadata')
+
+    duration = meta.get('duration').get('seconds')
+
+    fanartUrl = ""
+    thumbnailUrl = ""
+    if meta.get('images') and meta.get('images')[0] and meta.get('images')[0].get('url'):
+        # Remove query param type=TEXT to avoid title embeded in image
+        fanartUrl = meta.get('images')[0].get('url').replace('?type=TEXT', '')
+        thumbnailUrl = fanartUrl
+        # Set same image for fanart and thumbnail to spare network bandwidth
+        # and business logic easier to maintain
+        #if item.get('images')[0].get('alternateResolutions'):
+        #    smallerImage = item.get('images')[0].get('alternateResolutions')[3]
+        #    if smallerImage and smallerImage.get('url'):
+        #        thumbnailUrl = smallerImage.get('url').replace('?type=TEXT', '')
+    streamUrl=attr.get('streams')[0].get('url')
+
+    return {
+        'label': utils.format_live_title_and_subtitle(meta.get('title'), meta.get('subtitle')),
+        'path': plugin.url_for('play_live', streamUrl=streamUrl),
+        'thumbnail': thumbnailUrl,
+        'is_playable': True, # not show_video_streams
+        'info_type': 'video',
+        'info': {
+            'title': meta.get('title'),
+            'duration': duration,
+            #'genre': item.get('genrePresse'),
+            'plot': meta.get('description'),
+            #'plotoutline': meta.get('shortDescription'),
+            # year is not correctly used by kodi :(
+            # the aired year will be used by kodi for production year :(
+            # 'year': int(config.get('productionYear')),
+            #'country': [country.get('label') for country in item.get('productionCountries', [])],
+            #'director': item.get('director'),
+            #'aired': airdate
+            'playcount': 0
+        },
+        'properties': {
+            'fanart_image': fanartUrl,
+        }
+    }
+
+
 def map_playlist(item):
     programId = item.get('programId')
     kind = item.get('kind')
