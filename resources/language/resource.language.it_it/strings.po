@@ -1,7 +1,7 @@
 # Kodi Media Center language file
 # Addon Name: Arte +7
 # Addon id: plugin.video.arteplussept
-# Addon Provider: bmf
+# Addon Provider: bmf, thomas-ernest
 msgid ""
 msgstr ""
 "MIME-Version: 1.0\n"
