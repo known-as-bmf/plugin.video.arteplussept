@@ -4,8 +4,7 @@ import mapper
 import hof
 import utils
 
-
-def build_categories(settings):
+def build_categories(most_viewed_categories, settings):
     categories = [
         mapper.create_favorites_item(),
         mapper.create_last_viewed_item(),
@@ -13,8 +12,8 @@ def build_categories(settings):
         mapper.create_most_viewed_item(),
         mapper.create_last_chance_item(),
     ]
-    categories.extend([mapper.map_categories_item(item) for item in
-        api.categories(settings.language)])
+    categories.extend(mapper.map_categories(
+        api.categories(settings.language), settings.show_video_streams, most_viewed_categories))
     # categories.append(mapper.create_creative_item())
     categories.append(mapper.create_magazines_item())
     categories.append(mapper.create_week_item())
@@ -22,11 +21,15 @@ def build_categories(settings):
     return categories
 
 
-def build_category(category_code, settings):
+def build_api_category(category_code, settings):
     category = [mapper.map_category_item(item, category_code) for item in
             api.category(category_code, settings.language)]
 
     return category
+
+
+def get_cached_category(category_title, most_viewed_categories):
+    return most_viewed_categories[category_title]
 
 
 def build_magazines(settings):
