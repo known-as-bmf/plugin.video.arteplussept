@@ -10,6 +10,14 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "#30044"
+msgid "General"
+msgstr "General"
+
+msgctxt "#30045"
+msgid "Profile"
+msgstr "Profil"
+
 msgctxt "#30050"
 msgid "Language (Videos)"
 msgstr "Langage (Vidéos)"
@@ -21,6 +29,14 @@ msgstr "Qualité vidéo préferée"
 msgctxt "#30053"
 msgid "Show video stream options"
 msgstr "Afficher les options de flux vidéo"
+
+msgctxt "#30054"
+msgid "Email"
+msgstr "Adresse e-mail"
+
+msgctxt "#30055"
+msgid "Password"
+msgstr "Mot de passe"
 
 msgctxt "#30005"
 msgid "Most recent"
@@ -41,3 +57,19 @@ msgstr "Émissions A-Z"
 msgctxt "#30009"
 msgid "This week"
 msgstr "Cette semaine"
+
+msgctxt "#30010"
+msgid "My list"
+msgstr "Mes favoris"
+
+msgctxt "#30011"
+msgid "My history"
+msgstr "Mon historique"
+
+msgctxt "#30020"
+msgid "Unable to authenticate"
+msgstr "Impossible de s'authentifier"
+
+msgctxt "#30021"
+msgid "Email or password missing"
+msgstr "E-mail ou mot de passe manquant"

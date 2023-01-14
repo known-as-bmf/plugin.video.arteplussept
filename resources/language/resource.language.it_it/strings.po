@@ -10,6 +10,14 @@ msgstr ""
 "Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "#30044"
+msgid "General"
+msgstr "Generale"
+
+msgctxt "#30045"
+msgid "Profile"
+msgstr "Profilo"
+
 msgctxt "#30050"
 msgid "Language (Videos)"
 msgstr "Lingua (Video)"
@@ -21,6 +29,14 @@ msgstr "Qualità video"
 msgctxt "#30053"
 msgid "Show video stream options"
 msgstr "Show video stream options"
+
+msgctxt "#30054"
+msgid "Email"
+msgstr "Indirizzo email"
+
+msgctxt "#30055"
+msgid "Password"
+msgstr "Password"
 
 msgctxt "#30005"
 msgid "Most recent"
@@ -41,3 +57,19 @@ msgstr "Spettacoli A-Z"
 msgctxt "#30009"
 msgid "This week"
 msgstr "Questa settimana"
+
+msgctxt "#30010"
+msgid "My list"
+msgstr "La mia lista"
+
+msgctxt "#30011"
+msgid "My history"
+msgstr "Cronologia"
+
+msgctxt "#30020"
+msgid "Unable to authenticate"
+msgstr "Impossibile autenticare"
+
+msgctxt "#30021"
+msgid "Email or password missing"
+msgstr "E-mail o password mancanti"

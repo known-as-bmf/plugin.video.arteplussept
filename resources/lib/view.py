@@ -7,12 +7,14 @@ import utils
 
 def build_categories(settings):
     categories = [
+        mapper.create_favorites_item(),
+        mapper.create_last_viewed_item(),
         mapper.create_newest_item(),
         mapper.create_most_viewed_item(),
         mapper.create_last_chance_item(),
     ]
-    categories.extend([mapper.map_categories_item(
-        item) for item in api.categories(settings.language)])
+    categories.extend([mapper.map_categories_item(item) for item in
+        api.categories(settings.language)])
     # categories.append(mapper.create_creative_item())
     categories.append(mapper.create_magazines_item())
     categories.append(mapper.create_week_item())
@@ -21,33 +23,49 @@ def build_categories(settings):
 
 
 def build_category(category_code, settings):
-    category = [mapper.map_category_item(
-        item, category_code) for item in api.category(category_code, settings.language)]
+    category = [mapper.map_category_item(item, category_code) for item in
+            api.category(category_code, settings.language)]
 
     return category
 
 
 def build_magazines(settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in api.magazines(settings.language)]
+    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
+            api.magazines(settings.language)]
+
+
+def build_favorites(plugin, settings):
+    return [mapper.map_artetv_video(item) for item in
+            api.favorites(plugin, settings.language, settings.username, settings.password) or
+            # display an empty list in case of error. error should be display in a notification
+            []]
+
+
+def build_last_viewed(plugin, settings):
+    return [mapper.map_artetv_video(item) for item in
+            api.last_viewed(plugin, settings.language, settings.username, settings.password) or
+            # display an empty list in case of error. error should be display in a notification
+            []]
 
 
 def build_newest(settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for
-            item in api.home_category('mostRecent', settings.language)]
+    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
+            api.home_category('mostRecent', settings.language)]
 
 
 def build_most_viewed(settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for
-            item in api.home_category('mostViewed', settings.language)]
+    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
+            api.home_category('mostViewed', settings.language)]
 
 
 def build_last_chance(settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for
-            item in api.home_category('lastChance', settings.language)]
+    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
+            api.home_category('lastChance', settings.language)]
 
 
 def build_sub_category_by_code(sub_category_code, settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in api.subcategory(sub_category_code, settings.language)]
+    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
+            api.subcategory(sub_category_code, settings.language)]
 
 
 def build_sub_category_by_title(category_code, sub_category_title, settings):
@@ -56,11 +74,13 @@ def build_sub_category_by_title(category_code, sub_category_title, settings):
 
     sub_category = hof.find(lambda i: i.get('title') == unquoted_title, category)
 
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in sub_category.get('teasers')]
+    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
+            sub_category.get('teasers')]
 
 
 def build_mixed_collection(kind, collection_id, settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in api.collection(kind, collection_id, settings.language)]
+    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
+            api.collection(kind, collection_id, settings.language)]
 
 
 def build_video_streams(program_id, settings):

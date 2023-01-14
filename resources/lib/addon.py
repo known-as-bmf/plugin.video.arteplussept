@@ -19,6 +19,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
+# https://xbmcswift2.readthedocs.io/en/latest/api.html
+# https://github.com/XBMC-Addons/script.module.xbmcswift2
 from xbmcswift2 import Plugin
 
 
@@ -58,6 +60,18 @@ def category(category_code):
 def magazines():
     plugin.set_content('tvshows')
     return plugin.finish(view.build_magazines(settings))
+
+
+@plugin.route('/favorites', name='favorites')
+def favorites():
+    plugin.set_content('tvshows')
+    return plugin.finish(view.build_favorites(plugin, settings))
+
+
+@plugin.route('/last_viewed', name='last_viewed')
+def favorites():
+    plugin.set_content('tvshows')
+    return plugin.finish(view.build_last_viewed(plugin, settings))
 
 
 @plugin.route('/newest', name='newest')
