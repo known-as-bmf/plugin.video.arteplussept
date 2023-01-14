@@ -20,7 +20,7 @@ Download the plugin [here](https://github.com/thomas-ernest/plugin.video.arteplu
 
 Then follow the steps bellow depending on your system and software version
 
-##1. Open the addons folder
+## 1. Open the addons folder
 
 ### Windows
 
@@ -37,7 +37,7 @@ Then follow the steps bellow depending on your system and software version
 * For Kodi : Open the `/Users/<your_user_name>/Library/Application Support/Kodi/addons` folder
 * For XBMC : Open the `/Users/<your_user_name>/Library/Application Support/XBMC/addons` folder
 
-##2. Install the add-on
+## 2. Install the add-on
 
 * Extract the content of the zip in the `addons` folder
 * Rename the extracted directory from `plugin.video.arteplussept-master` to `plugin.video.arteplussept`
@@ -48,7 +48,7 @@ Then follow the steps bellow depending on your system and software version
 * mv plugin.video.arteplussept plugin.video.arteplussept-backup OR rm -fr plugin.video.arteplussept
 * mv plugin.video.arteplussept-master plugin.video.arteplussept
 
-##3. Enjoy
+## 3. Enjoy
 
 * Done ! The plugin should show up in your video add-ons section.
 
