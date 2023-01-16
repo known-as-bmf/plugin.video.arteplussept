@@ -81,3 +81,27 @@ msgstr "Brak e-mail lub hasła"
 msgctxt "#30022"
 msgid "Update your profile in settings to fetch this content"
 msgstr "Zaktualizuj swój profil w ustawieniach, aby pobrać tę zawartość"
+
+msgctxt "#30023"
+msgid "Add to Arte favorites"
+msgstr "Dodaj do ulubionych Arte"
+
+msgctxt "#30024"
+msgid "Remove from Arte favorites"
+msgstr "Usuń z ulubionych Arte"
+
+msgctxt "#30025"
+msgid "Successfully added to favorites"
+msgstr "Pomyślnie dodano do ulubionych"
+
+msgctxt "#30026"
+msgid "Failed to add to favorites"
+msgstr "Nie udało się dodać do ulubionych"
+
+msgctxt "#30027"
+msgid "Successfully remove from favorites"
+msgstr "Pomyślnie usunięto z ulubionych"
+
+msgctxt "#30028"
+msgid "Failed to remove from favorites"
+msgstr "Nie udało się usunąć z ulubionych"
