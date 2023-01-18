@@ -28,12 +28,16 @@ _endpoints = {
 
 # Arte TV API - Used on Arte TV website
 _artetv_url = 'https://api.arte.tv/api'
+_artetv_rproxy_url = 'https://arte.tv/api/rproxy'
 _artetv_endpoints = {
     'token': '/sso/v3/token', # POST
-    'favorites': '/sso/v3/favorites/{lang}?page={page}&limit={limit}', #GET
-    'last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', #GET
-    'magazines': '/sso/v3/magazines/{lang}?page={page}&limit={limit}', #GET
-    'live': '/player/v2/config/{lang}/LIVE', #GET
+    'favorites': '/sso/v3/favorites/{lang}?page={page}&limit={limit}', # needs token in authorization header
+    'last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', # needs token in authorization header
+    'magazines': '/sso/v3/magazines/{lang}?page={page}&limit={limit}',
+    'program': '/player/v2/config/{lang}/{program_id}', # program_id can be 103520-000-A or LIVE
+    'page': '/emac/v4/{lang}/web/pages/{category}/', #rproxy
+    # not yet impl. 'search': 'rproxy/emac/v4/{lang}/web/pages/SEARCH/?page={page}&query={query}', #GET
+    # not yet impl. 'guide_tv': 'https://www.arte.tv/api/rproxy/emac/v3/fr/web/pages/TV_GUIDE/?day=2023-01-17', #GET
 }
 _artetv_headers = {
     'authorization': 'I6k2z58YGO08P1X0E8A7VBOjDxr8Lecg', # required to use token endpoint
@@ -51,8 +55,8 @@ def last_viewed(plugin, lang, usr, pwd):
     url = _artetv_url + _artetv_endpoints['last_viewed'].format(lang=lang, page='1', limit='50')
     return _load_json_personal_content(plugin, url, usr, pwd)
 
-def live_video(lang):
-    url = _artetv_url + _artetv_endpoints['live'].format(lang=lang)
+def program_video(lang, program_id):
+    url = _artetv_url + _artetv_endpoints['program'].format(lang=lang, program_id=program_id)
     return _load_json_full_url(url, None).get('data', {})
 
 
@@ -104,6 +108,11 @@ def magazines(lang):
 def daily(date, lang):
     url = _endpoints['daily'].format(date=date, lang=lang)
     return _load_json(url).get('programs', [])
+
+# Get content to be display in a page. It can be a page for a category or the home page.
+def page(lang):
+    url = _artetv_rproxy_url + _artetv_endpoints['page'].format(lang=lang, category='HOME')
+    return _load_json_full_url(url, _artetv_headers).get('value', [])
 
 # Deprecated since 2022. Prefer building url on client side
 def _load_json(path, headers=_base_headers):
