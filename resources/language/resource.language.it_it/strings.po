@@ -66,6 +66,10 @@ msgctxt "#30011"
 msgid "My history"
 msgstr "Cronologia"
 
+msgctxt "#30012"
+msgid "Search"
+msgstr "Search"
+
 msgctxt "#30020"
 msgid "Unable to authenticate"
 msgstr "Impossibile autenticare"

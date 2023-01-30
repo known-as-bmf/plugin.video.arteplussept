@@ -1,12 +1,26 @@
+from xbmcswift2 import xbmc
 
 import api
 import mapper
 import hof
 import utils
 
-def build_categories(most_viewed_categories, settings):
+def build_home_page(plugin, cached_categories, settings):
+    addon_menu = [
+        mapper.create_search_item(),
+        mapper.map_live_video(api.program_video(settings.language, 'LIVE'), settings.quality, '1')]
+    arte_home = api.page(settings.language)
+    for zone in arte_home.get('zones'):
+        menu_item = mapper.map_zone_to_item(zone, cached_categories)
+        if(menu_item):
+            addon_menu.append(menu_item)
+    return addon_menu
+
+
+def build_categories(plugin, cached_categories, settings):
     categories = [
-        mapper.map_live_video(api.live_video(settings.language)),
+        mapper.create_search_item(),
+        mapper.map_live_video(api.program_video(settings.language, 'LIVE'), settings.quality, '1'),
         mapper.create_favorites_item(),
         mapper.create_last_viewed_item(),
         mapper.create_newest_item(),
@@ -14,11 +28,10 @@ def build_categories(most_viewed_categories, settings):
         mapper.create_last_chance_item(),
     ]
     categories.extend(mapper.map_categories(
-        api.categories(settings.language), settings.show_video_streams, most_viewed_categories))
+        api.categories(settings.language), settings.show_video_streams, cached_categories))
     # categories.append(mapper.create_creative_item())
     categories.append(mapper.create_magazines_item())
     categories.append(mapper.create_week_item())
-
     return categories
 
 
@@ -100,7 +113,9 @@ def build_video_streams(program_id, settings):
 
 
 def build_stream_url(kind, program_id, audio_slot, settings):
-    return mapper.map_playable(api.streams(kind, program_id, settings.language), settings.quality, audio_slot)
+    return mapper.map_playable(
+        api.streams(kind, program_id, settings.language),
+        settings.quality, audio_slot, mapper.match_hbbtv)
 
 
 _useless_kinds = ['CLIP', 'MANUAL_CLIP', 'TRAILER']
@@ -126,3 +141,19 @@ def build_weekly(settings):
         item, 'info.aired'), reverse=True)
 
     return videos_mapped
+
+def search(plugin, settings):
+    return mapper.map_cached_categories(
+        api.search(settings.language, get_search_query(plugin)))
+
+def get_search_query(plugin):
+    searchStr = ''
+    keyboard = xbmc.Keyboard(searchStr, plugin.addon.getLocalizedString(30012))
+    keyboard.doModal()
+    if (keyboard.isConfirmed() == False):
+        return
+    searchStr = keyboard.getText()
+    if len(searchStr) == 0:
+        return
+    else:
+        return searchStr

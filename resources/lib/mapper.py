@@ -4,17 +4,17 @@ from xbmcswift2 import xbmc
 import hof
 import utils
 
-def map_categories(api_categories, show_video_streams, most_viewed_categories):
+def map_categories(api_categories, show_video_streams, cached_categories):
     categories = []
     for item in api_categories:
         # categories have code MOST_VIEWED, when content is returned in teasers
         # and not available in sub API call
         if item.get('code') == "MOST_VIEWED":
-            cat_code = "MOST_VIEWED_{id}".format(id=(len(most_viewed_categories) or 0))
+            cat_code = "MOST_VIEWED_{id}".format(id=(len(cached_categories) or 0))
             item['code'] = cat_code
             if item.get('teasers'):
                 # build cached categories
-                most_viewed_categories[cat_code]=[map_generic_item(teaser, show_video_streams)
+                cached_categories[cat_code]=[map_generic_item(teaser, show_video_streams)
                         for teaser in item.get('teasers')]
                 categories.append(map_categories_item(item, 'cached_category'))
             else:
@@ -23,10 +23,12 @@ def map_categories(api_categories, show_video_streams, most_viewed_categories):
             categories.append(map_categories_item(item, 'api_category'))
     return categories
 
-def map_categories_item(item, category_rule):
+def map_categories_item(item, category_rule, category_code=None):
+    if(not category_code):
+        category_code=item.get('code')
     return {
         'label': utils.colorize(item.get('title'), item.get('color')),
-        'path': plugin.url_for(category_rule, category_code=item.get('code'))
+        'path': plugin.url_for(category_rule, category_code=category_code)
     }
 
 
@@ -37,17 +39,28 @@ def map_categories_item(item, category_rule):
 #     }
 
 
-def create_favorites_item():
+def create_favorites_item(label=None):
+    if(not label):
+        label = plugin.addon.getLocalizedString(30010)
     return {
-        'label': plugin.addon.getLocalizedString(30010),
+        'label': label,
         'path': plugin.url_for('favorites')
     }
 
 
-def create_last_viewed_item():
+def create_last_viewed_item(label=None):
+    if(not label):
+        label = plugin.addon.getLocalizedString(30011)
     return {
-        'label': plugin.addon.getLocalizedString(30011),
+        'label': label,
         'path': plugin.url_for('last_viewed')
+    }
+
+
+def create_search_item():
+    return {
+        'label': plugin.addon.getLocalizedString(30012),
+        'path': plugin.url_for('search')
     }
 
 
@@ -147,6 +160,8 @@ def map_video(item, show_video_streams):
 #   "type": "teaser",
 #   "id": "079395-000-A_fr",
 #   "kind": "SHOW",
+# OR
+#   "kind":{"code":"SHOW","label":"Programme","isCollection":false}
 #   "programId": "079395-000-A",
 #   "language": "fr",
 #   "url": "https://www.arte.tv/fr/videos/079395-000-A/maitriser-l-energie-des-etoiles-la-revolution-de-demain/",
@@ -199,22 +214,33 @@ def map_artetv_video(item):
     if item.get('images') and item.get('images')[0] and item.get('images')[0].get('url'):
         # Remove query param type=TEXT to avoid title embeded in image
         fanartUrl = item.get('images')[0].get('url').replace('?type=TEXT', '')
-        thumbnailUrl = fanartUrl
         # Set same image for fanart and thumbnail to spare network bandwidth
         # and business logic easier to maintain
         #if item.get('images')[0].get('alternateResolutions'):
         #    smallerImage = item.get('images')[0].get('alternateResolutions')[3]
         #    if smallerImage and smallerImage.get('url'):
         #        thumbnailUrl = smallerImage.get('url').replace('?type=TEXT', '')
+    if(not fanartUrl):
+        fanartUrl = item.get('mainImage').get('url').replace('__SIZE__', '1920x1080')
+    thumbnailUrl = fanartUrl
+
     playcount = 0
     if item.get('lastviewed') and item.get('lastviewed').get('progress'):
         playcount = item.get('lastviewed').get('progress')
+    
+    if(not isinstance(kind, str)):
+        kind = kind.get('code')
+    if(kind == 'EXTERNAL'):
+        return None
 
+    is_playlist = programId.startswith('RC-') or programId.startswith('PL-')
+    path = plugin.url_for('collection' if is_playlist else 'play', kind=kind, program_id=programId)
+    
     return {
         'label': utils.format_title_and_subtitle(item.get('title'), item.get('subtitle')),
-        'path': plugin.url_for('play', kind=kind, program_id=programId),
+        'path': path,
         'thumbnail': thumbnailUrl,
-        'is_playable': item.get('playable'), # not show_video_streams
+        'is_playable': not is_playlist, # item.get('playable') # not show_video_streams
         'info_type': 'video',
         'info': {
             'title': item.get('title'),
@@ -236,10 +262,9 @@ def map_artetv_video(item):
     }
 
 
-def map_live_video(item):
+def map_live_video(item, quality, audio_slot):
     programId = item.get('id')
     attr = item.get('attributes')
-    print(item)
     meta = attr.get('metadata')
 
     duration = meta.get('duration').get('seconds')
@@ -256,11 +281,14 @@ def map_live_video(item):
         #    smallerImage = item.get('images')[0].get('alternateResolutions')[3]
         #    if smallerImage and smallerImage.get('url'):
         #        thumbnailUrl = smallerImage.get('url').replace('?type=TEXT', '')
-    streamUrl=attr.get('streams')[0].get('url')
+    streamUrl=map_playable(attr.get('streams'), quality, audio_slot, match_artetv).get('path')
 
     return {
         'label': utils.format_live_title_and_subtitle(meta.get('title'), meta.get('subtitle')),
         'path': plugin.url_for('play_live', streamUrl=streamUrl),
+        # playing the stream from program id makes the live starts from the beginning of the video
+        # while it starts the video like the live tv, with the above
+        #  'path': plugin.url_for('play', kind='SHOW', program_id=programId.replace('_fr', '')),
         'thumbnail': thumbnailUrl,
         'is_playable': True, # not show_video_streams
         'info_type': 'video',
@@ -332,7 +360,7 @@ def map_streams(item, streams, quality):
     return [map_stream(dict(video_item), stream) for stream in sorted_filtered_streams]
 
 
-def map_playable(streams, quality, audio_slot):
+def map_playable(streams, quality, audio_slot, match):
     stream = None
     for q in [quality] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality]:
         stream = hof.find(lambda s: match(s, q, audio_slot), streams)
@@ -347,5 +375,37 @@ def map_playable(streams, quality, audio_slot):
     }
 
 
-def match(item, quality, audio_slot):
+def match_hbbtv(item, quality, audio_slot):
     return item.get('quality') == quality and item.get('audioSlot') == audio_slot
+
+def match_artetv(item, quality, audio_slot):
+    return item.get('mainQuality').get('code') == quality and str(item.get('slot')) == audio_slot
+
+
+# Arte TV API page is split into zones. Map a 'zone' to menu item(s).
+# Populate cached_categories for zones with videos available in child 'content'
+def map_zone_to_item(zone, cached_categories):
+    menu_item = None
+    title = zone.get('title')
+    if(zone.get('id') == '9fc57105-847b-49c5-9b4a-f46863754059'):
+        menu_item = create_favorites_item(title)
+    elif(zone.get('id') == '67cea6f3-7af0-4ffa-a6c2-59b1da0ecd4b'):
+        menu_item = create_last_viewed_item(title)
+    elif (zone.get('link')):
+        menu_item = map_categories_item(zone, 'api_category', zone.get('link').get('page'))
+    else:
+        cached_category = map_cached_categories(zone)
+        if cached_category:
+            category_code = zone.get('code')
+            cached_categories[category_code] = cached_category
+            menu_item = map_categories_item(zone, 'cached_category')
+    return menu_item
+
+
+def map_cached_categories(zone):
+    cached_category = []
+    for item in zone.get('content').get('data'):
+        menu_video = map_artetv_video(item)
+        if(menu_video):
+            cached_category.append(menu_video)
+    return cached_category
