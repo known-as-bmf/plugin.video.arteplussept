@@ -35,9 +35,8 @@ _artetv_endpoints = {
     'last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', # needs token in authorization header
     'magazines': '/sso/v3/magazines/{lang}?page={page}&limit={limit}',
     'program': '/player/v2/config/{lang}/{program_id}', # program_id can be 103520-000-A or LIVE
-    'page': '/emac/v4/{lang}/web/pages/{category}/', #rproxy
-    # not yet impl. 'search': 'rproxy/emac/v4/{lang}/web/pages/SEARCH/?page={page}&query={query}', #GET
-    # not yet impl. 'guide_tv': 'https://www.arte.tv/api/rproxy/emac/v3/fr/web/pages/TV_GUIDE/?day=2023-01-17', #GET
+    'page': '/emac/v4/{lang}/web/pages/{category}/', #rproxy category=HOME, CIN, SER, SEARCH
+    # not yet impl. 'guide_tv': '/emac/v3/{lang}/web/pages/TV_GUIDE/?day={DATE}', #rproxy date=2023-01-17
 }
 _artetv_headers = {
     'authorization': 'I6k2z58YGO08P1X0E8A7VBOjDxr8Lecg', # required to use token endpoint
@@ -114,14 +113,20 @@ def page(lang):
     url = _artetv_rproxy_url + _artetv_endpoints['page'].format(lang=lang, category='HOME')
     return _load_json_full_url(url, _artetv_headers).get('value', [])
 
+# /emac/v4/{lang}/web/pages/SEARCH/?page={page}&query={query}
+def search(lang, query, page='1'):
+    url = _artetv_rproxy_url + _artetv_endpoints['page'].format(lang=lang, category='SEARCH')
+    params = {'page' : page, 'query' : query}
+    return _load_json_full_url(url, _artetv_headers, params).get('value', []).get('zones', [None])[0]
+
 # Deprecated since 2022. Prefer building url on client side
 def _load_json(path, headers=_base_headers):
     url = _base_api_url + path
     return _load_json_full_url(url, headers)
 
-def _load_json_full_url(url, headers=_base_headers):
+def _load_json_full_url(url, headers=_base_headers, params=None):
     # https://requests.readthedocs.io/en/latest/
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers, params=params)
     return r.json(object_pairs_hook=OrderedDict)
 
 # Get a bearer token and add it in headers before sending the request

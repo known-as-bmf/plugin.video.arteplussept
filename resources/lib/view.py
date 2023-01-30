@@ -1,3 +1,4 @@
+from xbmcswift2 import xbmc
 
 import api
 import mapper
@@ -5,7 +6,9 @@ import hof
 import utils
 
 def build_home_page(plugin, cached_categories, settings):
-    addon_menu = [mapper.map_live_video(api.program_video(settings.language, 'LIVE'), settings.quality, '1')]
+    addon_menu = [
+        mapper.create_search_item(),
+        mapper.map_live_video(api.program_video(settings.language, 'LIVE'), settings.quality, '1')]
     arte_home = api.page(settings.language)
     for zone in arte_home.get('zones'):
         menu_item = mapper.map_zone_to_item(zone, cached_categories)
@@ -16,7 +19,8 @@ def build_home_page(plugin, cached_categories, settings):
 
 def build_categories(plugin, cached_categories, settings):
     categories = [
-        mapper.map_live_video(api.program_video(settings.language, 'LIVE'), settings.quality, 1),
+        mapper.create_search_item(),
+        mapper.map_live_video(api.program_video(settings.language, 'LIVE'), settings.quality, '1'),
         mapper.create_favorites_item(),
         mapper.create_last_viewed_item(),
         mapper.create_newest_item(),
@@ -137,3 +141,19 @@ def build_weekly(settings):
         item, 'info.aired'), reverse=True)
 
     return videos_mapped
+
+def search(plugin, settings):
+    return mapper.map_cached_categories(
+        api.search(settings.language, get_search_query(plugin)))
+
+def get_search_query(plugin):
+    searchStr = ''
+    keyboard = xbmc.Keyboard(searchStr, plugin.addon.getLocalizedString(30012))
+    keyboard.doModal()
+    if (keyboard.isConfirmed() == False):
+        return
+    searchStr = keyboard.getText()
+    if len(searchStr) == 0:
+        return
+    else:
+        return searchStr

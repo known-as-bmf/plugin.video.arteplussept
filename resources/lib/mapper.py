@@ -57,6 +57,13 @@ def create_last_viewed_item(label=None):
     }
 
 
+def create_search_item():
+    return {
+        'label': plugin.addon.getLocalizedString(30012),
+        'path': plugin.url_for('search')
+    }
+
+
 def create_magazines_item():
     return {
         'label': plugin.addon.getLocalizedString(30008),
@@ -387,13 +394,18 @@ def map_zone_to_item(zone, cached_categories):
     elif (zone.get('link')):
         menu_item = map_categories_item(zone, 'api_category', zone.get('link').get('page'))
     else:
-        cached_category = []
-        for item in zone.get('content').get('data'):
-            menu_video = map_artetv_video(item)
-            if(menu_video):
-                cached_category.append(menu_video)
+        cached_category = map_cached_categories(zone)
         if cached_category:
             category_code = zone.get('code')
             cached_categories[category_code] = cached_category
             menu_item = map_categories_item(zone, 'cached_category')
     return menu_item
+
+
+def map_cached_categories(zone):
+    cached_category = []
+    for item in zone.get('content').get('data'):
+        menu_video = map_artetv_video(item)
+        if(menu_video):
+            cached_category.append(menu_video)
+    return cached_category

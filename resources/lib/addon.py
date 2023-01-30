@@ -145,6 +145,10 @@ def weekly():
     plugin.set_content('tvshows')
     return plugin.finish(view.build_weekly(settings))
 
+@plugin.route('/search', name='search')
+def weekly():
+    plugin.set_content('tvshows')
+    return plugin.finish(view.search(plugin, settings))
 
 # @plugin.route('/broadcast', name='broadcast')
 # def broadcast():
