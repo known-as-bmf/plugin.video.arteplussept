@@ -1,3 +1,9 @@
+# Version 1.1.5
+
+- Populate root menu from Arte TV API instead of HBB TV. Still play video from HBB TV.
+- Manage favorites in Arte profile from context menu
+- Added Search in root menu
+
 # Version 1.1.4
 
 - Added Live stream in root menu
