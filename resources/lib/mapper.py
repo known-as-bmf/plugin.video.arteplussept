@@ -1,5 +1,6 @@
 from addon import plugin
 from xbmcswift2 import xbmc
+from xbmcswift2 import actions
 
 import hof
 import utils
@@ -151,7 +152,13 @@ def map_video(item, show_video_streams):
         },
         'properties': {
             'fanart_image': item.get('imageUrl'),
-        }
+        },
+        'context_menu': [
+            (plugin.addon.getLocalizedString(30023),
+                actions.background(plugin.url_for('add_favorite', program_id=programId))),
+            (plugin.addon.getLocalizedString(30024),
+                actions.background(plugin.url_for('remove_favorite', program_id=programId))),
+        ],
     }
 
 # Create a video menu item from a json returned by Arte TV API
@@ -258,7 +265,13 @@ def map_artetv_video(item):
         },
         'properties': {
             'fanart_image': fanartUrl,
-        }
+        },
+        'context_menu': [
+            (plugin.addon.getLocalizedString(30023),
+                actions.background(plugin.url_for('add_favorite', program_id=programId))),
+            (plugin.addon.getLocalizedString(30024),
+                actions.background(plugin.url_for('remove_favorite', program_id=programId))),
+        ],
     }
 
 

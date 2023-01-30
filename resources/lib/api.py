@@ -31,7 +31,9 @@ _artetv_url = 'https://api.arte.tv/api'
 _artetv_rproxy_url = 'https://arte.tv/api/rproxy'
 _artetv_endpoints = {
     'token': '/sso/v3/token', # POST
-    'favorites': '/sso/v3/favorites/{lang}?page={page}&limit={limit}', # needs token in authorization header
+    'get_favorites': '/sso/v3/favorites/{lang}?page={page}&limit={limit}', # needs token in authorization header
+    'add_favorite': '/sso/v3/favorites', #PUT needs token in authorization header
+    'remove_favorite': '/sso/v3/favorites/{program_id}', #DELETE needs token in authorization header
     'last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', # needs token in authorization header
     'magazines': '/sso/v3/magazines/{lang}?page={page}&limit={limit}',
     'program': '/player/v2/config/{lang}/{program_id}', # program_id can be 103520-000-A or LIVE
@@ -45,9 +47,22 @@ _artetv_headers = {
 }
 
 # Retrieve favorites from a personal account.
-def favorites(plugin, lang, usr, pwd):
-    url = _artetv_url + _artetv_endpoints['favorites'].format(lang=lang, page='1', limit='50')
+def get_favorites(plugin, lang, usr, pwd):
+    url = _artetv_url + _artetv_endpoints['get_favorites'].format(lang=lang, page='1', limit='50')
     return _load_json_personal_content(plugin, url, usr, pwd)
+
+def add_favorite(plugin, usr, pwd, program_id):
+    url = _artetv_url + _artetv_endpoints['add_favorite'].format()
+    headers = _add_auth_token(plugin, usr, pwd, _artetv_headers)
+    data = {'programId': program_id}
+    r = requests.put(url, data=data, headers=headers)
+    return r.status_code
+
+def remove_favorite(plugin, usr, pwd, program_id):
+    url = _artetv_url + _artetv_endpoints['remove_favorite'].format(program_id=program_id)
+    headers = _add_auth_token(plugin, usr, pwd, _artetv_headers)
+    r = requests.delete(url, headers=headers)
+    return r.status_code
 
 # Retrieve content recently watched by a user.
 def last_viewed(plugin, lang, usr, pwd):
@@ -131,12 +146,19 @@ def _load_json_full_url(url, headers=_base_headers, params=None):
 
 # Get a bearer token and add it in headers before sending the request
 def _load_json_personal_content(plugin, url, usr, pwd, hdrs=_artetv_headers):
+    headers = _add_auth_token(plugin, usr, pwd, hdrs)
+    if not headers:
+        return None
+    return _load_json_full_url(url, headers).get('data', [])
+
+# Get a bearer token and add it as HTTP header authorization
+def _add_auth_token(plugin, usr, pwd, hdrs):
     tkn = token(plugin, usr, pwd)
     if not tkn:
         return None
     headers=hdrs.copy()
     headers['authorization'] = tkn['token_type'] + ' ' + tkn['access_token']
-    return _load_json_full_url(url, headers).get('data', [])
+    return headers
 
 # Log in user thanks to his/her settings and get a bearer token
 # return None if:

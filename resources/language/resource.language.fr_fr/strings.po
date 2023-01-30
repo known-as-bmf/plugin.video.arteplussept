@@ -81,3 +81,27 @@ msgstr "E-mail ou mot de passe manquant"
 msgctxt "#30022"
 msgid "Update your profile in settings to fetch this content"
 msgstr "Mettez à jour votre profil dans la configuration pour télécharger ce contenu"
+
+msgctxt "#30023"
+msgid "Add to Arte favorites"
+msgstr "Ajouter aux favoris Arte"
+
+msgctxt "#30024"
+msgid "Remove from Arte favorites"
+msgstr "Retirer des favoris Arte"
+
+msgctxt "#30025"
+msgid "Successfully added to favorites"
+msgstr "Ajouté aux favoris avec succès"
+
+msgctxt "#30026"
+msgid "Failed to add to favorites"
+msgstr "Erreur lors de l'ajout aux favoris"
+
+msgctxt "#30027"
+msgid "Successfully remove from favorites"
+msgstr "Retiré des favoris avec succès"
+
+msgctxt "#30028"
+msgid "Failed to remove from favorites"
+msgstr "Erreur lors du retrait des favoris"

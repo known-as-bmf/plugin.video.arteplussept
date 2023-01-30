@@ -53,9 +53,21 @@ def build_magazines(settings):
 
 def build_favorites(plugin, settings):
     return [mapper.map_artetv_video(item) for item in
-            api.favorites(plugin, settings.language, settings.username, settings.password) or
+            api.get_favorites(plugin, settings.language, settings.username, settings.password) or
             # display an empty list in case of error. error should be display in a notification
             []]
+
+def add_favorite(plugin, usr, pwd, program_id):
+    if (200 == api.add_favorite(plugin, usr, pwd, program_id)):
+        plugin.notify(msg=plugin.addon.getLocalizedString(30025), image='info')
+    else:
+        plugin.notify(msg=plugin.addon.getLocalizedString(30026), image='error')
+
+def remove_favorite(plugin, usr, pwd, program_id):
+    if (200 == api.remove_favorite(plugin, usr, pwd, program_id)):
+        plugin.notify(msg=plugin.addon.getLocalizedString(30027), image='info')
+    else:
+        plugin.notify(msg=plugin.addon.getLocalizedString(30028), image='error')
 
 
 def build_last_viewed(plugin, settings):

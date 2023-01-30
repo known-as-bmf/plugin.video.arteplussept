@@ -75,6 +75,14 @@ def favorites():
     plugin.set_content('tvshows')
     return plugin.finish(view.build_favorites(plugin, settings))
 
+@plugin.route('/add_favorite/<program_id>', name='add_favorite')
+def add_favorite(program_id):
+    view.add_favorite(plugin, settings.username, settings.password, program_id)
+
+@plugin.route('/remove_favorite/<program_id>', name='remove_favorite')
+def remove_favorite(program_id):
+    view.remove_favorite(plugin, settings.username, settings.password, program_id)
+
 
 @plugin.route('/last_viewed', name='last_viewed')
 def favorites():
