@@ -8,7 +8,14 @@ import utils
 def build_home_page(plugin, cached_categories, settings):
     addon_menu = [
         mapper.create_search_item(),
-        mapper.map_live_video(api.program_video(settings.language, 'LIVE'), settings.quality, '1')]
+    ]
+    try:
+        live_stream_data = api.program_video(settings.language, 'LIVE')
+        live_stream_item = mapper.map_live_video(live_stream_data, settings.quality, '1')
+        addon_menu.append(live_stream_item)
+    except:
+        xbmc.log("Unable to build live stream item with lang:{ln} quality:{qlt}".format(ln=settings.language, qlt=settings.quality))
+
     arte_home = api.page(settings.language)
     for zone in arte_home.get('zones'):
         menu_item = mapper.map_zone_to_item(zone, cached_categories)
@@ -155,8 +162,11 @@ def build_weekly(settings):
     return videos_mapped
 
 def search(plugin, settings):
+    query = get_search_query(plugin)
+    if(not(query)):
+        plugin.end_of_directory(succeeded=False)
     return mapper.map_cached_categories(
-        api.search(settings.language, get_search_query(plugin)))
+        api.search(settings.language, query))
 
 def get_search_query(plugin):
     searchStr = ''
