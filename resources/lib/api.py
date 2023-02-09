@@ -37,12 +37,13 @@ _artetv_endpoints = {
     'last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', # needs token in authorization header
     'magazines': '/sso/v3/magazines/{lang}?page={page}&limit={limit}',
     'program': '/player/v2/config/{lang}/{program_id}', # program_id can be 103520-000-A or LIVE
-    'page': '/emac/v4/{lang}/web/pages/{category}/', #rproxy category=HOME, CIN, SER, SEARCH
-    # not yet impl. 'guide_tv': '/emac/v3/{lang}/web/pages/TV_GUIDE/?day={DATE}', #rproxy date=2023-01-17
+    'page': '/emac/v4/{lang}/{client}/pages/{category}/', #rproxy category=HOME, CIN, SER, SEARCH client=app, tv, web, orange, free
+    # not yet impl. 'guide_tv': '/emac/v3/{lang}/{client}/pages/TV_GUIDE/?day={DATE}', #rproxy date=2023-01-17
+    # PUT https://api.arte.tv/api/sso/v3/lastvieweds {"programId":"110342-012-A","timecode":3}
 }
 _artetv_headers = {
     'authorization': 'I6k2z58YGO08P1X0E8A7VBOjDxr8Lecg', # required to use token endpoint
-    'client': 'web', # required for Arte TV API
+    'client': 'tv', # required for Arte TV API. values like web, app, tv, orange, free
     'accept': 'application/json'
 }
 
@@ -125,12 +126,12 @@ def daily(date, lang):
 
 # Get content to be display in a page. It can be a page for a category or the home page.
 def page(lang):
-    url = _artetv_rproxy_url + _artetv_endpoints['page'].format(lang=lang, category='HOME')
+    url = _artetv_rproxy_url + _artetv_endpoints['page'].format(lang=lang, category='HOME', client='tv')
     return _load_json_full_url(url, _artetv_headers).get('value', [])
 
-# /emac/v4/{lang}/web/pages/SEARCH/?page={page}&query={query}
+# /emac/v4/{lang}/{client}/pages/SEARCH/?page={page}&query={query}
 def search(lang, query, page='1'):
-    url = _artetv_rproxy_url + _artetv_endpoints['page'].format(lang=lang, category='SEARCH')
+    url = _artetv_rproxy_url + _artetv_endpoints['page'].format(lang=lang, category='SEARCH', client='tv')
     params = {'page' : page, 'query' : query}
     return _load_json_full_url(url, _artetv_headers, params).get('value', []).get('zones', [None])[0]
 
@@ -166,7 +167,7 @@ def _add_auth_token(plugin, usr, pwd, hdrs):
 #     - silenty if both parameters are empty
 #     - with a notification if one is not empty
 #   - connection to arte tv failed
-def token(plugin, username="", password=""):
+def token(plugin, username="", password="", headers=_artetv_headers):
     # unable to authenticate if either username or password are empty
     if not username and not password:
         plugin.notify(msg=plugin.addon.getLocalizedString(30022), image='info')
@@ -179,9 +180,11 @@ def token(plugin, username="", password=""):
 
     url = _artetv_url + _artetv_endpoints['token']
     token_data = {'anonymous_token': None, 'grant_type': 'password', 'username': username, 'password': password}
+    # set to web, because with tv get error client_invalid, error Client not authorized
+    headers['client'] = 'web'
     try:
         # https://requests.readthedocs.io/en/latest/
-        r = requests.post(url, data=token_data, headers=_artetv_headers)
+        r = requests.post(url, data=token_data, headers=headers)
     except requests.exceptions.ConnectionError as err:
         # unable to auth. e.g.
         # HTTPSConnectionPool(host='api.arte.tv', port=443): Max retries exceeded with url: /api/sso/v3/token
