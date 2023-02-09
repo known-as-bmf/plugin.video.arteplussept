@@ -125,8 +125,7 @@ def map_generic_item(item, show_video_streams):
 def map_video(item, show_video_streams):
     programId = item.get('programId')
     kind = item.get('kind')
-    duration = int(item.get('duration') or 0) * \
-        60 or item.get('durationSeconds')
+    duration = item.get('durationSeconds')
     airdate = item.get('broadcastBegin')
     if airdate is not None:
         airdate = str(utils.parse_date(airdate))
@@ -203,15 +202,14 @@ def map_video(item, show_video_streams):
 #   "durationLabel": null,
 #   "available": true,
 #   "trackingPixel": "https://www.arte.tv/ct/?language=fr&support=web&pageid={HOME}&zonename=myarte_favorites&zoneid=myarte_favorites&teasertitle=Maitriser-l-energie-des-etoiles-la-revolution-de-demain&teaserid=079395-000-A&programid=079395-000-A&position=17",
-#   "lastviewed": { "is": true, "timecode": 0, "progress": 0 },
+#   "lastviewed": { "is": true, "timecode": 0, "progress": 1 },
 #   "favorite": { "is": true }
 # }
 # Destination object : https://romanvm.github.io/Kodistubs/_autosummary/xbmcgui.html#xbmcgui.ListItem.setInfo
 def map_artetv_video(item):
     programId = item.get('programId')
     kind = item.get('kind')
-    duration = int(item.get('duration') or 0) * \
-        60 or item.get('durationSeconds')
+    duration = item.get('durationSeconds')
     airdate = item.get('beginsAt') # broadcastBegin
     if airdate is not None:
         airdate = str(utils.parse_artetv_date(airdate))
@@ -231,9 +229,8 @@ def map_artetv_video(item):
         fanartUrl = item.get('mainImage').get('url').replace('__SIZE__', '1920x1080')
     thumbnailUrl = fanartUrl
 
-    playcount = 0
-    if item.get('lastviewed') and item.get('lastviewed').get('progress'):
-        playcount = item.get('lastviewed').get('progress')
+    progress = item.get('lastviewed') and item.get('lastviewed').get('progress') or 0
+    time_offset = item.get('lastviewed') and item.get('lastviewed').get('timecode') or 0
     
     if(not isinstance(kind, str)):
         kind = kind.get('code')
@@ -261,10 +258,12 @@ def map_artetv_video(item):
             #'country': [country.get('label') for country in item.get('productionCountries', [])],
             #'director': item.get('director'),
             #'aired': airdate
-            'playcount': playcount
+            'playcount': progress,
         },
         'properties': {
             'fanart_image': fanartUrl,
+            'ResumeTime': str(time_offset),
+            'StartPercent': str(progress * 100)
         },
         'context_menu': [
             (plugin.addon.getLocalizedString(30023),
@@ -384,7 +383,9 @@ def map_playable(streams, quality, audio_slot, match):
         raise RuntimeError('Could not resolve stream...')
 
     return {
-        'path': stream.get('url')
+        # 'label': 'to be added',
+        'info_type': 'video',
+        'path': stream.get('url'),
     }
 
 
