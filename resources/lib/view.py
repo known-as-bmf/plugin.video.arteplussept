@@ -19,7 +19,7 @@ def build_home_page(plugin, cached_categories, settings):
     arte_home = api.page(settings.language)
     for zone in arte_home.get('zones'):
         menu_item = mapper.map_zone_to_item(zone, cached_categories)
-        if(menu_item):
+        if menu_item:
             addon_menu.append(menu_item)
     return addon_menu
 
@@ -65,13 +65,13 @@ def build_favorites(plugin, settings):
             []]
 
 def add_favorite(plugin, usr, pwd, program_id):
-    if (200 == api.add_favorite(plugin, usr, pwd, program_id)):
+    if 200 == api.add_favorite(plugin, usr, pwd, program_id):
         plugin.notify(msg=plugin.addon.getLocalizedString(30025), image='info')
     else:
         plugin.notify(msg=plugin.addon.getLocalizedString(30026), image='error')
 
 def remove_favorite(plugin, usr, pwd, program_id):
-    if (200 == api.remove_favorite(plugin, usr, pwd, program_id)):
+    if 200 == api.remove_favorite(plugin, usr, pwd, program_id):
         plugin.notify(msg=plugin.addon.getLocalizedString(30027), image='info')
     else:
         plugin.notify(msg=plugin.addon.getLocalizedString(30028), image='error')
@@ -131,10 +131,13 @@ def build_video_streams(program_id, settings):
     return mapper.map_streams(item, api.streams(kind, programId, settings.language), settings.quality)
 
 
-def build_stream_url(kind, program_id, audio_slot, settings):
-    return mapper.map_playable(
-        api.streams(kind, program_id, settings.language),
-        settings.quality, audio_slot, mapper.match_hbbtv)
+def build_stream_url(plugin, kind, program_id, audio_slot, settings):
+    program_stream = api.streams(kind, program_id, settings.language)
+    if not program_stream:
+        msg=plugin.addon.getLocalizedString(30029)
+        plugin.notify(msg=msg.format(strm=program_id, ln=settings.language), image='error')
+    else:
+        return mapper.map_playable(program_stream, settings.quality, audio_slot, mapper.match_hbbtv)
 
 
 _useless_kinds = ['CLIP', 'MANUAL_CLIP', 'TRAILER']
@@ -163,7 +166,7 @@ def build_weekly(settings):
 
 def search(plugin, settings):
     query = get_search_query(plugin)
-    if(not(query)):
+    if not query:
         plugin.end_of_directory(succeeded=False)
     return mapper.map_cached_categories(
         api.search(settings.language, query))
@@ -172,7 +175,7 @@ def get_search_query(plugin):
     searchStr = ''
     keyboard = xbmc.Keyboard(searchStr, plugin.addon.getLocalizedString(30012))
     keyboard.doModal()
-    if (keyboard.isConfirmed() == False):
+    if False == keyboard.isConfirmed():
         return
     searchStr = keyboard.getText()
     if len(searchStr) == 0:

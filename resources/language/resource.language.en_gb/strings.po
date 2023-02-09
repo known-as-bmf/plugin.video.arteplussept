@@ -105,3 +105,7 @@ msgstr ""
 msgctxt "#30028"
 msgid "Failed to remove from favorites"
 msgstr ""
+
+msgctxt "#30029"
+msgid "Stream {strm} in {ln} is not available"
+msgstr ""

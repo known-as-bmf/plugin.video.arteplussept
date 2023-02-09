@@ -105,3 +105,7 @@ msgstr "Retiré des favoris avec succès"
 msgctxt "#30028"
 msgid "Failed to remove from favorites"
 msgstr "Erreur lors du retrait des favoris"
+
+msgctxt "#30029"
+msgid "Stream {strm} in {ln} is not available"
+msgstr "Stream {strm} en {ln} indisponible"

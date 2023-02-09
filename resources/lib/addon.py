@@ -145,7 +145,7 @@ def play_live(streamUrl):
 @plugin.route('/play/<kind>/<program_id>', name='play')
 @plugin.route('/play/<kind>/<program_id>/<audio_slot>', name='play_specific')
 def play(kind, program_id, audio_slot='1'):
-    return plugin.set_resolved_url(view.build_stream_url(kind, program_id, int(audio_slot), settings))
+    return plugin.set_resolved_url(view.build_stream_url(plugin, kind, program_id, int(audio_slot), settings))
 
 
 @plugin.route('/weekly', name='weekly')
