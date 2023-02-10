@@ -37,6 +37,7 @@ class PluginInformation:
 
 # my imports
 import view
+from player import Player
 # import api
 from settings import Settings
 
@@ -142,10 +143,20 @@ def play_live(streamUrl):
 #     streamUrl=attr.get('streams')[0].get('url')
 #     return plugin.set_resolved_url({'path': streamUrl})
 
+
 @plugin.route('/play/<kind>/<program_id>', name='play')
 @plugin.route('/play/<kind>/<program_id>/<audio_slot>', name='play_specific')
 def play(kind, program_id, audio_slot='1'):
-    return plugin.set_resolved_url(view.build_stream_url(plugin, kind, program_id, int(audio_slot), settings))
+    synched_player = Player(plugin, settings, program_id)
+    item = view.build_stream_url(plugin, kind, program_id, int(audio_slot), settings)
+    r = plugin.set_resolved_url(item)
+    # wait 1s first to give a chance for playback to start
+    # otherwise synched_player won't be able to listen
+    xbmc.sleep(1000)
+    while synched_player.isPlayback():
+        xbmc.sleep(1000)
+    del synched_player
+    return r
 
 
 @plugin.route('/weekly', name='weekly')

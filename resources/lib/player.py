@@ -1,53 +1,59 @@
 from xbmcswift2 import xbmc
 from xbmcswift2 import ListItem
 
+import api
+
+# this player send request to Arte TV API
+# to synchronise playback progress
+# when playback is paused or stopped or crashed
 class Player(xbmc.Player):
-    
-    def __init__(self):
+
+    def __init__(self, plugin, settings, program_id):
         super(Player, self).__init__()
-    
-    def isPlayback(self): # rename to is_playback
+        self.plugin=plugin
+        self.settings=settings
+        self.program_id=program_id
+        self.last_time=None
+
+    def isPlayback(self):
         try:
-            return self.isPlaying() and self.isPlayingVideo() and self.getTime() >= 0
+            # need to keep track of last time to avoid 
+            # RuntimeError: Kodi is not playing any media file
+            # when calling player.getTime() in onPlayBackStopped()
+            self.last_time = self.getTime()
+            return self.isPlaying() and self.isPlayingVideo() and self.last_time >= 0
         except Exception:
             return False
-       
-    def onAVStarted(self):
-        print('LED Status started AV')
-        # Will be called when playback starts and all player properties are updated
-        # Not really needed since Plugin might be triggered after playback starts?
-        pass
-    
-    def start_playback(self):
-        # send up next information
-        pass
-    
+
     def onPlayBackStopped(self):
         # Will be called when user stops playing a file.
-        print('LED Status stopped')
-        self.stop_playback()
-        pass
-    
-    def onPlayBackEnded(self):
-        # Will be called when kodi stops playing a file.
-        print('LED Status stopped')
-        self.stop_playback()
-        pass
-    
-    def onPlayBackError(self):
-        # Will be called when kodi stops playing a file.
-        print('LED Status error')
-        pass
-    
-    def onPlayBackPaused(self):
-        # Will be called when kodi stops playing a file.
-        print('LED Status paused')
+        self.synchProgress()
         pass
 
-    def stop_playback(self):
-        # code that should run everytime playback stops.
+    def onPlayBackEnded(self):
+        # Will be called when kodi stops playing a file.
+        self.synchProgress()
         pass
-        
-    def signal_callback(self, data):
+
+    def onPlayBackError(self):
+        # Will be called when kodi stops playing a file.
+        self.synchProgress()
         pass
-    
+
+    def onPlayBackPaused(self):
+        # Will be called when kodi stops playing a file.
+        self.synchProgress()
+        pass
+
+    def synchProgress(self):
+        if not self.last_time:
+            print("No progress to synchronise with Arte TV for {pid}")
+            return 400
+
+        self.last_time = round(self.last_time)
+        status = api.sync_last_viewed(
+            self.plugin,
+            self.settings.language, self.settings.username, self.settings.password,
+            self.program_id, self.last_time)
+        print("Synchronisation of progress {t}s with Arte TV for {pid} ended with {status}".format(t=self.last_time, pid=self.program_id, status=status))
+        return status

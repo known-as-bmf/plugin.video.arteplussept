@@ -35,11 +35,12 @@ _artetv_endpoints = {
     'add_favorite': '/sso/v3/favorites', #PUT needs token in authorization header
     'remove_favorite': '/sso/v3/favorites/{program_id}', #DELETE needs token in authorization header
     'last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', # needs token in authorization header
+    'sync_last_viewed': '/sso/v3/lastvieweds', # payload {"programId":"110342-012-A","timecode":574} for 574s i.e. 9:34
+    # not yet impl. 'purge_last_viewed': '/sso/v3/lastvieweds/purge', # PATCH empty payload
     'magazines': '/sso/v3/magazines/{lang}?page={page}&limit={limit}',
     'program': '/player/v2/config/{lang}/{program_id}', # program_id can be 103520-000-A or LIVE
     'page': '/emac/v4/{lang}/{client}/pages/{category}/', #rproxy category=HOME, CIN, SER, SEARCH client=app, tv, web, orange, free
     # not yet impl. 'guide_tv': '/emac/v3/{lang}/{client}/pages/TV_GUIDE/?day={DATE}', #rproxy date=2023-01-17
-    # PUT https://api.arte.tv/api/sso/v3/lastvieweds {"programId":"110342-012-A","timecode":3}
 }
 _artetv_headers = {
     'authorization': 'I6k2z58YGO08P1X0E8A7VBOjDxr8Lecg', # required to use token endpoint
@@ -53,7 +54,7 @@ def get_favorites(plugin, lang, usr, pwd):
     return _load_json_personal_content(plugin, url, usr, pwd)
 
 def add_favorite(plugin, usr, pwd, program_id):
-    url = _artetv_url + _artetv_endpoints['add_favorite'].format()
+    url = _artetv_url + _artetv_endpoints['add_favorite']
     headers = _add_auth_token(plugin, usr, pwd, _artetv_headers)
     data = {'programId': program_id}
     r = requests.put(url, data=data, headers=headers)
@@ -69,6 +70,13 @@ def remove_favorite(plugin, usr, pwd, program_id):
 def last_viewed(plugin, lang, usr, pwd):
     url = _artetv_url + _artetv_endpoints['last_viewed'].format(lang=lang, page='1', limit='50')
     return _load_json_personal_content(plugin, url, usr, pwd)
+
+def sync_last_viewed(plugin, lang, usr, pwd, program_id, time):
+    url = _artetv_url + _artetv_endpoints['sync_last_viewed']
+    headers = _add_auth_token(plugin, usr, pwd, _artetv_headers)
+    data = {'programId': program_id, "timecode": time}
+    r = requests.put(url, data=data, headers=headers)
+    return r.status_code
 
 def program_video(lang, program_id):
     url = _artetv_url + _artetv_endpoints['program'].format(lang=lang, program_id=program_id)

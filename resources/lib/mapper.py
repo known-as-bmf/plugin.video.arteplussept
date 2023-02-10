@@ -383,7 +383,6 @@ def map_playable(streams, quality, audio_slot, match):
         raise RuntimeError('Could not resolve stream...')
 
     return {
-        # 'label': 'to be added',
         'info_type': 'video',
         'path': stream.get('url'),
     }
