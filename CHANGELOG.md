@@ -1,5 +1,12 @@
 Changelog also available in file ./addon.xml xpath /addon/extension/news following Kodi guidelines https://kodi.wiki/view/Add-on_structure#changelog.txt
 
+v1.1.7 (2023-2-14)
+- Add feature to purge my history thanks to action in context menu of my history
+- Move addon.py to root following Kodi recommendations
+- Move back change log fron addon.xml //news to CHANGELOG.md because news is limited to 1500 characters
+- Fix translation in English for Successfully removeD from favorite
+- Log message instead of notify user, when user or password are not confiugred, while using synched player
+
 v1.1.6 (2023-2-11)
 - Fixed playback progress / resume point retrieved from Arte TV
 - Added synchronisation of playback progress with Arte TV when video playback paused, stopped or crashed

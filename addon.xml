@@ -58,7 +58,7 @@ https://github.com/known-as-bmf/plugin.video.arteplussept
         <website>https://www.arte.tv/fr/</website>
         <source>https://github.com/known-as-bmf/plugin.video.arteplussept</source>
         <news>
-        Highlights since 1.1.2 (2023-2-11)
+        Highlights since 1.1.2
         - Integrate Arte account favorites, last viewed items and playback progress (thanks to Arte account to be configured in settings).
         - Move from HBB TV to Arte TV API.
         - Fixed playback progress / resume point retrieved from Arte TV
@@ -68,6 +68,7 @@ https://github.com/known-as-bmf/plugin.video.arteplussept
         - Added Live stream in root menu
         - Added Polish translation
         - Added My list and My history content from Arte TV profile
+        - Added purge of my history
         </news>
         <assets>
             <icon>resources/icon.png</icon>
