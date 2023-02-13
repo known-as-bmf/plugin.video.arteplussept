@@ -34,9 +34,9 @@ _artetv_endpoints = {
     'get_favorites': '/sso/v3/favorites/{lang}?page={page}&limit={limit}', # needs token in authorization header
     'add_favorite': '/sso/v3/favorites', #PUT needs token in authorization header
     'remove_favorite': '/sso/v3/favorites/{program_id}', #DELETE needs token in authorization header
-    'last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', # needs token in authorization header
+    'get_last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}', # needs token in authorization header
     'sync_last_viewed': '/sso/v3/lastvieweds', # payload {"programId":"110342-012-A","timecode":574} for 574s i.e. 9:34
-    # not yet impl. 'purge_last_viewed': '/sso/v3/lastvieweds/purge', # PATCH empty payload
+    'purge_last_viewed': '/sso/v3/lastvieweds/purge', # PATCH empty payload
     'magazines': '/sso/v3/magazines/{lang}?page={page}&limit={limit}',
     'program': '/player/v2/config/{lang}/{program_id}', # program_id can be 103520-000-A or LIVE
     'page': '/emac/v4/{lang}/{client}/pages/{category}/', #rproxy category=HOME, CIN, SER, SEARCH client=app, tv, web, orange, free
@@ -67,8 +67,8 @@ def remove_favorite(plugin, usr, pwd, program_id):
     return r.status_code
 
 # Retrieve content recently watched by a user.
-def last_viewed(plugin, lang, usr, pwd):
-    url = _artetv_url + _artetv_endpoints['last_viewed'].format(lang=lang, page='1', limit='50')
+def get_last_viewed(plugin, lang, usr, pwd):
+    url = _artetv_url + _artetv_endpoints['get_last_viewed'].format(lang=lang, page='1', limit='50')
     return _load_json_personal_content(plugin, url, usr, pwd)
 
 def sync_last_viewed(plugin, usr, pwd, program_id, time):
@@ -76,6 +76,12 @@ def sync_last_viewed(plugin, usr, pwd, program_id, time):
     headers = _add_auth_token(plugin, usr, pwd, _artetv_headers)
     data = {'programId': program_id, "timecode": time}
     r = requests.put(url, data=data, headers=headers)
+    return r.status_code
+
+def purge_last_viewed(plugin, usr, pwd):
+    url = _artetv_url + _artetv_endpoints['purge_last_viewed']
+    headers = _add_auth_token(plugin, usr, pwd, _artetv_headers)
+    r = requests.patch(url, data={}, headers=headers)
     return r.status_code
 
 def program_video(lang, program_id):
@@ -180,7 +186,7 @@ def token(plugin, username="", password="", headers=_artetv_headers):
     if not username and not password:
         plugin.notify(msg=plugin.addon.getLocalizedString(30022), image='info')
         return None
-    # inform that setings are incomplete
+    # inform that settings are incomplete
     if not username or not password:
         msg = plugin.addon.getLocalizedString(30020) + " : " + plugin.addon.getLocalizedString(30021)
         plugin.notify(msg=msg, image='warning')

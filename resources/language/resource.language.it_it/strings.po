@@ -99,7 +99,7 @@ msgid "Failed to add to favorites"
 msgstr "Impossibile aggiungere ai preferiti"
 
 msgctxt "#30027"
-msgid "Successfully remove from favorites"
+msgid "Successfully removed from favorites"
 msgstr "Rimozione riuscita dai preferiti"
 
 msgctxt "#30028"
@@ -109,3 +109,15 @@ msgstr "Impossibile rimuovere dai preferiti"
 msgctxt "#30029"
 msgid "Stream {strm} in {ln} is not available"
 msgstr "Lo streaming {strm} in {ln} non è disponibile"
+
+msgctxt "#30030"
+msgid "Purge my history"
+msgstr "Elimina la cronologia"
+
+msgctxt "#30031"
+msgid "Successfully purged history"
+msgstr "Cronologia eliminata con successo"
+
+msgctxt "#30032"
+msgid "Failed to purge my history"
+msgstr "Impossibile eliminare la cronologia"

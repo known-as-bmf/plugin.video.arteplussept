@@ -99,7 +99,7 @@ msgid "Failed to add to favorites"
 msgstr ""
 
 msgctxt "#30027"
-msgid "Successfully remove from favorites"
+msgid "Successfully removed from favorites"
 msgstr ""
 
 msgctxt "#30028"
@@ -108,4 +108,16 @@ msgstr ""
 
 msgctxt "#30029"
 msgid "Stream {strm} in {ln} is not available"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Purge my history"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Successfully purged history"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Failed to purge my history"
 msgstr ""

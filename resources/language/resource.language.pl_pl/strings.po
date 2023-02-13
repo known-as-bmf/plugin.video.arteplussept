@@ -99,7 +99,7 @@ msgid "Failed to add to favorites"
 msgstr "Nie udało się dodać do ulubionych"
 
 msgctxt "#30027"
-msgid "Successfully remove from favorites"
+msgid "Successfully removed from favorites"
 msgstr "Pomyślnie usunięto z ulubionych"
 
 msgctxt "#30028"
@@ -109,3 +109,15 @@ msgstr "Nie udało się usunąć z ulubionych"
 msgctxt "#30029"
 msgid "Stream {strm} in {ln} is not available"
 msgstr "Strumień {strm} w języku {ln} jest niedostępny"
+
+msgctxt "#30030"
+msgid "Purge my history"
+msgstr "Wyczyść moją historię"
+
+msgctxt "#30031"
+msgid "Successfully purged history"
+msgstr "Pomyślnie wyczyszczono historię"
+
+msgctxt "#30032"
+msgid "Failed to purge my history"
+msgstr "Nie udało się wyczyścić mojej historii"

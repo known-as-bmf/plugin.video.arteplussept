@@ -99,7 +99,7 @@ msgid "Failed to add to favorites"
 msgstr "Fehler beim Hinzufügen zu den Favoriten"
 
 msgctxt "#30027"
-msgid "Successfully remove from favorites"
+msgid "Successfully removed from favorites"
 msgstr "Erfolgreich aus Favoriten entfernen"
 
 msgctxt "#30028"
@@ -109,3 +109,15 @@ msgstr "Entfernen aus Favoriten fehlgeschlagen"
 msgctxt "#30029"
 msgid "Stream {strm} in {ln} is not available"
 msgstr "Stream {strm} in {ln} ist nicht verfügbar"
+
+msgctxt "#30030"
+msgid "Purge my history"
+msgstr "Lösche mein Videoverlauf"
+
+msgctxt "#30031"
+msgid "Successfully purged history"
+msgstr "Videoverlauf erfolgreich gelöscht"
+
+msgctxt "#30032"
+msgid "Failed to purge my history"
+msgstr "Mein Videoerlauf konnte nicht gelöscht werden"

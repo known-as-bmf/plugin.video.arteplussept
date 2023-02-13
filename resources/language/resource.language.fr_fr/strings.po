@@ -96,16 +96,28 @@ msgstr "Ajouté aux favoris avec succès"
 
 msgctxt "#30026"
 msgid "Failed to add to favorites"
-msgstr "Erreur lors de l'ajout aux favoris"
+msgstr "Echec de l'ajout aux favoris"
 
 msgctxt "#30027"
-msgid "Successfully remove from favorites"
+msgid "Successfully removed from favorites"
 msgstr "Retiré des favoris avec succès"
 
 msgctxt "#30028"
 msgid "Failed to remove from favorites"
-msgstr "Erreur lors du retrait des favoris"
+msgstr "Echec du retrait des favoris"
 
 msgctxt "#30029"
 msgid "Stream {strm} in {ln} is not available"
 msgstr "Stream {strm} en {ln} indisponible"
+
+msgctxt "#30030"
+msgid "Purge my history"
+msgstr "Purger mon historique"
+
+msgctxt "#30031"
+msgid "Successfully purged history"
+msgstr "Historique purgé avec succès"
+
+msgctxt "#30032"
+msgid "Failed to purge my history"
+msgstr "Echec de la purge de mon historique"

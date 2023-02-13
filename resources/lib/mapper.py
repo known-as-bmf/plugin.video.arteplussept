@@ -54,7 +54,11 @@ def create_last_viewed_item(label=None):
         label = plugin.addon.getLocalizedString(30011)
     return {
         'label': label,
-        'path': plugin.url_for('last_viewed')
+        'path': plugin.url_for('last_viewed'),
+        'context_menu': [
+            (plugin.addon.getLocalizedString(30030),
+                actions.background(plugin.url_for('purge_last_viewed')))
+        ]
     }
 
 

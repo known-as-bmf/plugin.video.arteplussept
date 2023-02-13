@@ -79,9 +79,16 @@ def remove_favorite(plugin, usr, pwd, program_id):
 
 def build_last_viewed(plugin, settings):
     return [mapper.map_artetv_video(item) for item in
-            api.last_viewed(plugin, settings.language, settings.username, settings.password) or
+            api.get_last_viewed(plugin, settings.language, settings.username, settings.password) or
             # display an empty list in case of error. error should be display in a notification
             []]
+
+def purge_last_viewed(plugin, usr, pwd):
+    if 200 == api.purge_last_viewed(plugin, usr, pwd):
+        plugin.notify(msg=plugin.addon.getLocalizedString(30031), image='info')
+    else:
+        plugin.notify(msg=plugin.addon.getLocalizedString(30032), image='error')
+
 
 
 def build_newest(settings):

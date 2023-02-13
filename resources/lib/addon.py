@@ -86,9 +86,13 @@ def remove_favorite(program_id):
 
 
 @plugin.route('/last_viewed', name='last_viewed')
-def favorites():
+def last_viewed():
     plugin.set_content('tvshows')
     return plugin.finish(view.build_last_viewed(plugin, settings))
+
+@plugin.route('/purge_last_viewed', name='purge_last_viewed')
+def purge_last_viewed():
+    view.purge_last_viewed(plugin, settings.username, settings.password)
 
 
 @plugin.route('/newest', name='newest')
