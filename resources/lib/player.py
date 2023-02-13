@@ -1,6 +1,5 @@
 from xbmcswift2 import xbmc
-
-import api
+from . import api
 
 # this player send request to Arte TV API
 # to synchronise playback progress

@@ -1,10 +1,8 @@
+from addon import PluginInformation
 from collections import OrderedDict
 import requests
 from xbmcswift2 import xbmc
-
-import hof
-
-from addon import PluginInformation
+from . import hof
 
 
 # Arte hbbtv - deprecated API since 2022 prefer Arte TV API

@@ -1,9 +1,8 @@
 from addon import plugin
 from xbmcswift2 import xbmc
 from xbmcswift2 import actions
-
-import hof
-import utils
+from . import hof
+from . import utils
 
 def map_categories(api_categories, show_video_streams, cached_categories):
     categories = []

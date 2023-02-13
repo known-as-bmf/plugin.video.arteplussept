@@ -24,6 +24,9 @@
 # https://github.com/XBMC-Addons/script.module.xbmcswift2
 from xbmcswift2 import Plugin
 from xbmcswift2 import xbmc
+from resources.lib import view
+from resources.lib.player import Player
+from resources.lib.settings import Settings
 
 # global declarations
 # plugin stuff
@@ -34,12 +37,6 @@ class PluginInformation:
     name = plugin.name
     version = plugin.addon.getAddonInfo('version')
 
-
-# my imports
-import view
-from player import Player
-# import api
-from settings import Settings
 
 settings = Settings(plugin)
 
@@ -172,14 +169,6 @@ def weekly():
 def weekly():
     plugin.set_content('tvshows')
     return plugin.finish(view.search(plugin, settings))
-
-# @plugin.route('/broadcast', name='broadcast')
-# def broadcast():
-#     plugin.set_content('tvshows')
-#     items = custom.map_broadcast_item(
-#         custom.past_week_programs(language.get('short', 'fr')))
-#     return plugin.finish(items)
-
 
 # plugin bootstrap
 if __name__ == '__main__':

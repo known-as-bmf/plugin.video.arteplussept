@@ -1,9 +1,9 @@
 from xbmcswift2 import xbmc
 
-import api
-import mapper
-import hof
-import utils
+from . import api
+from . import mapper
+from . import hof
+from . import utils
 
 def build_home_page(plugin, cached_categories, settings):
     addon_menu = [
