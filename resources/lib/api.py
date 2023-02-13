@@ -71,7 +71,7 @@ def last_viewed(plugin, lang, usr, pwd):
     url = _artetv_url + _artetv_endpoints['last_viewed'].format(lang=lang, page='1', limit='50')
     return _load_json_personal_content(plugin, url, usr, pwd)
 
-def sync_last_viewed(plugin, lang, usr, pwd, program_id, time):
+def sync_last_viewed(plugin, usr, pwd, program_id, time):
     url = _artetv_url + _artetv_endpoints['sync_last_viewed']
     headers = _add_auth_token(plugin, usr, pwd, _artetv_headers)
     data = {'programId': program_id, "timecode": time}

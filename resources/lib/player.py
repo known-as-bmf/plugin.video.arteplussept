@@ -1,5 +1,4 @@
 from xbmcswift2 import xbmc
-from xbmcswift2 import ListItem
 
 import api
 
@@ -46,14 +45,20 @@ class Player(xbmc.Player):
         pass
 
     def synchProgress(self):
+        if not self.settings.username or not self.settings.password:
+            xbmc.log("Unable to synchronise progress with Arte TV for {pid}".format(pid=self.program_id))
+            xbmc.log("Missing user or password to authenticate")
+            return 400
+
         if not self.last_time:
-            print("No progress to synchronise with Arte TV for {pid}")
+            xbmc.log("Unable to synchronise progress with Arte TV for {pid}.".format(pid=self.program_id))
+            xbmc.log("Missing time to synch")
             return 400
 
         self.last_time = round(self.last_time)
         status = api.sync_last_viewed(
             self.plugin,
-            self.settings.language, self.settings.username, self.settings.password,
+            self.settings.username, self.settings.password,
             self.program_id, self.last_time)
-        print("Synchronisation of progress {t}s with Arte TV for {pid} ended with {status}".format(t=self.last_time, pid=self.program_id, status=status))
+        xbmc.log("Synchronisation of progress {t}s with Arte TV for {pid} ended with {status}".format(t=self.last_time, pid=self.program_id, status=status))
         return status
