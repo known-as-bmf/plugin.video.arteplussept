@@ -18,7 +18,7 @@ def map_categories(api_categories, show_video_streams, cached_categories):
                         for teaser in item.get('teasers')]
                 categories.append(map_categories_item(item, 'cached_category'))
             else:
-                xbmc.log("category \"{cat_title}\" will be ignored, because it contains no teaser".format(cat_title=item.get('title')))
+                xbmc.log("Category \"{cat_title}\" will be ignored, because it contains no teaser".format(cat_title=item.get('title')))
         else:
             categories.append(map_categories_item(item, 'api_category'))
     return categories
@@ -127,6 +127,7 @@ def map_generic_item(item, show_video_streams):
 # Create a video menu item from a json returned by Arte HBBTV API
 def map_video(item, show_video_streams):
     programId = item.get('programId')
+    label = utils.format_title_and_subtitle(item.get('title'), item.get('subtitle'))
     kind = item.get('kind')
     duration = item.get('durationSeconds')
     airdate = item.get('broadcastBegin')
@@ -134,7 +135,7 @@ def map_video(item, show_video_streams):
         airdate = str(utils.parse_date(airdate))
 
     return {
-        'label': utils.format_title_and_subtitle(item.get('title'), item.get('subtitle')),
+        'label': label,
         'path': plugin.url_for('streams', program_id=programId) if show_video_streams else plugin.url_for('play', kind=kind, program_id=programId),
         'thumbnail': item.get('imageUrl'),
         'is_playable': not show_video_streams,
@@ -157,9 +158,9 @@ def map_video(item, show_video_streams):
         },
         'context_menu': [
             (plugin.addon.getLocalizedString(30023),
-                actions.background(plugin.url_for('add_favorite', program_id=programId))),
+                actions.background(plugin.url_for('add_favorite', program_id=programId, label=label))),
             (plugin.addon.getLocalizedString(30024),
-                actions.background(plugin.url_for('remove_favorite', program_id=programId))),
+                actions.background(plugin.url_for('remove_favorite', program_id=programId, label=label))),
         ],
     }
 
@@ -211,6 +212,7 @@ def map_video(item, show_video_streams):
 # Destination object : https://romanvm.github.io/Kodistubs/_autosummary/xbmcgui.html#xbmcgui.ListItem.setInfo
 def map_artetv_video(item):
     programId = item.get('programId')
+    label = utils.format_title_and_subtitle(item.get('title'), item.get('subtitle'))
     kind = item.get('kind')
     duration = item.get('durationSeconds')
     airdate = item.get('beginsAt') # broadcastBegin
@@ -244,7 +246,7 @@ def map_artetv_video(item):
     path = plugin.url_for('collection' if is_playlist else 'play', kind=kind, program_id=programId)
     
     return {
-        'label': utils.format_title_and_subtitle(item.get('title'), item.get('subtitle')),
+        'label': label,
         'path': path,
         'thumbnail': thumbnailUrl,
         'is_playable': not is_playlist, # item.get('playable') # not show_video_streams
@@ -270,9 +272,9 @@ def map_artetv_video(item):
         },
         'context_menu': [
             (plugin.addon.getLocalizedString(30023),
-                actions.background(plugin.url_for('add_favorite', program_id=programId))),
+                actions.background(plugin.url_for('add_favorite', program_id=programId, label=label))),
             (plugin.addon.getLocalizedString(30024),
-                actions.background(plugin.url_for('remove_favorite', program_id=programId))),
+                actions.background(plugin.url_for('remove_favorite', program_id=programId, label=label))),
         ],
     }
 
@@ -407,14 +409,17 @@ def map_zone_to_item(zone, cached_categories):
         menu_item = create_favorites_item(title)
     elif(zone.get('id') == '67cea6f3-7af0-4ffa-a6c2-59b1da0ecd4b'):
         menu_item = create_last_viewed_item(title)
-    elif (zone.get('link')):
-        menu_item = map_categories_item(zone, 'api_category', zone.get('link').get('page'))
-    else:
+    elif(zone.get('content') and zone.get('content').get('data')):
         cached_category = map_cached_categories(zone)
         if cached_category:
             category_code = zone.get('code')
             cached_categories[category_code] = cached_category
             menu_item = map_categories_item(zone, 'cached_category')
+    elif (zone.get('link')):
+        menu_item = map_categories_item(zone, 'api_category', zone.get('link').get('page'))
+    else:
+        xbmc.log("Zone \"{zone_title}\" will be ignored. No link. No content. id unknown.".format(zone_title=title))
+
     return menu_item
 
 
