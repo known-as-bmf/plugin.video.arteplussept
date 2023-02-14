@@ -64,17 +64,21 @@ def build_favorites(plugin, settings):
             # display an empty list in case of error. error should be display in a notification
             []]
 
-def add_favorite(plugin, usr, pwd, program_id):
+def add_favorite(plugin, usr, pwd, program_id, label):
     if 200 == api.add_favorite(plugin, usr, pwd, program_id):
-        plugin.notify(msg=plugin.addon.getLocalizedString(30025), image='info')
+        msg = plugin.addon.getLocalizedString(30025).format(label=label)
+        plugin.notify(msg=msg, image='info')
     else:
-        plugin.notify(msg=plugin.addon.getLocalizedString(30026), image='error')
+        msg = plugin.addon.getLocalizedString(30026).format(label=label)
+        plugin.notify(msg=msg, image='error')
 
-def remove_favorite(plugin, usr, pwd, program_id):
+def remove_favorite(plugin, usr, pwd, program_id, label):
     if 200 == api.remove_favorite(plugin, usr, pwd, program_id):
-        plugin.notify(msg=plugin.addon.getLocalizedString(30027), image='info')
+        msg = plugin.addon.getLocalizedString(30027).format(label=label)
+        plugin.notify(msg=msg, image='info')
     else:
-        plugin.notify(msg=plugin.addon.getLocalizedString(30028), image='error')
+        msg = plugin.addon.getLocalizedString(30028).format(label=label)
+        plugin.notify(msg=msg, image='error')
 
 
 def build_last_viewed(plugin, settings):
