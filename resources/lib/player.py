@@ -4,6 +4,7 @@ from . import api
 # this player send request to Arte TV API
 # to synchronise playback progress
 # when playback is paused or stopped or crashed
+# https://xbmc.github.io/docs.kodi.tv/master/kodi-dev-kit/group__python___player_c_b.html
 class Player(xbmc.Player):
 
     def __init__(self, plugin, settings, program_id):
@@ -11,7 +12,7 @@ class Player(xbmc.Player):
         self.plugin=plugin
         self.settings=settings
         self.program_id=program_id
-        self.last_time=None
+        self.last_time=0
 
     def isPlayback(self):
         try:
@@ -23,23 +24,28 @@ class Player(xbmc.Player):
         except Exception:
             return False
 
+    def onAVStarted(self):
+        # Will be called when user stars playing
+        self.synchProgress()
+        pass
+
     def onPlayBackStopped(self):
-        # Will be called when user stops playing a file.
+        # Will be called when user stops playing
         self.synchProgress()
         pass
 
     def onPlayBackEnded(self):
-        # Will be called when kodi stops playing a file.
+        # Will be called when kodi stops playing
         self.synchProgress()
         pass
 
     def onPlayBackError(self):
-        # Will be called when kodi stops playing a file.
+        # Will be called when kodi stops playing
         self.synchProgress()
         pass
 
     def onPlayBackPaused(self):
-        # Will be called when kodi stops playing a file.
+        # Will be called when kodi stops playing
         self.synchProgress()
         pass
 

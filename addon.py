@@ -153,9 +153,10 @@ def play(kind, program_id, audio_slot='1'):
     r = plugin.set_resolved_url(item)
     # wait 1s first to give a chance for playback to start
     # otherwise synched_player won't be able to listen
-    xbmc.sleep(1000)
+    xbmc.sleep(500)
     while synched_player.isPlayback():
         xbmc.sleep(1000)
+    synched_player.synchProgress()
     del synched_player
     return r
 

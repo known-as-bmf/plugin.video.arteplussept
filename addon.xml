@@ -2,7 +2,7 @@
 <addon
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/xbmc/xbmc/master/addons/xbmc.addon/metadata.xsd"
-        id="plugin.video.arteplussept" name="Arte +7" version="1.1.6" provider-name="bmf, thomas-ernest">
+        id="plugin.video.arteplussept" name="Arte +7" version="1.1.7" provider-name="bmf, thomas-ernest">
     <!-- https://kodi.wiki/view/Addon.xml -->
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
@@ -51,7 +51,6 @@ https://github.com/known-as-bmf/plugin.video.arteplussept/issues
 Każda pomoc mile widziana:
 https://github.com/known-as-bmf/plugin.video.arteplussept
         </description>
-        <disclaimer lang="en_GB"></disclaimer>
         <language>fr de en it pl</language>
         <platform>all</platform>
         <license>MIT</license>
