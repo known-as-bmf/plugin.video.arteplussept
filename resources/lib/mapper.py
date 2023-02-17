@@ -236,7 +236,7 @@ def map_artetv_video(item):
 
     progress = item.get('lastviewed') and item.get('lastviewed').get('progress') or 0
     time_offset = item.get('lastviewed') and item.get('lastviewed').get('timecode') or 0
-    
+
     if(not isinstance(kind, str)):
         kind = kind.get('code')
     if(kind == 'EXTERNAL'):
@@ -263,11 +263,13 @@ def map_artetv_video(item):
             #'country': [country.get('label') for country in item.get('productionCountries', [])],
             #'director': item.get('director'),
             #'aired': airdate
-            'playcount': progress,
+            'playcount': '1' if progress >= 0.95 else '0',
         },
         'properties': {
             'fanart_image': fanartUrl,
+            # ResumeTime and TotalTime deprecated. Use InfoTagVideo.setResumePoint() instead.
             'ResumeTime': str(time_offset),
+            'TotalTime': str(duration),
             'StartPercent': str(progress * 100)
         },
         'context_menu': [
@@ -321,7 +323,7 @@ def map_live_video(item, quality, audio_slot):
             #'country': [country.get('label') for country in item.get('productionCountries', [])],
             #'director': item.get('director'),
             #'aired': airdate
-            'playcount': 0
+            'playcount': '0',
         },
         'properties': {
             'fanart_image': fanartUrl,
