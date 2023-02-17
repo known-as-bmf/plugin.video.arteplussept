@@ -136,16 +136,16 @@ def build_video_streams(program_id, settings):
     if item is None:
         raise RuntimeError('Video not found...')
 
-    programId = item.get('programId')
+    program_id = item.get('programId')
     kind = item.get('kind')
 
-    return mapper.map_streams(item, api.streams(kind, programId, settings.language), settings.quality)
+    return mapper.map_streams(item, api.streams(kind, program_id, settings.language), settings.quality)
 
 
 def build_stream_url(plugin, kind, program_id, audio_slot, settings):
     program_stream = api.streams(kind, program_id, settings.language)
     if not program_stream:
-        msg=plugin.addon.getLocalizedString(30029)
+        msg = plugin.addon.getLocalizedString(30029)
         plugin.notify(msg=msg.format(strm=program_id, ln=settings.language), image='error')
     else:
         return mapper.map_playable(program_stream, settings.quality, audio_slot, mapper.match_hbbtv)

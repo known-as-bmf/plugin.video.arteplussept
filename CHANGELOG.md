@@ -29,7 +29,7 @@ v1.1.3 (2022-12-29)
 - Added Polish translation
 - Added My list and My history content from Arte TV profile
 
-v1.1.2
+v1.1.2 (2021-06-27)
 - better date / locale handling and prevent crash when http error
 
 v1.1.1
