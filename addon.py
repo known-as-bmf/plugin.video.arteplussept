@@ -154,7 +154,14 @@ def play(kind, program_id, audio_slot='1'):
     # wait 1s first to give a chance for playback to start
     # otherwise synched_player won't be able to listen
     xbmc.sleep(500)
+    # start at 0 to synch progress at start-up
+    i = 0
+    # keep current method stack up to keep event callbacks up
     while synched_player.isPlayback():
+        # synch progress to Arte TV every minute, as on website
+        if i % 60 == 0:
+            synched_player.synchProgress()
+        i += 1
         xbmc.sleep(1000)
     synched_player.synchProgress()
     del synched_player
