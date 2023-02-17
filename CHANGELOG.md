@@ -1,5 +1,17 @@
 Changelog also available in file ./addon.xml xpath /addon/extension/news following Kodi guidelines https://kodi.wiki/view/Add-on_structure#changelog.txt
 
+v1.1.8 (2023-2-17)
+- Improve synchronization of playback progress with Arte TV
+    - Synchronize progress every minute
+    - Fix missing synchronization when playback ends
+    - Enable Resume from beginning (on top of synchronized progress point)
+- Improve display of collection item in home page
+    - Before : rely on old sub category, creating additional menu with a dead entry
+    - After : rely on cached category, collection videos directly poulated from home page zone
+- Add label in notification when manipulating favorites
+- Fix plural for Polish
+- Non-functional code clean-up
+
 v1.1.7 (2023-2-14)
 - Add feature to purge my history thanks to action in context menu of my history
 - Move addon.py to root following Kodi recommendations
