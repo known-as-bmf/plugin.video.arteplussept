@@ -1,8 +1,8 @@
 import datetime
 import dateutil.parser
-from xbmcswift2 import xbmc
 import html
 import urllib.parse
+from xbmcswift2 import xbmc
 
 
 def format_live_title_and_subtitle(title, subtitle=None):
@@ -55,13 +55,6 @@ def parse_artetv_date(datestr):
         date = None
     return date
 
-
-def past_week():
-    today = datetime.date.today()
-    one_day = datetime.timedelta(days=1)
-
-    for i in range(0, 8):  # TODO: find better interval
-        yield today - (one_day * i)
 
 def is_playlist(program_id):
     is_playlist = False

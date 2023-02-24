@@ -1,3 +1,4 @@
+
 import functools
 
 def find(findFn, l):
@@ -39,36 +40,11 @@ def filter_dict(filterFn, d):
     """
     return {k: v for k, v in d.items() if filterFn(v, k)}
 
-
-def reject_dict(filterFn, d):
-    """
-      filterFn: A function taking two params: value, key. MUST return a boolean
-      d: The dict to filter
-    """
-    def invert(*args, **kwargs):
-        return not filterFn(*args, **kwargs)
-    return filter_dict(invert, d)
-
-
-def get_property(d, path, default=None):
-    def walk(sub_d, segment):
-        if sub_d is None:
-            return None
-        return sub_d.get(segment)
-    segments = path.split('.')
-    return functools.reduce(walk, segments, d) or default
-
-
 def merge_dicts(*args):
     result = {}
     for d in args:
         result.update(d)
     return result
-
-
-def flatten(l):
-    return [item for sublist in l for item in sublist]
-
 
 def flat_map(f, lst):
     return [item for list_item in lst for item in f(list_item)]

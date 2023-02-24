@@ -11,10 +11,7 @@ _base_headers = {
     'user-agent': PluginInformation.name + '/' + PluginInformation.version
 }
 _endpoints = {
-    'categories': '/EMAC/teasers/{type}/v2/{lang}',
     'category': '/EMAC/teasers/category/v2/{category_code}/{lang}',
-    'subcategory': '/OPA/v3/videos/subcategory/{sub_category_code}/page/1/limit/100/{lang}',
-    # 'magazines': '/OPA/v3/magazines/{lang}', # moved to arte tv api
     'collection': '/EMAC/teasers/collection/v2/{collection_id}/{lang}',
     # program details
     'video': '/OPA/v3/videos/{program_id}/{lang}',
@@ -48,7 +45,6 @@ _artetv_endpoints = {
     # PATCH empty payload
     # needs token in authorization header
     'purge_last_viewed': '/sso/v3/lastvieweds/purge',
-    'magazines': '/sso/v3/magazines/{lang}?page={page}&limit={limit}',
     # program_id can be 103520-000-A or LIVE
     'program': '/player/v2/config/{lang}/{program_id}',
     # rproxy
@@ -113,25 +109,9 @@ def program_video(lang, program_id):
     return _load_json_full_url(url, None).get('data', {})
 
 
-def categories(lang):
-    url = _endpoints['categories'].format(type='categories', lang=lang)
-    return _load_json(url).get('categories', {})
-
-
-def home_category(name, lang):
-    url = _endpoints['categories'].format(type='home', lang=lang)
-    return _load_json(url).get('teasers', {}).get(name, [])
-
-
 def category(category_code, lang):
     url = _endpoints['category'].format(category_code=category_code, lang=lang)
     return _load_json(url).get('category', {})
-
-
-def subcategory(sub_category_code, lang):
-    url = _endpoints['subcategory'].format(
-        sub_category_code=sub_category_code, lang=lang)
-    return _load_json(url).get('videos', {})
 
 
 def collection(kind, collection_id, lang):
@@ -151,12 +131,6 @@ def streams(kind, program_id, lang):
     url = _endpoints['streams'].format(
         kind=kind, program_id=program_id, lang=lang)
     return _load_json(url).get('videoStreams', [])
-
-
-def magazines(lang):
-    url = _artetv_url + _artetv_endpoints['magazines'].format(
-        lang=lang, page='1', limit='50')
-    return _load_json_full_url(url, _artetv_headers).get('data')
 
 
 def daily(date, lang):

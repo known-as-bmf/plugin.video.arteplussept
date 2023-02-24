@@ -2,8 +2,6 @@ from xbmcswift2 import xbmc
 
 from . import api
 from . import mapper
-from . import hof
-from . import utils
 
 def build_home_page(plugin, cached_categories, settings):
     addon_menu = [
@@ -24,24 +22,6 @@ def build_home_page(plugin, cached_categories, settings):
     return addon_menu
 
 
-def build_categories(plugin, cached_categories, settings):
-    categories = [
-        mapper.create_search_item(),
-        mapper.map_live_video(api.program_video(settings.language, 'LIVE'), settings.quality, '1'),
-        mapper.create_favorites_item(),
-        mapper.create_last_viewed_item(),
-        mapper.create_newest_item(),
-        mapper.create_most_viewed_item(),
-        mapper.create_last_chance_item(),
-    ]
-    categories.extend(mapper.map_categories(
-        api.categories(settings.language), settings.show_video_streams, cached_categories))
-    # categories.append(mapper.create_creative_item())
-    categories.append(mapper.create_magazines_item())
-    categories.append(mapper.create_week_item())
-    return categories
-
-
 def build_api_category(category_code, settings):
     category = [mapper.map_category_item(item, category_code) for item in
             api.category(category_code, settings.language)]
@@ -51,11 +31,6 @@ def build_api_category(category_code, settings):
 
 def get_cached_category(category_title, most_viewed_categories):
     return most_viewed_categories[category_title]
-
-
-def build_magazines(settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
-            api.magazines(settings.language)]
 
 
 def build_favorites(plugin, settings):
@@ -94,37 +69,6 @@ def purge_last_viewed(plugin, usr, pwd):
         plugin.notify(msg=plugin.addon.getLocalizedString(30032), image='error')
 
 
-
-def build_newest(settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
-            api.home_category('mostRecent', settings.language)]
-
-
-def build_most_viewed(settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
-            api.home_category('mostViewed', settings.language)]
-
-
-def build_last_chance(settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
-            api.home_category('lastChance', settings.language)]
-
-
-def build_sub_category_by_code(sub_category_code, settings):
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
-            api.subcategory(sub_category_code, settings.language)]
-
-
-def build_sub_category_by_title(category_code, sub_category_title, settings):
-    category = api.category(category_code, settings.language)
-    unquoted_title = utils.decode_string(sub_category_title)
-
-    sub_category = hof.find(lambda i: i.get('title') == unquoted_title, category)
-
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
-            sub_category.get('teasers')]
-
-
 def build_mixed_collection(kind, collection_id, settings):
     return [mapper.map_generic_item(item, settings.show_video_streams) for item in
             api.collection(kind, collection_id, settings.language)]
@@ -150,30 +94,6 @@ def build_stream_url(plugin, kind, program_id, audio_slot, settings):
     else:
         return mapper.map_playable(program_stream, settings.quality, audio_slot, mapper.match_hbbtv)
 
-
-_useless_kinds = ['CLIP', 'MANUAL_CLIP', 'TRAILER']
-
-
-def build_weekly(settings):
-    programs = hof.flatten([api.daily(date, settings.language)
-                            for date in utils.past_week()])
-
-    def keep_video_item(item):
-        video = hof.get_property(item, 'video')
-
-        if video is None:
-            return False
-        return hof.get_property(item, 'kind') not in _useless_kinds
-
-    videos_filtered = [hof.get_property(item, 'video')
-                       for item in programs if keep_video_item(item)]
-
-    videos_mapped = [mapper.map_generic_item(
-        item, settings.show_video_streams) for item in videos_filtered]
-    videos_mapped.sort(key=lambda item: hof.get_property(
-        item, 'info.aired'), reverse=True)
-
-    return videos_mapped
 
 def search(plugin, settings):
     query = get_search_query(plugin)
