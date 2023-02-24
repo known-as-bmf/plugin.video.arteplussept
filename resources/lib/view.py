@@ -87,12 +87,17 @@ def build_video_streams(program_id, settings):
 
 
 def build_stream_url(plugin, kind, program_id, audio_slot, settings):
+    # first try with content
     program_stream = api.streams(kind, program_id, settings.language)
-    if not program_stream:
-        msg = plugin.addon.getLocalizedString(30029)
-        plugin.notify(msg=msg.format(strm=program_id, ln=settings.language), image='error')
-    else:
+    if program_stream:
         return mapper.map_playable(program_stream, settings.quality, audio_slot, mapper.match_hbbtv)
+    # second try to fallback clip
+    clip_stream = api.streams('CLIP', program_id, settings.language)
+    if clip_stream:
+        return mapper.map_playable(clip_stream, settings.quality, audio_slot, mapper.match_hbbtv)
+    # otherwise raise the error
+    msg = plugin.addon.getLocalizedString(30029)
+    plugin.notify(msg=msg.format(strm=program_id, ln=settings.language), image='error')
 
 
 def search(plugin, settings):

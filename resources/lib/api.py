@@ -257,7 +257,7 @@ def persist_token_in_arte(plugin, tokens, headers):
         error = err
     if error or not custom_token or custom_token.status_code != 200:
         plugin.notify(msg=plugin.addon.getLocalizedString(30020), image='warning')
-        xbmc.log('Unable to persist Arte TV token {tkn} for {user}. Step 1/2: {err}'.format(tkn=tokens['access_token'], user=username, err=error if error else custom_token.text))
+        xbmc.log('Unable to persist Arte TV token {tkn}. Step 1/2: {err}'.format(tkn=tokens['access_token'], err=error if error else custom_token.text))
         return False
 
     # step 2/2 : persist / remember token so that it can be reused
@@ -271,7 +271,7 @@ def persist_token_in_arte(plugin, tokens, headers):
         error = err
     if error or not login or login.status_code != 200:
         plugin.notify(msg=plugin.addon.getLocalizedString(30020), image='warning')
-        xbmc.log('Unable to persist Arte TV token {tkn} for {user}. Step 2/2: {err}'.format(tkn=tokens['access_token'], user=username, err=error if error else login.text))
+        xbmc.log('Unable to persist Arte TV token {tkn}. Step 2/2: {err}'.format(tkn=tokens['access_token'], err=error if error else login.text))
         return False
     
     return True
