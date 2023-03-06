@@ -43,7 +43,6 @@ settings = Settings(plugin)
 
 @plugin.route('/', name='index')
 def index():
-    # return view.build_categories(plugin, plugin.get_storage('cached_categories', TTL=60), settings)
     return view.build_home_page(plugin, plugin.get_storage('cached_categories', TTL=60), settings)
 
 
@@ -55,17 +54,6 @@ def api_category(category_code):
 @plugin.route('/cached_category/<category_code>', name='cached_category')
 def cached_category(category_code):
     return view.get_cached_category(category_code, plugin.get_storage('cached_categories', TTL=60))
-
-
-# @plugin.route('/creative', name='creative')
-# def creative():
-#     return []
-
-
-@plugin.route('/magazines', name='magazines')
-def magazines():
-    plugin.set_content('tvshows')
-    return plugin.finish(view.build_magazines(settings))
 
 
 @plugin.route('/favorites', name='favorites')
@@ -90,36 +78,6 @@ def last_viewed():
 @plugin.route('/purge_last_viewed', name='purge_last_viewed')
 def purge_last_viewed():
     view.purge_last_viewed(plugin, settings.username, settings.password)
-
-
-@plugin.route('/newest', name='newest')
-def newest():
-    plugin.set_content('tvshows')
-    return plugin.finish(view.build_newest(settings))
-
-
-@plugin.route('/most_viewed', name='most_viewed')
-def most_viewed():
-    plugin.set_content('tvshows')
-    return plugin.finish(view.build_most_viewed(settings))
-
-
-@plugin.route('/last_chance', name='last_chance')
-def last_chance():
-    plugin.set_content('tvshows')
-    return plugin.finish(view.build_last_chance(settings))
-
-
-@plugin.route('/sub_category/<sub_category_code>', name='sub_category_by_code')
-def sub_category_by_code(sub_category_code):
-    plugin.set_content('tvshows')
-    return plugin.finish(view.build_sub_category_by_code(sub_category_code, settings))
-
-
-@plugin.route('/sub_category/<category_code>/<sub_category_title>', name='sub_category_by_title')
-def sub_category_by_title(category_code, sub_category_title):
-    plugin.set_content('tvshows')
-    return plugin.finish(view.build_sub_category_by_title(category_code, sub_category_title, settings))
 
 
 @plugin.route('/collection/<kind>/<program_id>', name='collection')
@@ -168,13 +126,8 @@ def play(kind, program_id, audio_slot='1'):
     return r
 
 
-@plugin.route('/weekly', name='weekly')
-def weekly():
-    plugin.set_content('tvshows')
-    return plugin.finish(view.build_weekly(settings))
-
 @plugin.route('/search', name='search')
-def weekly():
+def search():
     plugin.set_content('tvshows')
     return plugin.finish(view.search(plugin, settings))
 

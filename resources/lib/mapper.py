@@ -4,53 +4,15 @@ from xbmcswift2 import actions
 from . import hof
 from . import utils
 
-def map_categories(api_categories, show_video_streams, cached_categories):
-    categories = []
-    for item in api_categories:
-        # categories have code MOST_VIEWED, when content is returned in teasers
-        # and not available in sub API call
-        if item.get('code') == "MOST_VIEWED":
-            cat_code = "MOST_VIEWED_{id}".format(id=(len(cached_categories) or 0))
-            item['code'] = cat_code
-            if item.get('teasers'):
-                # build cached categories
-                cached_categories[cat_code] = [map_generic_item(teaser, show_video_streams)
-                        for teaser in item.get('teasers')]
-                categories.append(map_categories_item(item, 'cached_category'))
-            else:
-                xbmc.log("Category \"{cat_title}\" will be ignored, because it contains no teaser".format(cat_title=item.get('title')))
-        else:
-            categories.append(map_categories_item(item, 'api_category'))
-    return categories
 
-def map_categories_item(item, category_rule, category_code=None):
-    if not category_code:
-        category_code = item.get('code')
-    return {
-        'label': utils.colorize(item.get('title'), item.get('color')),
-        'path': plugin.url_for(category_rule, category_code=category_code)
-    }
-
-
-# def create_creative_item():
-#     return {
-#         'label': 'Creative I18N',
-#         'path': plugin.url_for('creative')
-#     }
-
-
-def create_favorites_item(label=None):
-    if not label:
-        label = plugin.addon.getLocalizedString(30010)
+def create_favorites_item(label):
     return {
         'label': label,
         'path': plugin.url_for('favorites')
     }
 
 
-def create_last_viewed_item(label=None):
-    if not label:
-        label = plugin.addon.getLocalizedString(30011)
+def create_last_viewed_item(label):
     return {
         'label': label,
         'path': plugin.url_for('last_viewed'),
@@ -65,41 +27,6 @@ def create_search_item():
     return {
         'label': plugin.addon.getLocalizedString(30012),
         'path': plugin.url_for('search')
-    }
-
-
-def create_magazines_item():
-    return {
-        'label': plugin.addon.getLocalizedString(30008),
-        'path': plugin.url_for('magazines')
-    }
-
-
-def create_week_item():
-    return {
-        'label': plugin.addon.getLocalizedString(30009),
-        'path': plugin.url_for('weekly')
-    }
-
-
-def create_newest_item():
-    return {
-        'label': plugin.addon.getLocalizedString(30005),
-        'path': plugin.url_for('newest')
-    }
-
-
-def create_most_viewed_item():
-    return {
-        'label': plugin.addon.getLocalizedString(30006),
-        'path': plugin.url_for('most_viewed')
-    }
-
-
-def create_last_chance_item():
-    return {
-        'label': plugin.addon.getLocalizedString(30007),
-        'path': plugin.url_for('last_chance')
     }
 
 
@@ -432,3 +359,11 @@ def map_cached_categories(zone):
         if menu_video:
             cached_category.append(menu_video)
     return cached_category
+
+def map_categories_item(item, category_rule, category_code=None):
+    if not category_code:
+        category_code = item.get('code')
+    return {
+        'label': utils.colorize(item.get('title'), item.get('color')),
+        'path': plugin.url_for(category_rule, category_code=category_code)
+    }
