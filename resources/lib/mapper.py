@@ -1,11 +1,16 @@
-from addon import plugin
+"""Map JSON API outputs into playable content and meanus for Kodi"""
+# pylint: disable=import-error
 from xbmcswift2 import xbmc
+# pylint: disable=import-error
 from xbmcswift2 import actions
+# pylint: disable=cyclic-import
+from addon import plugin
 from . import hof
 from . import utils
 
 
 def create_favorites_item(label):
+    """Return menu entry to access user favorites"""
     return {
         'label': label,
         'path': plugin.url_for('favorites')
@@ -13,6 +18,8 @@ def create_favorites_item(label):
 
 
 def create_last_viewed_item(label):
+    """Return menu entry to access user history
+    with an additional command to flush user history"""
     return {
         'label': label,
         'path': plugin.url_for('last_viewed'),
@@ -24,6 +31,7 @@ def create_last_viewed_item(label):
 
 
 def create_search_item():
+    """Return menu entry to search content"""
     return {
         'label': plugin.addon.getLocalizedString(30012),
         'path': plugin.url_for('search')
@@ -31,9 +39,12 @@ def create_search_item():
 
 
 def map_category_item(item, category_code):
+    """Return menu entry to access a category content"""
     title = item.get('title')
-    path = plugin.url_for('sub_category_by_title',
-                          category_code=category_code, sub_category_title=utils.encode_string(title))
+    path = plugin.url_for(
+        'sub_category_by_title',
+        category_code=category_code,
+        sub_category_title=utils.encode_string(title))
 
     return {
         'label': title,
@@ -42,28 +53,33 @@ def map_category_item(item, category_code):
 
 
 def map_generic_item(item, show_video_streams):
+    """Return entry menu for video or playlist"""
     program_id = item.get('programId')
 
-    is_playlist = utils.is_playlist(program_id)
-    if not is_playlist:
-        return map_video(item, show_video_streams)
+    if utils.is_playlist(program_id):
+        item = map_playlist(item)
     else:
-        return map_playlist(item)
+        item = map_video(item, show_video_streams)
+    return item
 
 
-# Create a video menu item from a json returned by Arte HBBTV API
 def map_video(item, show_video_streams):
+    """Create a video menu item from a json returned by Arte HBBTV API"""
     program_id = item.get('programId')
     label = utils.format_title_and_subtitle(item.get('title'), item.get('subtitle'))
     kind = item.get('kind')
     duration = item.get('durationSeconds')
     airdate = item.get('broadcastBegin')
     if airdate is not None:
-        airdate = str(utils.parse_date(airdate))
+        airdate = str(utils.parse_date_hbbtv(airdate))
+    if show_video_streams:
+        path = plugin.url_for('streams', program_id=program_id)
+    else:
+        path = plugin.url_for('play', kind=kind, program_id=program_id)
 
     return {
         'label': label,
-        'path': plugin.url_for('streams', program_id=program_id) if show_video_streams else plugin.url_for('play', kind=kind, program_id=program_id),
+        'path': path,
         'thumbnail': item.get('imageUrl'),
         'is_playable': not show_video_streams,
         'info_type': 'video',
@@ -85,66 +101,25 @@ def map_video(item, show_video_streams):
         },
         'context_menu': [
             (plugin.addon.getLocalizedString(30023),
-                actions.background(plugin.url_for('add_favorite', program_id=program_id, label=label))),
+                actions.background(plugin.url_for(
+                    'add_favorite', program_id=program_id, label=label))),
             (plugin.addon.getLocalizedString(30024),
-                actions.background(plugin.url_for('remove_favorite', program_id=program_id, label=label))),
+                actions.background(plugin.url_for(
+                    'remove_favorite', program_id=program_id, label=label))),
         ],
     }
 
-# Create a video menu item from a json returned by Arte TV API
-# Source data example, unable to find public documentation
-# {
-#   "type": "teaser",
-#   "id": "079395-000-A_fr",
-#   "kind": "SHOW",
-# OR
-#   "kind":{"code":"SHOW","label":"Programme","isCollection":false}
-#   "programId": "079395-000-A",
-#   "language": "fr",
-#   "url": "https://www.arte.tv/fr/videos/079395-000-A/maitriser-l-energie-des-etoiles-la-revolution-de-demain/",
-#   "title": "Maîtriser l'énergie des étoiles, la révolution de demain",
-#   "subtitle": null,
-#   "images": [
-#     {
-#       "url": "https://api-cdn.arte.tv/img/v2/image/te28ppavJQNmHtpNndKqUG/1920x1080?type=TEXT", "format": "landscape", "width": 1920, "height": 1080,
-#       "alternateResolutions": [
-#         { "url": "https://api-cdn.arte.tv/img/v2/image/te28ppavJQNmHtpNndKqUG/1920x1080?type=TEXT", "width": 1920, "height": 1080, "imageSize": "1920x1080" }
-#       ]
-#     }
-#   ],
-#   "markings": [],
-#   "geoblocking": null,
-#   "warning": null,
-#   "description": "La technique de la fusion nucléaire revient régulièrement sur le devant de la scène. Face au défi de la transition énergétique, elle pourrait représenter une puissante alternative,aussi puissante que l'énergie du soleil dont elle entend s'inspirer. Sans déchets radioactifs, sans extractions polluantes, durable, elle est encore à ce stade un chantier pour la science et un gouffre financier. Explications.",
-#   "shortDescription": "La technique de la fusion nucléaire revient régulièrement sur le devant de la scène. Face au défi de la transition énergétique, elle pourrait représenter une puissante alternative,aussi puissante que l'énergie du soleil dont elle entend s'inspirer. Sans déchets radioactifs, sans extractions polluantes, durable, elle est encore à ce stade un chantier pour la science et un gouffre financier. Explications.",
-#   "beginsAt": "2022-07-01T03:00:00Z",
-#   "expireAt": "2023-06-30T03:00:00Z",
-#   "availability": { "type": "VOD", "start": "2022-07-01T03:00:00Z", "end": "2023-06-30T03:00:00Z", "hasVideoStreams": true, "broadcastBegin": null, "displayDate": "2022-07-01T03:00:00Z" },
-#   "duration": 52,
-#   "durationSeconds": 3114,
-#   "video_url": "/api/1/player/079395-000-A",
-#   "player": {
-#     "config": "https://api.arte.tv/api/player/v2/config/fr/079395-000-A"
-#   },
-#   "playable": true,
-#   "stickers": [
-#     { "code": "PLAYABLE", "label": "PLAYABLE"}
-#   ],
-#   "durationLabel": null,
-#   "available": true,
-#   "trackingPixel": "https://www.arte.tv/ct/?language=fr&support=web&pageid={HOME}&zonename=myarte_favorites&zoneid=myarte_favorites&teasertitle=Maitriser-l-energie-des-etoiles-la-revolution-de-demain&teaserid=079395-000-A&programid=079395-000-A&position=17",
-#   "lastviewed": { "is": true, "timecode": 0, "progress": 1 },
-#   "favorite": { "is": true }
-# }
-# Destination object : https://romanvm.github.io/Kodistubs/_autosummary/xbmcgui.html#xbmcgui.ListItem.setInfo
 def map_artetv_video(item):
+    """Return video menu item to show content from Arte TV API
+    :rtype dict[str, Any] | None: To be used in
+    https://romanvm.github.io/Kodistubs/_autosummary/xbmcgui.html#xbmcgui.ListItem.setInfo"""
     program_id = item.get('programId')
     label = utils.format_title_and_subtitle(item.get('title'), item.get('subtitle'))
     kind = item.get('kind')
     duration = item.get('durationSeconds')
     airdate = item.get('beginsAt') # broadcastBegin
     if airdate is not None:
-        airdate = str(utils.parse_artetv_date(airdate))
+        airdate = str(utils.parse_date_artetv(airdate))
 
     fanart_url = ""
     thumbnail_url = ""
@@ -171,7 +146,7 @@ def map_artetv_video(item):
 
     is_playlist = utils.is_playlist(program_id)
     path = plugin.url_for('collection' if is_playlist else 'play', kind=kind, program_id=program_id)
-    
+
     return {
         'label': label,
         'path': path,
@@ -201,14 +176,17 @@ def map_artetv_video(item):
         },
         'context_menu': [
             (plugin.addon.getLocalizedString(30023),
-                actions.background(plugin.url_for('add_favorite', program_id=program_id, label=label))),
+                actions.background(plugin.url_for(
+                    'add_favorite', program_id=program_id, label=label))),
             (plugin.addon.getLocalizedString(30024),
-                actions.background(plugin.url_for('remove_favorite', program_id=program_id, label=label))),
+                actions.background(plugin.url_for(
+                    'remove_favorite', program_id=program_id, label=label))),
         ],
     }
 
 
 def map_live_video(item, quality, audio_slot):
+    """Return menu entry to watch live content from Arte TV API"""
     # program_id = item.get('id')
     attr = item.get('attributes')
     meta = attr.get('metadata')
@@ -231,7 +209,7 @@ def map_live_video(item, quality, audio_slot):
 
     return {
         'label': utils.format_live_title_and_subtitle(meta.get('title'), meta.get('subtitle')),
-        'path': plugin.url_for('play_live', streamUrl=stream_url),
+        'path': plugin.url_for('play_live', stream_url=stream_url),
         # playing the stream from program id makes the live starts from the beginning of the video
         # while it starts the video like the live tv, with the above
         #  'path': plugin.url_for('play', kind='SHOW', program_id=programId.replace('_fr', '')),
@@ -259,6 +237,7 @@ def map_live_video(item, quality, audio_slot):
 
 
 def map_playlist(item):
+    """Map JSON item to menu entry to access playlist content"""
     program_id = item.get('programId')
     kind = item.get('kind')
 
@@ -274,15 +253,15 @@ def map_playlist(item):
 
 
 def map_streams(item, streams, quality):
+    """Map JSON item and list of audio streams into a menu."""
     program_id = item.get('programId')
     kind = item.get('kind')
 
     video_item = map_video(item, False)
 
-    # TODO: filter streams by quality
     filtered_streams = None
-    for q in [quality] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality]:
-        filtered_streams = [s for s in streams if s.get('quality') == q]
+    for qlt in [quality] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality]:
+        filtered_streams = [s for s in streams if s.get('quality') == qlt]
         if len(filtered_streams) > 0:
             break
 
@@ -307,9 +286,12 @@ def map_streams(item, streams, quality):
 
 
 def map_playable(streams, quality, audio_slot, match):
+    """Select the stream best matching quality and audio slot criteria in streams
+    and map to a menu entry"""
     stream = None
-    for q in [quality] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality]:
-        stream = hof.find(lambda s: match(s, q, audio_slot), streams)
+    for qlt in [quality] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality]:
+        # pylint: disable=cell-var-from-loop
+        stream = hof.find(lambda s: match(s, qlt, audio_slot), streams)
         if stream:
             break
 
@@ -321,17 +303,20 @@ def map_playable(streams, quality, audio_slot, match):
         'path': stream.get('url'),
     }
 
-
 def match_hbbtv(item, quality, audio_slot):
+    """Return True if item from HHB TV API matches quality and audio_slot constraints,
+    False otherwise"""
     return item.get('quality') == quality and item.get('audioSlot') == audio_slot
 
 def match_artetv(item, quality, audio_slot):
+    """Return True if item from Arte TV API matches quality and audio_slot constraints,
+    False otherwise"""
     return item.get('mainQuality').get('code') == quality and str(item.get('slot')) == audio_slot
 
 
-# Arte TV API page is split into zones. Map a 'zone' to menu item(s).
-# Populate cached_categories for zones with videos available in child 'content'
 def map_zone_to_item(zone, cached_categories):
+    """Arte TV API page is split into zones. Map a 'zone' to menu item(s).
+    Populate cached_categories for zones with videos available in child 'content'"""
     menu_item = None
     title = zone.get('title')
     if zone.get('id') == '9fc57105-847b-49c5-9b4a-f46863754059':
@@ -347,12 +332,13 @@ def map_zone_to_item(zone, cached_categories):
     elif zone.get('link'):
         menu_item = map_categories_item(zone, 'api_category', zone.get('link').get('page'))
     else:
-        xbmc.log("Zone \"{zone_title}\" will be ignored. No link. No content. id unknown.".format(zone_title=title))
+        xbmc.log(f"Zone \"{title}\" will be ignored. No link. No content. id unknown.")
 
     return menu_item
 
 
 def map_cached_categories(zone):
+    """Map JSON node zone from Arte TV API to a list of menu items."""
     cached_category = []
     for item in zone.get('content').get('data'):
         menu_video = map_artetv_video(item)
@@ -361,6 +347,11 @@ def map_cached_categories(zone):
     return cached_category
 
 def map_categories_item(item, category_rule, category_code=None):
+    """Return a menu entry to access content of category item.
+    :param dict item: JSON node item
+    :param str category_rule: value is either cached_category, either api_category.
+    :param str category_code: if None, use item code.
+    """
     if not category_code:
         category_code = item.get('code')
     return {
