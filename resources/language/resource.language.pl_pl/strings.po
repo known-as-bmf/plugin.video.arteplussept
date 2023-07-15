@@ -38,6 +38,10 @@ msgctxt "#30055"
 msgid "Password"
 msgstr "Hasło"
 
+msgctxt "#30056"
+msgid "Log level"
+msgstr "Log level"
+
 
 msgctxt "#30012"
 msgid "Search"

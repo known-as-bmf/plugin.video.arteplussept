@@ -5,6 +5,7 @@ import requests
 # pylint: disable=import-error
 from xbmcswift2 import xbmc
 from . import hof
+from . import logger
 
 
 # Arte hbbtv - deprecated API since 2022 prefer Arte TV API
@@ -81,6 +82,7 @@ def add_favorite(plugin, usr, pwd, program_id):
     headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
     data = {'programId': program_id}
     reply = requests.put(url, data=data, headers=headers, timeout=10)
+    logger.log_json(reply, 'artetv_addfavorite')
     return reply.status_code
 
 def remove_favorite(plugin, usr, pwd, program_id):
@@ -89,6 +91,7 @@ def remove_favorite(plugin, usr, pwd, program_id):
     url = _ARTETV_URL + ARTETV_ENDPOINTS['remove_favorite'].format(program_id=program_id)
     headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
     reply = requests.delete(url, headers=headers, timeout=10)
+    logger.log_json(reply, 'artetv_removefavorite')
     return reply.status_code
 
 def get_last_viewed(plugin, lang, usr, pwd):
@@ -103,6 +106,7 @@ def sync_last_viewed(plugin, usr, pwd, program_id, time):
     headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
     data = {'programId': program_id, 'timecode': time}
     reply = requests.put(url, data=data, headers=headers, timeout=10)
+    logger.log_json(reply, 'artetv_synchlastviewed')
     return reply.status_code
 
 def purge_last_viewed(plugin, usr, pwd):
@@ -110,6 +114,7 @@ def purge_last_viewed(plugin, usr, pwd):
     url = _ARTETV_URL + ARTETV_ENDPOINTS['purge_last_viewed']
     headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
     reply = requests.patch(url, data={}, headers=headers, timeout=10)
+    logger.log_json(reply, 'artetv_purgelastviewed')
     return reply.status_code
 
 def program_video(lang, program_id):
@@ -174,6 +179,7 @@ def _load_json_full_url(url, headers=None, params=None):
         headers = _HBBTV_HEADERS
     # https://requests.readthedocs.io/en/latest/
     reply = requests.get(url, headers=headers, params=params, timeout=10)
+    logger.log_json(reply, 'hbbtv_loadurl')
     return reply.json(object_pairs_hook=OrderedDict)
 
 def _load_json_personal_content(plugin, url, usr, pwd, hdrs=None):
@@ -261,6 +267,7 @@ def authenticate_in_arte(plugin, username='', password='', headers=None):
     try:
         # https://requests.readthedocs.io/en/latest/
         reply = requests.post(url, data=token_data, headers=headers, timeout=10)
+        logger.log_json(reply, 'artetv_auth')
     except requests.exceptions.ConnectionError as err:
         # unable to auth. e.g.
         # HTTPSConnectionPool(host='api.arte.tv', port=443):
@@ -299,6 +306,7 @@ def persist_token_in_arte(plugin, tokens, headers):
     cstm_tkn = None
     try:
         cstm_tkn = requests.get(url,params=params, headers=headers, cookies=cookies, timeout=10)
+        logger.log_json(cstm_tkn, 'artetv_customtoken')
     except requests.exceptions.ConnectionError as err:
         error = err
     if error or not cstm_tkn or cstm_tkn.status_code != 200:
@@ -314,6 +322,7 @@ def persist_token_in_arte(plugin, tokens, headers):
     login = None
     try:
         login = requests.get(url,params=params, headers=headers, cookies=cookies, timeout=10)
+        logger.log_json(login, 'artetv_login')
     except requests.exceptions.ConnectionError as err:
         error = err
     if error or not login or login.status_code != 200:

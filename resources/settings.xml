@@ -21,6 +21,12 @@
 			type="bool"
 			label="30053"
 			default="false"/>
+		<setting
+			id="loglevel"
+			type="enum"
+			label="30056"
+			values="DEFAULT|API"
+			default="0"/>
 	</category>
 	
     <!-- Profile -->

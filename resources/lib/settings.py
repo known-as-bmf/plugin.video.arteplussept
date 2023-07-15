@@ -1,6 +1,7 @@
 """Add-on settings"""
 languages = ['fr', 'de', 'en', 'es', 'pl', 'it']
 qualities = ['SQ', 'EQ', 'HQ']
+loglevel = ['DEFAULT', 'API']
 
 
 class Settings:
@@ -27,3 +28,6 @@ class Settings:
 		# defaults to empty string to return false with if not str
         self.password = plugin.get_setting(
             'password') or ""
+        
+        self.loglevel = plugin.get_setting(
+            'loglevel', choices=loglevel) or loglevel[0]
