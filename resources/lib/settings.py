@@ -28,6 +28,6 @@ class Settings:
 		# defaults to empty string to return false with if not str
         self.password = plugin.get_setting(
             'password') or ""
-        
+        # Enable additional logs managed by plugin : API messages
         self.loglevel = plugin.get_setting(
             'loglevel', choices=loglevel) or loglevel[0]

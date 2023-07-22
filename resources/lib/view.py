@@ -12,7 +12,7 @@ def build_home_page(cached_categories, settings):
         mapper.create_search_item(),
     ]
     try:
-        live_stream_data = api.program_video(settings.language, 'LIVE')
+        live_stream_data = api.player_video(settings.language, 'LIVE')
         live_stream_item = mapper.map_live_video(
             live_stream_data, settings.quality, '1')
         addon_menu.append(live_stream_item)

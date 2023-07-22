@@ -2,7 +2,9 @@
 
 from os.path import join as OSPJoin
 from datetime import datetime
+# pylint: disable=import-error
 from xbmcswift2 import Plugin
+# pylint: disable=import-error
 from xbmcswift2 import xbmcvfs
 from . import settings
 

@@ -48,7 +48,9 @@ ARTETV_ENDPOINTS = {
     # needs token in authorization header
     'purge_last_viewed': '/sso/v3/lastvieweds/purge',
     # program_id can be 103520-000-A or LIVE
-    'program': '/player/v2/config/{lang}/{program_id}',
+    'player': '/player/v2/config/{lang}/{program_id}',
+    # rproxy
+    'program': '/emac/v4/{lang}/web/programs/{program_id}',
     # rproxy
     # category=HOME, CIN, SER, SEARCH client=app, tv, web, orange, free
     'page': '/emac/v4/{lang}/{client}/pages/{category}/',
@@ -73,7 +75,7 @@ ARTETV_HEADERS = {
 def get_favorites(plugin, lang, usr, pwd):
     """Retrieve favorites from a personal account."""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['get_favorites'].format(lang=lang, page='1', limit='50')
-    return _load_json_personal_content(plugin, url, usr, pwd)
+    return _load_json_personal_content(plugin, 'artetv_getfavorites', url, usr, pwd)
 
 def add_favorite(plugin, usr, pwd, program_id):
     """Add content program_id to user favorites.
@@ -97,7 +99,7 @@ def remove_favorite(plugin, usr, pwd, program_id):
 def get_last_viewed(plugin, lang, usr, pwd):
     """Retrieve content recently watched by a user."""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['get_last_viewed'].format(lang=lang, page='1', limit='50')
-    return _load_json_personal_content(plugin, url, usr, pwd)
+    return _load_json_personal_content(plugin, 'artetv_lastviewed', url, usr, pwd)
 
 def sync_last_viewed(plugin, usr, pwd, program_id, time):
     """Synchronize in arte profile the progress time of content being played.
@@ -117,23 +119,28 @@ def purge_last_viewed(plugin, usr, pwd):
     logger.log_json(reply, 'artetv_purgelastviewed')
     return reply.status_code
 
+def player_video(lang, program_id):
+    """Get the info of content program_id from Arte TV API."""
+    url = _ARTETV_URL + ARTETV_ENDPOINTS['player'].format(lang=lang, program_id=program_id)
+    return _load_json_full_url('artetv_player', url, None).get('data', {})
+
 def program_video(lang, program_id):
     """Get the info of content program_id from Arte TV API."""
-    url = _ARTETV_URL + ARTETV_ENDPOINTS['program'].format(lang=lang, program_id=program_id)
-    return _load_json_full_url(url, None).get('data', {})
+    url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['program'].format(lang=lang, program_id=program_id)
+    return _load_json_full_url('artetv_program', url, None).get('value', {})
 
 
 def category(category_code, lang):
     """Get the info of category with category_code."""
     url = _HBBTV_ENDPOINTS['category'].format(category_code=category_code, lang=lang)
-    return _load_json(url).get('category', {})
+    return _load_json('hbbtv_category', url).get('category', {})
 
 
 def collection(kind, collection_id, lang):
     """Get the info of collection collection_id"""
     url = _HBBTV_ENDPOINTS['collection'].format(
         kind=kind, collection_id=collection_id, lang=lang)
-    sub_collections = _load_json(url).get('subCollections', [])
+    sub_collections = _load_json('hbbtv_collection', url).get('subCollections', [])
     return hof.flat_map(
         lambda sub_collections: sub_collections.get('videos', []),
         sub_collections)
@@ -143,20 +150,20 @@ def video(program_id, lang):
     """Get the info of content program_id from HBB TV API."""
     url = _HBBTV_ENDPOINTS['video'].format(
         program_id=program_id, lang=lang)
-    return _load_json(url).get('videos', [])[0]
+    return _load_json('hbbtv_video', url).get('videos', [])[0]
 
 
 def streams(kind, program_id, lang):
     """Get the stream info of content program_id."""
     url = _HBBTV_ENDPOINTS['streams'].format(
         kind=kind, program_id=program_id, lang=lang)
-    return _load_json(url).get('videoStreams', [])
+    return _load_json('hbbtv_streams', url).get('videoStreams', [])
 
 def page_content(lang):
     """Get content to be display in a page. It can be a page for a category or the home page."""
     url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['page'].format(
         lang=lang, category='HOME', client='tv')
-    return _load_json_full_url(url, ARTETV_HEADERS).get('value', [])
+    return _load_json_full_url('artetv_home', url, ARTETV_HEADERS).get('value', [])
 
 def search(lang, query, page='1'):
     """Search for content in Arte TV API.
@@ -165,31 +172,33 @@ def search(lang, query, page='1'):
     url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['page'].format(
         lang=lang, category='SEARCH', client='tv')
     params = {'page' : page, 'query' : query}
-    return _load_json_full_url(url, ARTETV_HEADERS, params).get('value', []).get('zones', [None])[0]
+    return _load_json_full_url('artetv_search', url, ARTETV_HEADERS, params).get(
+        'value', []).get('zones', [None])[0]
 
-def _load_json(path, headers=None):
+def _load_json(request_scope, path, headers=None):
     """Deprecated since 2022. Prefer building url on client side"""
     if headers is None:
         headers = _HBBTV_HEADERS
     url = _HBBTV_URL + path
-    return _load_json_full_url(url, headers)
+    return _load_json_full_url(request_scope, url, headers)
 
-def _load_json_full_url(url, headers=None, params=None):
+def _load_json_full_url(request_scope, url, headers=None, params=None):
     if headers is None:
         headers = _HBBTV_HEADERS
     # https://requests.readthedocs.io/en/latest/
     reply = requests.get(url, headers=headers, params=params, timeout=10)
-    logger.log_json(reply, 'hbbtv_loadurl')
+    logger.log_json(reply, request_scope)
     return reply.json(object_pairs_hook=OrderedDict)
 
-def _load_json_personal_content(plugin, url, usr, pwd, hdrs=None):
+# pylint: disable=too-many-arguments
+def _load_json_personal_content(plugin, request_scope, url, usr, pwd, hdrs=None):
     """Get a bearer token and add it in headers before sending the request"""
     if hdrs is None:
         hdrs = ARTETV_HEADERS
     headers = _add_auth_token(plugin, usr, pwd, hdrs)
     if not headers:
         return None
-    return _load_json_full_url(url, headers).get('data', [])
+    return _load_json_full_url(request_scope, url, headers).get('data', [])
 
 # Get a bearer token and add it as HTTP header authorization
 def _add_auth_token(plugin, usr, pwd, hdrs):
