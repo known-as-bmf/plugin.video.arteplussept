@@ -81,8 +81,10 @@ def get_favorites(plugin, lang, usr, pwd):
     return _load_json_personal_content(plugin, 'artetv_getfavorites', url, usr, pwd)
 
 def add_favorite(plugin, usr, pwd, program_id):
-    """Add content program_id to user favorites.
-    :return: HTTP status code."""
+    """
+    Add content program_id to user favorites.
+    :return: HTTP status code.
+    """
     url = _ARTETV_URL + ARTETV_ENDPOINTS['add_favorite']
     headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
     data = {'programId': program_id}
@@ -91,8 +93,10 @@ def add_favorite(plugin, usr, pwd, program_id):
     return reply.status_code
 
 def remove_favorite(plugin, usr, pwd, program_id):
-    """Remove content program_id from user favorites.
-    :return: HTTP status code."""
+    """
+    Remove content program_id from user favorites.
+    :return: HTTP status code.
+    """
     url = _ARTETV_URL + ARTETV_ENDPOINTS['remove_favorite'].format(program_id=program_id)
     headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
     reply = requests.delete(url, headers=headers, timeout=10)
@@ -113,8 +117,10 @@ def get_last_viewed(plugin, lang, usr, pwd):
     return _load_json_personal_content(plugin, 'artetv_lastviewed', url, usr, pwd)
 
 def sync_last_viewed(plugin, usr, pwd, program_id, time):
-    """Synchronize in arte profile the progress time of content being played.
-    :return: HTTP status code."""
+    """
+    Synchronize in arte profile the progress time of content being played.
+    :return: HTTP status code.
+    """
     url = _ARTETV_URL + ARTETV_ENDPOINTS['sync_last_viewed']
     headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
     data = {'programId': program_id, 'timecode': time}
@@ -140,6 +146,22 @@ def program_video(lang, program_id):
     url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['program'].format(lang=lang, program_id=program_id)
     return _load_json_full_url('artetv_program', url, None).get('value', {})
 
+def get_parent_collection(lang, program_id):
+    """
+    Get parent collection of program program_id.
+    Return an empty list, if nothing found.
+    """
+    artetv_program_stream = program_video(lang, program_id)
+    if artetv_program_stream:
+        for zone in artetv_program_stream.get('zones', []):
+            if zone.get('content'):
+                for data in zone.get('content').get('data'):
+                    return data.get('parentCollections', [])
+    return []
+
+def is_of_kind(arte_item, kind):
+    """Return true if arte_item is not None and of the kind provided as parameter"""
+    return (arte_item and arte_item.get('kind') == kind) or False
 
 def category(category_code, lang):
     """Get the info of category with category_code."""

@@ -56,6 +56,25 @@ def cached_category(category_code):
     return view.get_cached_category(category_code, plugin.get_storage('cached_categories', TTL=60))
 
 
+@plugin.route('/playlist/<kind>/<collection_id>', name='playlist')
+def playlist(kind, collection_id):
+    """
+    Load a playlist and start playing its first item.
+    """
+    pair = view.build_collection_playlist(kind, collection_id, settings)
+
+    # Empty playlist, otherwise requested video is present twice in the playlist
+    xbmc.PlayList(xbmc.PLAYLIST_VIDEO).clear()
+    # Start playing with the first playlist item
+    synched_player = Player(plugin, settings, pair['start_program_id'])
+    # try to seek parent collection, when out of the context of playlist creation
+    # Start playing with the first playlist item
+    result = plugin.set_resolved_url(plugin.add_to_playlist(pair['listitems'])[0])
+    synch_during_playback(synched_player)
+    del synched_player
+    return result
+
+
 @plugin.route('/favorites', name='favorites')
 def favorites():
     """Display the menu for user favorites"""
@@ -130,14 +149,32 @@ def play_live(stream_url):
 
 @plugin.route('/play/<kind>/<program_id>', name='play')
 @plugin.route('/play/<kind>/<program_id>/<audio_slot>', name='play_specific')
-def play(kind, program_id, audio_slot='1'):
+@plugin.route('/play/<kind>/<program_id>/<audio_slot>/<from_playlist>', name='play_collection')
+def play(kind, program_id, audio_slot='1', from_playlist='0'):
     """Play content identified with program_id.
     :param str kind: an enum in TODO (e.g. TRAILER, COLLECTION, LINK, CLIP, ...)
     :param str audio_slot: a numeric to identify the audio stream to use e.g. 1 2
     """
     synched_player = Player(plugin, settings, program_id)
-    item = view.build_stream_url(plugin, kind, program_id, int(audio_slot), settings)
-    result = plugin.set_resolved_url(item)
+    # try to seek parent collection, when out of the context of playlist creation
+    sibling_items = None
+    if from_playlist == '0':
+        sibling_items = view.build_sibling_playlist(program_id, settings)
+    if sibling_items is not None and len(sibling_items) > 1:
+        # Empty playlist, otherwise requested video is present twice in the playlist
+        xbmc.PlayList(xbmc.PLAYLIST_VIDEO).clear()
+        # Start playing with the first playlist item
+        result = plugin.set_resolved_url(plugin.add_to_playlist(sibling_items)[0])
+    else:
+        item = view.build_stream_url(plugin, kind, program_id, int(audio_slot), settings)
+        result = plugin.set_resolved_url(item)
+    synch_during_playback(synched_player)
+    del synched_player
+    return result
+
+
+def synch_during_playback(synched_player):
+    """Manage timeframe to send synchronization events to Arte TV API"""
     # wait 1s first to give a chance for playback to start
     # otherwise synched_player won't be able to listen
     xbmc.sleep(500)
@@ -151,8 +188,6 @@ def play(kind, program_id, audio_slot='1'):
         i += 1
         xbmc.sleep(1000)
     synched_player.synch_progress()
-    del synched_player
-    return result
 
 
 @plugin.route('/search', name='search')

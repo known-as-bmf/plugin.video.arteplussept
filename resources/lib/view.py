@@ -3,6 +3,7 @@
 from xbmcswift2 import xbmc
 
 from . import api
+from . import hof
 from . import mapper
 from . import settings as stg
 
@@ -47,7 +48,7 @@ def get_cached_category(category_title, most_viewed_categories):
 
 def build_favorites(plugin, settings):
     """Build the menu for user favorites thanks to API call"""
-    return [mapper.map_artetv_video(item) for item in
+    return [mapper.map_artetv_item(item) for item in
             api.get_favorites(plugin, settings.language, settings.username, settings.password) or
             # display an empty list in case of error. error should be display in a notification
             []]
@@ -107,7 +108,7 @@ def mark_as_watched(plugin, usr, pwd, program_id, label):
 
 def build_last_viewed(plugin, settings):
     """Build the menu of user history"""
-    return [mapper.map_artetv_video(item) for item in
+    return [mapper.map_artetv_item(item) for item in
             api.get_last_viewed(plugin, settings.language, settings.username, settings.password) or
             # display an empty list in case of error. error should be display in a notification
             []]
@@ -141,8 +142,43 @@ def build_video_streams(program_id, settings):
         item, api.streams(kind, program_id, settings.language), settings.quality)
 
 
+def build_sibling_playlist(program_id, settings):
+    """
+    Return as a playlist videos belonging to the same parent
+    e.g. other episodes of a same serie, videos around the same topic
+    """
+    parent_program = None
+    # get parent of prefered kind first. for the moment TV_SERIES only
+    for prefered_kind in mapper.PREFERED_KINDS:
+        # pylint: disable=cell-var-from-loop
+        parent_program = hof.find(
+            lambda parent: api.is_of_kind(parent, prefered_kind),
+            api.get_parent_collection(settings.language, program_id))
+        if parent_program:
+            break
+    # if a parent was found, then return the list of kodi playable dict.
+    if parent_program:
+        sibling_arte_items = api.collection(
+            parent_program.get('kind'), parent_program.get('programId'), settings.language)
+        return mapper.map_collection_as_playlist(sibling_arte_items, program_id)
+    return None
+
+def build_collection_playlist(kind, collection_id, settings):
+    """
+    Return a pair with list items for collection with id collection_id
+    and program id of the first element
+    """
+    playlist_api_items = api.collection(kind, collection_id, settings.language)
+    start_program_id = playlist_api_items[0].get('programId')
+    return {
+        'listitems' : mapper.map_collection_as_playlist(playlist_api_items, start_program_id),
+        'start_program_id': start_program_id}
+
 def build_stream_url(plugin, kind, program_id, audio_slot, settings):
-    """Return URL to stream content"""
+    """
+    Return URL to stream content.
+    If the content is not available, it tries to return a related trailer or teaser.
+    """
     # first try with content
     program_stream = api.streams(kind, program_id, settings.language)
     if program_stream:
@@ -164,8 +200,7 @@ def search(plugin, settings):
     query = get_search_query(plugin)
     if not query:
         plugin.end_of_directory(succeeded=False)
-    return mapper.map_cached_categories(
-        api.search(settings.language, query))
+    return mapper.map_collection_as_menu(api.search(settings.language, query))
 
 
 def get_search_query(plugin):
