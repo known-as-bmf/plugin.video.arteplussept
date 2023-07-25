@@ -110,3 +110,16 @@ msgstr "\"{label}\" erfolgreich als geschaut markiert"
 msgctxt "#30035"
 msgid "Failed to mark as watched \"{label}\""
 msgstr "\"{label}\" konnte nicht als geschaut markiert werden"
+
+
+msgctxt "#30036"
+msgid "Purge my Arte favorites"
+msgstr "Lösche meine Arte-Favoriten"
+
+msgctxt "#30037"
+msgid "Successfully purged favorites"
+msgstr "Favoriten erfolgreich gelöscht"
+
+msgctxt "#30038"
+msgid "Failed to purge favorites"
+msgstr "Meine Favoriten konnte nicht gelöscht werden"

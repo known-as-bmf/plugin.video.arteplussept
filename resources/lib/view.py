@@ -75,6 +75,14 @@ def remove_favorite(plugin, usr, pwd, program_id, label):
         plugin.notify(msg=msg, image='error')
 
 
+def purge_favorites(plugin, usr, pwd):
+    """Flush user favorites and notify about success or failure"""
+    if 200 == api.purge_favorites(plugin, usr, pwd):
+        plugin.notify(msg=plugin.addon.getLocalizedString(30037), image='info')
+    else:
+        plugin.notify(msg=plugin.addon.getLocalizedString(30038), image='error')
+
+
 def mark_as_watched(plugin, usr, pwd, program_id, label):
     """
     Get program duration and synch progress with total duration

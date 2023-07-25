@@ -110,3 +110,16 @@ msgstr "\"{label}\" marqué comme lu avec succès"
 msgctxt "#30035"
 msgid "Failed to mark as watched \"{label}\""
 msgstr "Echec pour marquer comme lu \"{label}\""
+
+
+msgctxt "#30036"
+msgid "Purge my favorites"
+msgstr "Purger mes favorites"
+
+msgctxt "#30037"
+msgid "Successfully purged favorites"
+msgstr "Favoris purgés avec succès"
+
+msgctxt "#30038"
+msgid "Failed to purge favorites"
+msgstr "Echec de la purge des favoris"

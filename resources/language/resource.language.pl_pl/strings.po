@@ -110,3 +110,16 @@ msgstr "Pomyślnie oznaczone \"{label}\" jako obejrzane"
 msgctxt "#30035"
 msgid "Failed to mark as watched \"{label}\""
 msgstr "Nie udało się oznaczyć jako oglądane \"{label}\""
+
+
+msgctxt "#30036"
+msgid "Purge my Arte favorites"
+msgstr "Wyczyść moje ulubione Arte"
+
+msgctxt "#30037"
+msgid "Successfully purged favorites"
+msgstr "Pomyślnie wyczyszczono ulubione"
+
+msgctxt "#30038"
+msgid "Failed to purge favorites"
+msgstr "Nie udało się wyczyścić ulubionych"

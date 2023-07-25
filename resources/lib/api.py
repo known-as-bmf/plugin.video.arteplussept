@@ -38,6 +38,9 @@ ARTETV_ENDPOINTS = {
     # DELETE
     # needs token in authorization header
     'remove_favorite': '/sso/v3/favorites/{program_id}',
+    # PATCH empty payload
+    # needs token in authorization header
+    'purge_favorites': '/sso/v3/favorites/purge',
     # needs token in authorization header
     'get_last_viewed': '/sso/v3/lastvieweds/{lang}?page={page}&limit={limit}',
     # PUT
@@ -94,6 +97,14 @@ def remove_favorite(plugin, usr, pwd, program_id):
     headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
     reply = requests.delete(url, headers=headers, timeout=10)
     logger.log_json(reply, 'artetv_removefavorite')
+    return reply.status_code
+
+def purge_favorites(plugin, usr, pwd):
+    """Flush user favorites"""
+    url = _ARTETV_URL + ARTETV_ENDPOINTS['purge_favorites']
+    headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
+    reply = requests.patch(url, data={}, headers=headers, timeout=10)
+    logger.log_json(reply, 'artetv_purgefavorites')
     return reply.status_code
 
 def get_last_viewed(plugin, lang, usr, pwd):

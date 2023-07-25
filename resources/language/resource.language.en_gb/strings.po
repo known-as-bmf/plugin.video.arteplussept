@@ -110,3 +110,16 @@ msgstr ""
 msgctxt "#30035"
 msgid "Failed to mark as watched \"{label}\""
 msgstr ""
+
+
+msgctxt "#30036"
+msgid "Purge my Arte favorites"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Successfully purged favorites"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Failed to purge favorites"
+msgstr ""

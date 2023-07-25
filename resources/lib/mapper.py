@@ -13,7 +13,11 @@ def create_favorites_item(label):
     """Return menu entry to access user favorites"""
     return {
         'label': label,
-        'path': plugin.url_for('favorites')
+        'path': plugin.url_for('favorites'),
+        'context_menu': [
+            (plugin.addon.getLocalizedString(30036),
+                actions.background(plugin.url_for('purge_favorites')))
+        ]
     }
 
 

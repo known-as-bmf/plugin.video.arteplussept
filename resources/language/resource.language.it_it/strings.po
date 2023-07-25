@@ -93,7 +93,7 @@ msgstr "Elimina la cronologia"
 
 msgctxt "#30031"
 msgid "Successfully purged history"
-msgstr "Cronologia eliminata con successo"
+msgstr "Cronologia eliminata correttamente"
 
 msgctxt "#30032"
 msgid "Failed to purge my history"
@@ -110,3 +110,16 @@ msgstr "\"{label}\" contrassegnato con successo come guardato"
 msgctxt "#30035"
 msgid "Failed to mark as watched \"{label}\""
 msgstr "Impossibile contrassegnare come guardato \"{label}\""
+
+
+msgctxt "#30036"
+msgid "Purge my Arte favorites"
+msgstr "Elimina i miei preferiti di Arte"
+
+msgctxt "#30037"
+msgid "Successfully purged favorites"
+msgstr "Preferiti eliminati correttamente"
+
+msgctxt "#30038"
+msgid "Failed to purge favorites"
+msgstr "Impossibile eliminare i preferiti"
