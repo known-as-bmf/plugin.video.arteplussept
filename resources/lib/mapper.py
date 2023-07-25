@@ -329,9 +329,9 @@ def map_zone_to_item(zone, cached_categories):
     Populate cached_categories for zones with videos available in child 'content'"""
     menu_item = None
     title = zone.get('title')
-    if zone.get('id') == 'b1dfd8e0-4757-4236-9dab-6f6331cb5ea4':
+    if get_authenticated_content_type(zone) == 'sso-favorites':
         menu_item = create_favorites_item(title)
-    elif zone.get('id') == '823d6af6-fedd-4b54-8049-ddb7158eee64':
+    elif get_authenticated_content_type(zone) == 'sso-personalzone':
         menu_item = create_last_viewed_item(title)
     elif zone.get('content') and zone.get('content').get('data'):
         cached_category = map_cached_categories(zone)
@@ -345,6 +345,18 @@ def map_zone_to_item(zone, cached_categories):
         xbmc.log(f"Zone \"{title}\" will be ignored. No link. No content. id unknown.")
 
     return menu_item
+
+
+def get_authenticated_content_type(artetv_zone):
+    """
+    Return the value of artetv_zone.authenticatedContent.contentId or None.
+    Known values are sso-personalzone and sso-favorites
+    """
+    if not isinstance(artetv_zone, dict):
+        return None
+    if not isinstance(artetv_zone.get('authenticatedContent', None), dict):
+        return None
+    return artetv_zone.get('authenticatedContent').get('contentId', None)
 
 
 def map_cached_categories(zone):

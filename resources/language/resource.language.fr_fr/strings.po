@@ -113,8 +113,8 @@ msgstr "Echec pour marquer comme lu \"{label}\""
 
 
 msgctxt "#30036"
-msgid "Purge my favorites"
-msgstr "Purger mes favorites"
+msgid "Purge my Arte favorites"
+msgstr "Purger mes favoris Arte"
 
 msgctxt "#30037"
 msgid "Successfully purged favorites"
