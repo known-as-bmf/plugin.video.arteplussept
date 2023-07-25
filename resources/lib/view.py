@@ -4,6 +4,7 @@ from xbmcswift2 import xbmc
 
 from . import api
 from . import mapper
+from . import settings as stg
 
 
 def build_home_page(cached_categories, settings):
@@ -71,6 +72,28 @@ def remove_favorite(plugin, usr, pwd, program_id, label):
         plugin.notify(msg=msg, image='info')
     else:
         msg = plugin.addon.getLocalizedString(30028).format(label=label)
+        plugin.notify(msg=msg, image='error')
+
+
+def mark_as_watched(plugin, usr, pwd, program_id, label):
+    """
+    Get program duration and synch progress with total duration
+    in order to mark a program as watched
+    """
+    status = -1
+    try:
+        program_info = api.player_video(stg.languages[0], program_id)
+        total_time = program_info.get('attributes').get('metadata').get('duration').get('seconds')
+        status = api.sync_last_viewed(plugin, usr, pwd, program_id, total_time)
+    # pylint: disable=broad-exception-caught
+    except Exception as excp:
+        xbmc.log(f" exception caught :{str(excp)}")
+
+    if 200 == status:
+        msg = plugin.addon.getLocalizedString(30034).format(label=label)
+        plugin.notify(msg=msg, image='info')
+    else:
+        msg = plugin.addon.getLocalizedString(30035).format(label=label)
         plugin.notify(msg=msg, image='error')
 
 

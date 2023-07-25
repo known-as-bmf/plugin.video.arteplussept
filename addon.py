@@ -76,6 +76,13 @@ def remove_favorite(program_id, label):
     useful when several operations are requested in parallel."""
     view.remove_favorite(plugin, settings.username, settings.password, program_id, label)
 
+@plugin.route('/mark_as_watched/<program_id>/<label>', name='mark_as_watched')
+def mark_as_watched(program_id, label):
+    """Mark program as watched in Arte
+    Notify about completion status with label,
+    useful when several operations are requested in parallel."""
+    view.mark_as_watched(plugin, settings.username, settings.password, program_id, label)
+
 
 @plugin.route('/last_viewed', name='last_viewed')
 def last_viewed():

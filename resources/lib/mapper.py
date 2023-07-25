@@ -106,6 +106,9 @@ def map_video(item, show_video_streams):
             (plugin.addon.getLocalizedString(30024),
                 actions.background(plugin.url_for(
                     'remove_favorite', program_id=program_id, label=label))),
+            (plugin.addon.getLocalizedString(30033),
+                actions.background(plugin.url_for(
+                    'mark_as_watched', program_id=program_id, label=label))),
         ],
     }
 
@@ -181,6 +184,9 @@ def map_artetv_video(item):
             (plugin.addon.getLocalizedString(30024),
                 actions.background(plugin.url_for(
                     'remove_favorite', program_id=program_id, label=label))),
+            (plugin.addon.getLocalizedString(30033),
+                actions.background(plugin.url_for(
+                    'mark_as_watched', program_id=program_id, label=label))),
         ],
     }
 

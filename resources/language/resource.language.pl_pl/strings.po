@@ -98,3 +98,15 @@ msgstr "Pomyślnie wyczyszczono historię"
 msgctxt "#30032"
 msgid "Failed to purge my history"
 msgstr "Nie udało się wyczyścić mojej historii"
+
+msgctxt "#30033"
+msgid "Mark as watched in Arte"
+msgstr "Oznacz jako obejrzane w Arte"
+
+msgctxt "#30034"
+msgid "\"{label}\" successfully marked as watched"
+msgstr "Pomyślnie oznaczone \"{label}\" jako obejrzane"
+
+msgctxt "#30035"
+msgid "Failed to mark as watched \"{label}\""
+msgstr "Nie udało się oznaczyć jako oglądane \"{label}\""

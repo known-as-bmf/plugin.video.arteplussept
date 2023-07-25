@@ -98,3 +98,15 @@ msgstr "Videoverlauf erfolgreich gelöscht"
 msgctxt "#30032"
 msgid "Failed to purge my history"
 msgstr "Mein Videoerlauf konnte nicht gelöscht werden"
+
+msgctxt "#30033"
+msgid "Mark as watched in Arte"
+msgstr "Als geschaut in Arte markieren"
+
+msgctxt "#30034"
+msgid "\"{label}\" successfully marked as watched"
+msgstr "\"{label}\" erfolgreich als geschaut markiert"
+
+msgctxt "#30035"
+msgid "Failed to mark as watched \"{label}\""
+msgstr "\"{label}\" konnte nicht als geschaut markiert werden"
