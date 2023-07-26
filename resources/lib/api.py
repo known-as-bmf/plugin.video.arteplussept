@@ -4,14 +4,16 @@ from collections import OrderedDict
 import requests
 # pylint: disable=import-error
 from xbmcswift2 import xbmc
+from xbmcswift2.plugin import Plugin
 from . import hof
 from . import logger
 
-
+_PLUGIN_NAME = Plugin().name
+_PLUGIN_VERSION = Plugin().addon.getAddonInfo('version')
 # Arte hbbtv - deprecated API since 2022 prefer Arte TV API
 _HBBTV_URL = 'http://www.arte.tv/hbbtvv2/services/web/index.php'
 _HBBTV_HEADERS = {
-    'user-agent': 'plugin.video.arteplussept/1.1.10'
+    'user-agent': f"{_PLUGIN_NAME}/{_PLUGIN_VERSION}"
 }
 _HBBTV_ENDPOINTS = {
     'category': '/EMAC/teasers/category/v2/{category_code}/{lang}',
@@ -66,7 +68,7 @@ ARTETV_ENDPOINTS = {
     'login': '/login',
 }
 ARTETV_HEADERS = {
-    'user-agent': 'plugin.video.arteplussept/1.1.10',
+    'user-agent': f"{_PLUGIN_NAME}/{_PLUGIN_VERSION}",
     # required to use token endpoint
     'authorization': 'I6k2z58YGO08P1X0E8A7VBOjDxr8Lecg',
     # required for Arte TV API. values like web, app, tv, orange, free
