@@ -69,7 +69,7 @@ def map_generic_item(item, show_video_streams):
         item = map_video_as_item(item)
     return item
 
-def map_collection_as_playlist(arte_collection, start_program_id = None):
+def map_collection_as_playlist(arte_collection, req_start_program_id = None):
     """
     Map a collection from arte API to a list of items ready to build a playlist.
     Playlist item will be in the same order as arte_collection, if start_program_id
@@ -80,17 +80,32 @@ def map_collection_as_playlist(arte_collection, start_program_id = None):
     items_before_start = []
     items_after_start = []
     before_start = True
+    # assume arte_collection[0] will be mapped successfully with map_video_as_playlist_item
+    start_program_id = arte_collection[0].get('programId')
     for arte_item in arte_collection or []:
         xbmc_item = map_video_as_playlist_item(arte_item)
         if xbmc_item is None:
             break
-        if start_program_id == arte_item.get('programId', -1):
-            before_start = False
+
+        # search for the start item until it is found once
+        if before_start:
+            if req_start_program_id is None:
+                # start from the first element not fully viewed
+                if utils.get_progress(arte_item) < 0.95:
+                    before_start = False
+                    start_program_id = arte_item.get('programId')
+            else:
+                # start from the requested element
+                if req_start_program_id == arte_item.get('programId'):
+                    before_start = False
+                    start_program_id = req_start_program_id
+
         if before_start:
             items_before_start.append(xbmc_item)
         else:
             items_after_start.append(xbmc_item)
-    return items_after_start + items_before_start
+    return { 'collection': items_after_start + items_before_start,
+        'start_program_id': start_program_id}
 
 def map_video_as_playlist_item(item):
     """
@@ -103,9 +118,11 @@ def map_video_as_playlist_item(item):
     if isinstance(kind, dict) and kind.get('code', False):
         kind = kind.get('code')
         is_hbbtv_content = False
+    if isinstance(item.get('lastviewed'), dict):
+        is_hbbtv_content = False
 
     path = plugin.url_for(
-        'play_collection', kind=kind, program_id=program_id, audio_slot='1', from_playlist='1')
+        'play_siblings', kind=kind, program_id=program_id, audio_slot='1', from_playlist='1')
     result = map_generic_video(item, path, True) if is_hbbtv_content \
         else map_artetv_item_new(item, path, True)
     return result
@@ -128,6 +145,10 @@ def map_generic_video(item, path, is_playable):
     program_id = item.get('programId')
     label = utils.format_title_and_subtitle(item.get('title'), item.get('subtitle'))
     duration = item.get('durationSeconds')
+    if duration is None:
+        duration = item.get('duration', None)
+        if isinstance(duration, dict):
+            duration = duration.get('seconds', None)
     airdate = item.get('broadcastBegin')
     if airdate is not None:
         airdate = str(utils.parse_date_hbbtv(airdate))
@@ -184,11 +205,11 @@ def map_artetv_item(item):
     if utils.is_playlist(program_id):
         if kind in PREFERED_KINDS:
             #content_type = Content.PLAYLIST
-            path = plugin.url_for('playlist', kind=kind, collection_id=program_id)
+            path = plugin.url_for('play_collection', kind=kind, collection_id=program_id)
             is_playable = True
         else:
             #content_type = Content.MENU_ITEM
-            path = plugin.url_for('collection', kind=kind, program_id=program_id)
+            path = plugin.url_for('display_collection', kind=kind, program_id=program_id)
             is_playable = False
     else:
         #content_type = Content.VIDEO
@@ -227,7 +248,7 @@ def map_artetv_item_new(item, path, is_playable):
         fanart_url = item.get('mainImage').get('url').replace('__SIZE__', '1920x1080')
     thumbnail_url = fanart_url
 
-    progress = item.get('lastviewed') and item.get('lastviewed').get('progress') or 0
+    progress = utils.get_progress(item)
     time_offset = item.get('lastviewed') and item.get('lastviewed').get('timecode') or 0
 
     if isinstance(kind, dict) and kind.get('code', False):
@@ -334,7 +355,7 @@ def map_collection_as_menu_item(item):
 
     return {
         'label': utils.format_title_and_subtitle(item.get('title'), item.get('subtitle')),
-        'path': plugin.url_for('collection', kind=kind, collection_id=program_id),
+        'path': plugin.url_for('display_collection', kind=kind, collection_id=program_id),
         'thumbnail': item.get('imageUrl'),
         'info': {
             'title': item.get('title'),
@@ -435,9 +456,9 @@ def get_authenticated_content_type(artetv_zone):
     """
     if not isinstance(artetv_zone, dict):
         return None
-    if not isinstance(artetv_zone.get('authenticatedContent', None), dict):
+    if not isinstance(artetv_zone.get('authenticatedContent'), dict):
         return None
-    return artetv_zone.get('authenticatedContent').get('contentId', None)
+    return artetv_zone.get('authenticatedContent', {}).get('contentId', None)
 
 
 def map_collection_as_menu(zone):

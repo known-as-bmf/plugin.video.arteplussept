@@ -25,7 +25,9 @@ class Player(xbmc.Player):
             # RuntimeError: Kodi is not playing any media file
             # when calling player.getTime() in onPlayBackStopped()
             self.last_time = self.getTime()
-            return self.isPlaying() and self.isPlayingVideo() and self.last_time >= 0
+            # when playing video playlist, isPlayingVideo() is False, isPlaying() is True
+            return (self.isPlaying() or self.isPlayingVideo() or self.isPlayingAudio()) \
+                and self.last_time >= 0
         # pylint: disable=broad-exception-caught
         # https://codedocs.xyz/MartijnKaijser/xbmc/group__python___player.html
         except Exception:

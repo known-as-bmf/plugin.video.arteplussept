@@ -178,6 +178,28 @@ def collection(kind, collection_id, lang):
         lambda sub_collections: sub_collections.get('videos', []),
         sub_collections)
 
+# pylint: disable=too-many-arguments
+def collection_with_last_viewed(plugin, lang, usr, pwd, kind, collection_id):
+    """
+    Get the info of collection collection_id and enhanced them with last_viewed details
+    e.g. progress
+    """
+    collection_items = collection(kind, collection_id, lang)
+    last_viewed_items = get_last_viewed(plugin, lang, usr, pwd)
+    # nothing to do
+    if len(collection_items) < 1 or last_viewed_items is None or len(last_viewed_items) < 1:
+        return collection_items
+    # merge the 2 collection based on program id.
+    last_viewed_map = {}
+    for item in last_viewed_items:
+        last_viewed_map[item.get('programId')] = item
+    for idx, basic_item in enumerate(collection_items):
+        if basic_item is not None and basic_item.get('programId') is not None:
+            enhanced_item = last_viewed_map.get(basic_item.get('programId'))
+            if enhanced_item is not None:
+                collection_items[idx] = enhanced_item
+    return collection_items
+
 
 def video(program_id, lang):
     """Get the info of content program_id from HBB TV API."""

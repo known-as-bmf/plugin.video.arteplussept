@@ -142,10 +142,11 @@ def build_video_streams(program_id, settings):
         item, api.streams(kind, program_id, settings.language), settings.quality)
 
 
-def build_sibling_playlist(program_id, settings):
+def build_sibling_playlist(plugin, settings, program_id):
     """
-    Return as a playlist videos belonging to the same parent
+    Return a pair with videos belonging to the same parent as program id
     e.g. other episodes of a same serie, videos around the same topic
+    and the start program id of this collection i.e. program_id
     """
     parent_program = None
     # get parent of prefered kind first. for the moment TV_SERIES only
@@ -158,21 +159,19 @@ def build_sibling_playlist(program_id, settings):
             break
     # if a parent was found, then return the list of kodi playable dict.
     if parent_program:
-        sibling_arte_items = api.collection(
-            parent_program.get('kind'), parent_program.get('programId'), settings.language)
+        sibling_arte_items = api.collection_with_last_viewed(
+            plugin, settings.language, settings.username, settings.password,
+            parent_program.get('kind'), parent_program.get('programId'))
         return mapper.map_collection_as_playlist(sibling_arte_items, program_id)
     return None
 
-def build_collection_playlist(kind, collection_id, settings):
+def build_collection_playlist(plugin, settings, kind, collection_id):
     """
-    Return a pair with list items for collection with id collection_id
-    and program id of the first element
+    Return a pair with collection with collection_id
+    and program id of the first element in the collection
     """
-    playlist_api_items = api.collection(kind, collection_id, settings.language)
-    start_program_id = playlist_api_items[0].get('programId')
-    return {
-        'listitems' : mapper.map_collection_as_playlist(playlist_api_items, start_program_id),
-        'start_program_id': start_program_id}
+    return mapper.map_collection_as_playlist(api.collection_with_last_viewed(
+        plugin, settings.language, settings.username, settings.password, kind, collection_id))
 
 def build_stream_url(plugin, kind, program_id, audio_slot, settings):
     """
