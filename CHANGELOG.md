@@ -1,5 +1,10 @@
 Changelog also available in file ./addon.xml xpath /addon/extension/news following Kodi guidelines https://kodi.wiki/view/Add-on_structure#changelog.txt
 
+v1.2.0 (2023-7-26)
+- Manage collections TV_SERIES and MAGAZINE as video playlist
+- Add a context menu item to purge favorites
+- Add a context menu item to mark as video as watched in Arte
+
 v1.1.10 (2023-5-28)
 - Bugfix to display favorites and last vieweds following id change in Arte
 
