@@ -1,6 +1,8 @@
 """Manage views like home menu, dynamic menus, search, favorites..."""
 # pylint: disable=import-error
 from xbmcswift2 import xbmc
+# pylint: disable=import-error
+from xbmcswift2 import xbmcgui
 
 from . import api
 from . import hof
@@ -78,10 +80,15 @@ def remove_favorite(plugin, usr, pwd, program_id, label):
 
 def purge_favorites(plugin, usr, pwd):
     """Flush user favorites and notify about success or failure"""
-    if 200 == api.purge_favorites(plugin, usr, pwd):
-        plugin.notify(msg=plugin.addon.getLocalizedString(30037), image='info')
-    else:
-        plugin.notify(msg=plugin.addon.getLocalizedString(30038), image='error')
+    purge_confirmed = xbmcgui.Dialog().yesno(
+        plugin.addon.getLocalizedString(30040),
+        plugin.addon.getLocalizedString(30043),
+        autoclose=10000)
+    if purge_confirmed:
+        if 200 == api.purge_favorites(plugin, usr, pwd):
+            plugin.notify(msg=plugin.addon.getLocalizedString(30041), image='info')
+        else:
+            plugin.notify(msg=plugin.addon.getLocalizedString(30042), image='error')
 
 
 def mark_as_watched(plugin, usr, pwd, program_id, label):
@@ -99,10 +106,10 @@ def mark_as_watched(plugin, usr, pwd, program_id, label):
         xbmc.log(f" exception caught :{str(excp)}")
 
     if 200 == status:
-        msg = plugin.addon.getLocalizedString(30034).format(label=label)
+        msg = plugin.addon.getLocalizedString(30036).format(label=label)
         plugin.notify(msg=msg, image='info')
     else:
-        msg = plugin.addon.getLocalizedString(30035).format(label=label)
+        msg = plugin.addon.getLocalizedString(30037).format(label=label)
         plugin.notify(msg=msg, image='error')
 
 
@@ -116,10 +123,15 @@ def build_last_viewed(plugin, settings):
 
 def purge_last_viewed(plugin, usr, pwd):
     """Flush user history and notify about success or failure"""
-    if 200 == api.purge_last_viewed(plugin, usr, pwd):
-        plugin.notify(msg=plugin.addon.getLocalizedString(30031), image='info')
-    else:
-        plugin.notify(msg=plugin.addon.getLocalizedString(30032), image='error')
+    purge_confirmed = xbmcgui.Dialog().yesno(
+        plugin.addon.getLocalizedString(30030),
+        plugin.addon.getLocalizedString(30033),
+        autoclose=10000)
+    if purge_confirmed:
+        if 200 == api.purge_last_viewed(plugin, usr, pwd):
+            plugin.notify(msg=plugin.addon.getLocalizedString(30031), image='info')
+        else:
+            plugin.notify(msg=plugin.addon.getLocalizedString(30032), image='error')
 
 
 def build_mixed_collection(kind, collection_id, settings):

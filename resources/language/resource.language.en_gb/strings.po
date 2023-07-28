@@ -100,26 +100,34 @@ msgid "Failed to purge my history"
 msgstr ""
 
 msgctxt "#30033"
-msgid "Mark as watched in Arte"
-msgstr ""
-
-msgctxt "#30034"
-msgid "\"{label}\" successfully marked as watched"
+msgid "Do you really want to purge your history ?"
 msgstr ""
 
 msgctxt "#30035"
+msgid "Mark as watched in Arte"
+msgstr ""
+
+msgctxt "#30036"
+msgid "\"{label}\" successfully marked as watched"
+msgstr ""
+
+msgctxt "#30037"
 msgid "Failed to mark as watched \"{label}\""
 msgstr ""
 
 
-msgctxt "#30036"
+msgctxt "#30040"
 msgid "Purge my Arte favorites"
 msgstr ""
 
-msgctxt "#30037"
+msgctxt "#30041"
 msgid "Successfully purged favorites"
 msgstr ""
 
-msgctxt "#30038"
+msgctxt "#30042"
 msgid "Failed to purge favorites"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Do you really want to purge Arte favorites ?"
 msgstr ""

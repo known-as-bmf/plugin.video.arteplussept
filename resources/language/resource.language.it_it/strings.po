@@ -87,6 +87,7 @@ msgctxt "#30029"
 msgid "Stream \"{strm}\" in \"{ln}\" is not available"
 msgstr "Lo streaming \"{strm}\" in \"{ln}\" non è disponibile"
 
+
 msgctxt "#30030"
 msgid "Purge my history"
 msgstr "Elimina la cronologia"
@@ -100,26 +101,35 @@ msgid "Failed to purge my history"
 msgstr "Impossibile eliminare la cronologia"
 
 msgctxt "#30033"
+msgid "Do you really want to purge your history ?"
+msgstr "Vuoi davvero eliminare la tua storia ?"
+
+
+msgctxt "#30035"
 msgid "Mark as watched in Arte"
 msgstr "Segna come guardato in Arte"
 
-msgctxt "#30034"
+msgctxt "#30036"
 msgid "\"{label}\" successfully marked as watched"
 msgstr "\"{label}\" contrassegnato con successo come guardato"
 
-msgctxt "#30035"
+msgctxt "#30037"
 msgid "Failed to mark as watched \"{label}\""
 msgstr "Impossibile contrassegnare come guardato \"{label}\""
 
 
-msgctxt "#30036"
+msgctxt "#30040"
 msgid "Purge my Arte favorites"
 msgstr "Elimina i miei preferiti di Arte"
 
-msgctxt "#30037"
+msgctxt "#30041"
 msgid "Successfully purged favorites"
 msgstr "Preferiti eliminati correttamente"
 
-msgctxt "#30038"
+msgctxt "#30042"
 msgid "Failed to purge favorites"
 msgstr "Impossibile eliminare i preferiti"
+
+msgctxt "#30043"
+msgid "Do you really want to purge Arte favorites ?"
+msgstr "Vuoi davvero eliminare i preferiti di Arte ?"
