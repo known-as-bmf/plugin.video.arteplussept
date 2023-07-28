@@ -36,17 +36,17 @@
 		<setting
 			type="action"
 			action="RunPlugin(plugin://plugin.video.arteplussept/user/login)"
-			label="login user" />
+			label="30057" />
 		<setting
 			id="login_acc"
 			type="text"
 			enable="false"
-			default="Not logged in"
+			default=""
 			subsetting="true"
-			label="30059" />
+			label="" />
 		<setting
 			type="action"
 			action="RunPlugin(plugin://plugin.video.arteplussept/user/logout)"
-			label="logout user" />
+			label="30058" />
 	</category>
 </settings>

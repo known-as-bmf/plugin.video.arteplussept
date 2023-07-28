@@ -88,9 +88,9 @@ def purge_favorites(plugin, usr):
 
     if purge_confirmed:
         if 200 == api.purge_favorites(user.get_cached_token(plugin, usr)):
-            plugin.notify(msg=plugin.addon.getLocalizedString(30037), image='info')
+            plugin.notify(msg=plugin.addon.getLocalizedString(30041), image='info')
         else:
-            plugin.notify(msg=plugin.addon.getLocalizedString(30038), image='error')
+            plugin.notify(msg=plugin.addon.getLocalizedString(30042), image='error')
 
 
 def mark_as_watched(plugin, usr, program_id, label):
@@ -174,7 +174,7 @@ def build_sibling_playlist(plugin, settings, program_id):
     # if a parent was found, then return the list of kodi playable dict.
     if parent_program:
         sibling_arte_items = api.collection_with_last_viewed(
-            settings.language, user.get_cached_token(plugin, settings.username),
+            settings.language, user.get_cached_token(plugin, settings.username, True),
             parent_program.get('kind'), parent_program.get('programId'))
         return mapper.map_collection_as_playlist(sibling_arte_items, program_id)
     return None
@@ -185,7 +185,9 @@ def build_collection_playlist(plugin, settings, kind, collection_id):
     and program id of the first element in the collection
     """
     return mapper.map_collection_as_playlist(api.collection_with_last_viewed(
-        settings.language, user.get_cached_token(plugin, settings.username), kind, collection_id))
+        settings.language,
+        user.get_cached_token(plugin, settings.username, True),
+        kind, collection_id))
 
 def build_stream_url(plugin, kind, program_id, audio_slot, settings):
     """

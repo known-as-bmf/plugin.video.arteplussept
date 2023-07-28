@@ -34,19 +34,27 @@ msgctxt "#30054"
 msgid "Email"
 msgstr "Indirizzo email"
 
-msgctxt "#30055"
-msgid "Password"
-msgstr "Password"
-
 msgctxt "#30056"
 msgid "Log level"
 msgstr "Log level"
+
+msgctxt "#30057"
+msgid "Log in"
+msgstr "Per accedere"
+
+msgctxt "#30058"
+msgid "Log out"
+msgstr "Disconnessione"
 
 
 msgctxt "#30012"
 msgid "Search"
 msgstr "Search"
 
+
+msgctxt "#30014"
+msgid "Authentication needed in addon settings"
+msgstr "Autenticazione necessaria nelle impostazioni del componente aggiuntivo"
 
 msgctxt "#30015"
 msgid "User already logged in"
