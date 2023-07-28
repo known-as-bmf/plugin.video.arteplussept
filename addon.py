@@ -26,6 +26,7 @@
 from xbmcswift2 import Plugin
 # pylint: disable=import-error
 from xbmcswift2 import xbmc
+from resources.lib import user
 from resources.lib import view
 from resources.lib.player import Player
 from resources.lib.settings import Settings
@@ -86,19 +87,19 @@ def add_favorite(program_id, label):
     """Add content program_id to user favorites.
     Notify about completion status with label,
     useful when several operations are requested in parallel."""
-    view.add_favorite(plugin, settings.username, settings.password, program_id, label)
+    view.add_favorite(plugin, settings.username, program_id, label)
 
 @plugin.route('/remove_favorite/<program_id>/<label>', name='remove_favorite')
 def remove_favorite(program_id, label):
     """Remove content program_id from user favorites
     Notify about completion status with label,
     useful when several operations are requested in parallel."""
-    view.remove_favorite(plugin, settings.username, settings.password, program_id, label)
+    view.remove_favorite(plugin, settings.username, program_id, label)
 
 @plugin.route('/purge_favorites', name='purge_favorites')
 def purge_favroties():
     """Flush user history and notify about completion status"""
-    view.purge_favorites(plugin, settings.username, settings.password)
+    view.purge_favorites(plugin, settings.username)
 
 
 @plugin.route('/mark_as_watched/<program_id>/<label>', name='mark_as_watched')
@@ -106,7 +107,7 @@ def mark_as_watched(program_id, label):
     """Mark program as watched in Arte
     Notify about completion status with label,
     useful when several operations are requested in parallel."""
-    view.mark_as_watched(plugin, settings.username, settings.password, program_id, label)
+    view.mark_as_watched(plugin, settings.username, program_id, label)
 
 
 @plugin.route('/last_viewed', name='last_viewed')
@@ -118,7 +119,7 @@ def last_viewed():
 @plugin.route('/purge_last_viewed', name='purge_last_viewed')
 def purge_last_viewed():
     """Flush user history and notify about completion status"""
-    view.purge_last_viewed(plugin, settings.username, settings.password)
+    view.purge_last_viewed(plugin, settings.username)
 
 
 @plugin.route('/display_collection/<kind>/<program_id>', name='display_collection')
@@ -195,6 +196,17 @@ def search():
     """Display the keyboard to search for content. Then, display the menu of search results"""
     plugin.set_content('tvshows')
     return plugin.finish(view.search(plugin, settings))
+
+
+@plugin.route('/user/login', name='user_login')
+def user_login():
+    """Login user with email already set in settings by creating and persisting a token."""
+    return plugin.finish(succeeded=user.login(plugin, settings))
+
+@plugin.route('/user/logout', name='user_logout')
+def user_logout():
+    """Discard token of user in settings."""
+    return plugin.finish(succeeded=user.logout(plugin, settings))
 
 # plugin bootstrap
 if __name__ == '__main__':

@@ -47,17 +47,39 @@ msgctxt "#30012"
 msgid "Search"
 msgstr "Search"
 
+
+msgctxt "#30015"
+msgid "User already logged in"
+msgstr "Utente già loggato"
+
+msgctxt "#30016"
+msgid "Do you want to log in as \"{new_user}\" instead of \"{old_user}\" ?"
+msgstr "Vuoi accedere come \"{new_user}\" invece che come \"{old_user}\" ?"
+
+msgctxt "#30017"
+msgid "Logged in as \"{user}\""
+msgstr "Effettuato l'accesso come \"{user}\""
+
+msgctxt "#30018"
+msgid "Logged out"
+msgstr "Disconnesso"
+
+msgctxt "#30019"
+msgid "Enter password please:"
+msgstr "Inserisci la password per favore:"
+
 msgctxt "#30020"
 msgid "Unable to authenticate"
 msgstr "Impossibile autenticare"
 
 msgctxt "#30021"
-msgid "Email or password missing"
-msgstr "E-mail o password mancanti"
+msgid "Email missing"
+msgstr "E-Mail mancanti"
 
 msgctxt "#30022"
-msgid "Update your profile in settings to fetch this content"
-msgstr "Aggiorna il tuo profilo nelle impostazioni per recuperare questo contenuto"
+msgid "Password missing"
+msgstr "Password mancanti"
+
 
 msgctxt "#30023"
 msgid "Add to Arte favorites"
