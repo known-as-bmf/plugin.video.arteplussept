@@ -2,7 +2,6 @@
 # pylint: disable=import-error
 from xbmcswift2 import xbmc
 from . import api
-from . import user
 
 # this player send request to Arte TV API
 # to synchronise playback progress
@@ -12,11 +11,10 @@ class Player(xbmc.Player):
     """Events enhancing behavior of default Kodi player
     used to track in Arte TV progress time and history"""
 
-    def __init__(self, plugin, settings, program_id):
+    def __init__(self, token, program_id):
         super().__init__()
-        self.plugin = plugin
-        self.settings = settings
         self.program_id = program_id
+        self.token = token
         self.last_time = 0
 
     def is_playback(self):
@@ -67,8 +65,7 @@ class Player(xbmc.Player):
     def synch_progress(self):
         """Track progress/playback time and share it with Arte TV,
         so that other device with the user account can share progress and history"""
-        tkn = user.get_cached_token(self.plugin, self.settings.username)
-        if not tkn:
+        if not self.token:
             xbmc.log(f"Unable to synchronise progress with Arte TV for {self.program_id}",
                      level=xbmc.LOGWARNING)
             xbmc.log("Missing user or password to authenticate", level=xbmc.LOGWARNING)
@@ -81,7 +78,7 @@ class Player(xbmc.Player):
             return 400
 
         self.last_time = round(self.last_time)
-        status = api.sync_last_viewed(tkn, self.program_id, self.last_time)
+        status = api.sync_last_viewed(self.token, self.program_id, self.last_time)
         xbmc.log(f"Synchronisation of progress {self.last_time}s with Arte TV " +
                  f"for {self.program_id} ended with {status}",
                  level=xbmc.LOGINFO)

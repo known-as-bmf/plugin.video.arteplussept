@@ -31,9 +31,8 @@ def login(plugin, settings):
 
     # ensure no user is not logged in
     loggedin_usr = is_logged_in_as(plugin)
-    tkn_data = get_cached_token(plugin, usr)
-    if len(loggedin_usr) > 0 and isinstance(tkn_data,dict):
-        print('tkn_data = ' + str(tkn_data))
+    tkn_data = get_cached_token(plugin, usr, True)
+    if len(loggedin_usr) > 0 and tkn_data:
         xbmc.log(
             f"\"{loggedin_usr}\" already authenticated to Arte TV : {tkn_data['access_token']}")
         # notify user that current token might be replaced
@@ -44,11 +43,13 @@ def login(plugin, settings):
         )
         # user didn't accept replacement, so leave
         if not accept_to_replace:
+            xbmc.log('Authentication aborted by user - keep initial token', level=xbmc.LOGWARNING)
             return False
 
     # get password
     pwd = get_user_password(plugin)
     if not pwd:
+        xbmc.log('Authentication aborted by user - no password entered', level=xbmc.LOGWARNING)
         msg = f"{plugin.addon.getLocalizedString(30020)} : {plugin.addon.getLocalizedString(30022)}"
         plugin.notify(msg=msg, image='error')
         return False
@@ -56,6 +57,7 @@ def login(plugin, settings):
     # get token for user and password
     tokens = api.get_and_persist_token_in_arte(plugin, usr, pwd)
     if tokens is None:
+        xbmc.log('Authentication failed in arte', level=xbmc.LOGERROR)
         msg = f"{plugin.addon.getLocalizedString(30020)}"
         plugin.notify(msg=msg, image='error')
         return False
@@ -115,16 +117,18 @@ def is_logged_in_as(plugin):
     return usr
 
 
-def get_cached_token(plugin, token_idx):
+def get_cached_token(plugin, token_idx, silent=False):
     """
     Return cached token for identified user or None.
     If user logged in and later changed the user email, it returns None
     """
     cached_token = plugin.get_storage(_STORAGE_KEY, TTL=_TTL)
-    if token_idx in cached_token:
+    if token_idx in cached_token and isinstance(cached_token[token_idx], dict):
         tokens = cached_token[token_idx]
-    else:
+    else :
         tokens = None
+        if not silent:
+            plugin.notify(msg=plugin.addon.getLocalizedString(30014), image='warning')
     return tokens
 
 def set_cached_token(plugin, token_idx, tokens):

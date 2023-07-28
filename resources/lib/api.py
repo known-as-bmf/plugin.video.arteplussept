@@ -315,9 +315,9 @@ def authenticate_in_arte(plugin, username='', password='', headers=None):
         # Max retries exceeded with url: /api/sso/v3/token
         error = err
     if error or not reply or reply.status_code != 200:
-        plugin.notify(msg=plugin.addon.getLocalizedString(30020), image='error')
         err_dtls = str(error) if error else (reply.text if reply is not None else '')
-        xbmc.log(f"Unable to authenticate to Arte TV : {err_dtls}")
+        xbmc.log(f"Unable to authenticate to Arte TV : {err_dtls}", level=xbmc.LOGERROR)
+        plugin.notify(msg=plugin.addon.getLocalizedString(30020), image='error')
         return None
     return reply.json(object_pairs_hook=OrderedDict)
 
@@ -356,9 +356,11 @@ def persist_token_in_arte(plugin, tokens, headers=None):
     except requests.exceptions.ConnectionError as err:
         error = err
     if error or not cstm_tkn or cstm_tkn.status_code != 200:
-        plugin.notify(msg=plugin.addon.getLocalizedString(30020), image='warning')
         err_dtls = str(error) if error else (cstm_tkn.text if cstm_tkn is not None else '')
-        xbmc.log(f"Unable to persist Arte TV token {tokens['access_token']}. Step 1/2: {err_dtls}")
+        xbmc.log(
+            f"Unable to persist Arte TV token {tokens['access_token']}. Step 1/2: {err_dtls}",
+            level=xbmc.LOGERROR)
+        plugin.notify(msg=plugin.addon.getLocalizedString(30020), image='warning')
         return False
 
     # step 2/2 : persist / remember token so that it can be reused
@@ -372,9 +374,11 @@ def persist_token_in_arte(plugin, tokens, headers=None):
     except requests.exceptions.ConnectionError as err:
         error = err
     if error or not login or login.status_code != 200:
-        plugin.notify(msg=plugin.addon.getLocalizedString(30020), image='warning')
         err_dtls = str(error) if error else (login.text if login is not None else '')
-        xbmc.log(f"Unable to persist Arte TV token {tokens['access_token']}. Step 2/2: {err_dtls}")
+        xbmc.log(
+            f"Unable to persist Arte TV token {tokens['access_token']}. Step 2/2: {err_dtls}",
+            level=xbmc.LOGERROR)
+        plugin.notify(msg=plugin.addon.getLocalizedString(30020), image='warning')
         return False
 
     return True

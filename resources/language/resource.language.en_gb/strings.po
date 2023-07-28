@@ -34,19 +34,27 @@ msgctxt "#30054"
 msgid "Email"
 msgstr ""
 
-msgctxt "#30055"
-msgid "Password"
-msgstr ""
-
 msgctxt "#30056"
 msgid "Log level"
 msgstr "Log level"
+
+msgctxt "#30057"
+msgid "Log in"
+msgstr ""
+
+msgctxt "#30058"
+msgid "Log out"
+msgstr ""
 
 
 msgctxt "#30012"
 msgid "Search"
 msgstr ""
 
+
+msgctxt "#30014"
+msgid "Authentication needed in addon settings"
+msgstr ""
 
 msgctxt "#30015"
 msgid "User already logged in"
