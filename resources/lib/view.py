@@ -8,6 +8,7 @@ from . import api
 from . import hof
 from . import mapper
 from . import settings as stg
+from . import user
 
 
 def build_home_page(cached_categories, settings):
@@ -50,16 +51,16 @@ def get_cached_category(category_title, most_viewed_categories):
 
 def build_favorites(plugin, settings):
     """Build the menu for user favorites thanks to API call"""
-    return [mapper.map_artetv_item(item) for item in
-            api.get_favorites(plugin, settings.language, settings.username, settings.password) or
+    return [mapper.map_artetv_item(item) for item in api.get_favorites(
+                settings.language, user.get_cached_token(plugin, settings.username)) or
             # display an empty list in case of error. error should be display in a notification
             []]
 
 
-def add_favorite(plugin, usr, pwd, program_id, label):
+def add_favorite(plugin, usr, program_id, label):
     """Add content program_id to user favorites.
     Notify about completion success or failure with label."""
-    if 200 == api.add_favorite(plugin, usr, pwd, program_id):
+    if 200 == api.add_favorite(user.get_cached_token(plugin, usr), program_id):
         msg = plugin.addon.getLocalizedString(30025).format(label=label)
         plugin.notify(msg=msg, image='info')
     else:
@@ -67,10 +68,10 @@ def add_favorite(plugin, usr, pwd, program_id, label):
         plugin.notify(msg=msg, image='error')
 
 
-def remove_favorite(plugin, usr, pwd, program_id, label):
+def remove_favorite(plugin, usr, program_id, label):
     """Remove content program_id from user favorites.
     Notify about completion success or failure with label."""
-    if 200 == api.remove_favorite(plugin, usr, pwd, program_id):
+    if 200 == api.remove_favorite(user.get_cached_token(plugin, usr), program_id):
         msg = plugin.addon.getLocalizedString(30027).format(label=label)
         plugin.notify(msg=msg, image='info')
     else:
@@ -78,20 +79,21 @@ def remove_favorite(plugin, usr, pwd, program_id, label):
         plugin.notify(msg=msg, image='error')
 
 
-def purge_favorites(plugin, usr, pwd):
+def purge_favorites(plugin, usr):
     """Flush user favorites and notify about success or failure"""
     purge_confirmed = xbmcgui.Dialog().yesno(
         plugin.addon.getLocalizedString(30040),
         plugin.addon.getLocalizedString(30043),
         autoclose=10000)
+
     if purge_confirmed:
-        if 200 == api.purge_favorites(plugin, usr, pwd):
-            plugin.notify(msg=plugin.addon.getLocalizedString(30041), image='info')
+        if 200 == api.purge_favorites(user.get_cached_token(plugin, usr)):
+            plugin.notify(msg=plugin.addon.getLocalizedString(30037), image='info')
         else:
-            plugin.notify(msg=plugin.addon.getLocalizedString(30042), image='error')
+            plugin.notify(msg=plugin.addon.getLocalizedString(30038), image='error')
 
 
-def mark_as_watched(plugin, usr, pwd, program_id, label):
+def mark_as_watched(plugin, usr, program_id, label):
     """
     Get program duration and synch progress with total duration
     in order to mark a program as watched
@@ -100,7 +102,7 @@ def mark_as_watched(plugin, usr, pwd, program_id, label):
     try:
         program_info = api.player_video(stg.languages[0], program_id)
         total_time = program_info.get('attributes').get('metadata').get('duration').get('seconds')
-        status = api.sync_last_viewed(plugin, usr, pwd, program_id, total_time)
+        status = api.sync_last_viewed(user.get_cached_token(plugin, usr), program_id, total_time)
     # pylint: disable=broad-exception-caught
     except Exception as excp:
         xbmc.log(f" exception caught :{str(excp)}")
@@ -115,20 +117,20 @@ def mark_as_watched(plugin, usr, pwd, program_id, label):
 
 def build_last_viewed(plugin, settings):
     """Build the menu of user history"""
-    return [mapper.map_artetv_item(item) for item in
-            api.get_last_viewed(plugin, settings.language, settings.username, settings.password) or
+    return [mapper.map_artetv_item(item) for item in api.get_last_viewed(
+                settings.language, user.get_cached_token(plugin, settings.username)) or
             # display an empty list in case of error. error should be display in a notification
             []]
 
 
-def purge_last_viewed(plugin, usr, pwd):
+def purge_last_viewed(plugin, usr):
     """Flush user history and notify about success or failure"""
     purge_confirmed = xbmcgui.Dialog().yesno(
         plugin.addon.getLocalizedString(30030),
         plugin.addon.getLocalizedString(30033),
         autoclose=10000)
     if purge_confirmed:
-        if 200 == api.purge_last_viewed(plugin, usr, pwd):
+        if 200 == api.purge_last_viewed(user.get_cached_token(plugin, usr)):
             plugin.notify(msg=plugin.addon.getLocalizedString(30031), image='info')
         else:
             plugin.notify(msg=plugin.addon.getLocalizedString(30032), image='error')
@@ -172,7 +174,7 @@ def build_sibling_playlist(plugin, settings, program_id):
     # if a parent was found, then return the list of kodi playable dict.
     if parent_program:
         sibling_arte_items = api.collection_with_last_viewed(
-            plugin, settings.language, settings.username, settings.password,
+            settings.language, user.get_cached_token(plugin, settings.username),
             parent_program.get('kind'), parent_program.get('programId'))
         return mapper.map_collection_as_playlist(sibling_arte_items, program_id)
     return None
@@ -183,7 +185,7 @@ def build_collection_playlist(plugin, settings, kind, collection_id):
     and program id of the first element in the collection
     """
     return mapper.map_collection_as_playlist(api.collection_with_last_viewed(
-        plugin, settings.language, settings.username, settings.password, kind, collection_id))
+        settings.language, user.get_cached_token(plugin, settings.username), kind, collection_id))
 
 def build_stream_url(plugin, kind, program_id, audio_slot, settings):
     """

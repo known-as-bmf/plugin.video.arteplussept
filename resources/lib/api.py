@@ -75,63 +75,63 @@ ARTETV_HEADERS = {
     'accept': 'application/json'
 }
 
-def get_favorites(plugin, lang, usr, pwd):
+def get_favorites(lang, tkn):
     """Retrieve favorites from a personal account."""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['get_favorites'].format(lang=lang, page='1', limit='50')
-    return _load_json_personal_content(plugin, 'artetv_getfavorites', url, usr, pwd)
+    return _load_json_personal_content('artetv_getfavorites', url, tkn)
 
-def add_favorite(plugin, usr, pwd, program_id):
+def add_favorite(tkn, program_id):
     """
     Add content program_id to user favorites.
     :return: HTTP status code.
     """
     url = _ARTETV_URL + ARTETV_ENDPOINTS['add_favorite']
-    headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
+    headers = _add_auth_token(tkn, ARTETV_HEADERS)
     data = {'programId': program_id}
     reply = requests.put(url, data=data, headers=headers, timeout=10)
     logger.log_json(reply, 'artetv_addfavorite')
     return reply.status_code
 
-def remove_favorite(plugin, usr, pwd, program_id):
+def remove_favorite(tkn, program_id):
     """
     Remove content program_id from user favorites.
     :return: HTTP status code.
     """
     url = _ARTETV_URL + ARTETV_ENDPOINTS['remove_favorite'].format(program_id=program_id)
-    headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
+    headers = _add_auth_token(tkn, ARTETV_HEADERS)
     reply = requests.delete(url, headers=headers, timeout=10)
     logger.log_json(reply, 'artetv_removefavorite')
     return reply.status_code
 
-def purge_favorites(plugin, usr, pwd):
+def purge_favorites(tkn):
     """Flush user favorites"""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['purge_favorites']
-    headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
+    headers = _add_auth_token(tkn, ARTETV_HEADERS)
     reply = requests.patch(url, data={}, headers=headers, timeout=10)
     logger.log_json(reply, 'artetv_purgefavorites')
     return reply.status_code
 
-def get_last_viewed(plugin, lang, usr, pwd):
+def get_last_viewed(lang, tkn):
     """Retrieve content recently watched by a user."""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['get_last_viewed'].format(lang=lang, page='1', limit='50')
-    return _load_json_personal_content(plugin, 'artetv_lastviewed', url, usr, pwd)
+    return _load_json_personal_content('artetv_lastviewed', url, tkn)
 
-def sync_last_viewed(plugin, usr, pwd, program_id, time):
+def sync_last_viewed(tkn, program_id, time):
     """
     Synchronize in arte profile the progress time of content being played.
     :return: HTTP status code.
     """
     url = _ARTETV_URL + ARTETV_ENDPOINTS['sync_last_viewed']
-    headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
+    headers = _add_auth_token(tkn, ARTETV_HEADERS)
     data = {'programId': program_id, 'timecode': time}
     reply = requests.put(url, data=data, headers=headers, timeout=10)
     logger.log_json(reply, 'artetv_synchlastviewed')
     return reply.status_code
 
-def purge_last_viewed(plugin, usr, pwd):
+def purge_last_viewed(tkn):
     """Flush user history"""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['purge_last_viewed']
-    headers = _add_auth_token(plugin, usr, pwd, ARTETV_HEADERS)
+    headers = _add_auth_token(tkn, ARTETV_HEADERS)
     reply = requests.patch(url, data={}, headers=headers, timeout=10)
     logger.log_json(reply, 'artetv_purgelastviewed')
     return reply.status_code
@@ -178,14 +178,13 @@ def collection(kind, collection_id, lang):
         lambda sub_collections: sub_collections.get('videos', []),
         sub_collections)
 
-# pylint: disable=too-many-arguments
-def collection_with_last_viewed(plugin, lang, usr, pwd, kind, collection_id):
+def collection_with_last_viewed(lang, tkn, kind, collection_id):
     """
     Get the info of collection collection_id and enhanced them with last_viewed details
     e.g. progress
     """
     collection_items = collection(kind, collection_id, lang)
-    last_viewed_items = get_last_viewed(plugin, lang, usr, pwd)
+    last_viewed_items = get_last_viewed(lang, tkn)
     # nothing to do
     if len(collection_items) < 1 or last_viewed_items is None or len(last_viewed_items) < 1:
         return collection_items
@@ -245,69 +244,44 @@ def _load_json_full_url(request_scope, url, headers=None, params=None):
     logger.log_json(reply, request_scope)
     return reply.json(object_pairs_hook=OrderedDict)
 
-# pylint: disable=too-many-arguments
-def _load_json_personal_content(plugin, request_scope, url, usr, pwd, hdrs=None):
+def _load_json_personal_content(request_scope, url, tkn, hdrs=None):
     """Get a bearer token and add it in headers before sending the request"""
     if hdrs is None:
         hdrs = ARTETV_HEADERS
-    headers = _add_auth_token(plugin, usr, pwd, hdrs)
+    headers = _add_auth_token(tkn, hdrs)
     if not headers:
         return None
     return _load_json_full_url(request_scope, url, headers).get('data', [])
 
 # Get a bearer token and add it as HTTP header authorization
-def _add_auth_token(plugin, usr, pwd, hdrs):
-    tkn = get_and_persist_token(plugin, usr, pwd)
+def _add_auth_token(tkn, hdrs):
     if not tkn:
         return None
     headers = hdrs.copy()
-    headers['authorization'] = tkn['token_type'] + ' ' + tkn['access_token']
+    headers['authorization'] = f"{tkn['token_type']} {tkn['access_token']}"
     # web client needed to reuse token. Otherwise API rejects with
     # {"error":"invalid_client","error_description":"Client not authorized"}
     headers['client'] = 'web'
     return headers
 
 
-def get_and_persist_token(plugin, username='', password='', headers=None):
+def get_and_persist_token_in_arte(plugin, username, password):
     """Log in user thanks to his/her settings and get a bearer token.
     Return None if:
         - any parameter is empty
         - silenty if both parameters are empty
         - with a notification if one is not empty
         - connection to arte tv failed"""
-    if headers is None:
-        headers = ARTETV_HEADERS
-    # unable to authenticate if either username or password are empty
-    if not username and not password:
-        plugin.notify(msg=plugin.addon.getLocalizedString(30022), image='info')
-        return None
-    # inform that settings are incomplete
-    if not username or not password:
-        msg = f"{plugin.addon.getLocalizedString(30020)} : {plugin.addon.getLocalizedString(30021)}"
-        plugin.notify(msg=msg, image='warning')
-        return None
 
-    cached_token = plugin.get_storage('token', TTL=24*60)
-    token_idx = f"{username}_{hash(password)}"
-    if token_idx in cached_token:
-        tkn_data = cached_token[token_idx]
-        xbmc.log(f"\"{username}\" already authenticated to Arte TV : {tkn_data['access_token']}")
-        return tkn_data
-
-    # set client to web, because with tv get error client_invalid, error Client not authorized
-    headers['client'] = 'web'
-
-    tokens = authenticate_in_arte(plugin, username, password, headers)
+    tokens = authenticate_in_arte(plugin, username, password)
     # exit if authentication failed
     if not tokens:
         return None
 
     # try to persist token in arte to be allowed to reuse; otherwise token is one-shot
-    if persist_token_in_arte(plugin, tokens, headers):
-        # token persisted remotly are stored in kodi cache to be reused
-        cached_token[token_idx] = tokens
-        xbmc.log(f"\"{username}\" is successfully authenticated to Arte TV")
-        xbmc.log(f"Token persisted for a day \"{tokens['access_token']}\"")
+    if not persist_token_in_arte(plugin, tokens):
+        return None
+
     # return persisted or unpersisted token anyway
     return tokens
 
@@ -318,6 +292,9 @@ def authenticate_in_arte(plugin, username='', password='', headers=None):
     (i.e. status 200, no exception)"""
     if headers is None:
         headers = ARTETV_HEADERS
+    # set client to web, because with tv get error client_invalid, error Client not authorized
+    headers['client'] = 'web'
+
     url = _ARTETV_URL + ARTETV_ENDPOINTS['token']
     token_data = {
         'anonymous_token': None,
@@ -344,7 +321,7 @@ def authenticate_in_arte(plugin, username='', password='', headers=None):
         return None
     return reply.json(object_pairs_hook=OrderedDict)
 
-def persist_token_in_arte(plugin, tokens, headers):
+def persist_token_in_arte(plugin, tokens, headers=None):
     """Calls the sequence of 2 services to be able to reuse authentication token
     Return True, if token is persisted, False otherwise.
     Notify the user with a warning if persistance failed.
@@ -357,6 +334,11 @@ def persist_token_in_arte(plugin, tokens, headers):
         'TC_PRIVACY' : '1%40031%7C29%7C3445%40%40%401677322453596%2C1677322453596%2C1711018453596%40',
         'TC_PRIVACY_CENTER' : None
     }
+
+    if headers is None:
+        headers = ARTETV_HEADERS
+    # set client to web, because with tv get error client_invalid, error Client not authorized
+    headers['client'] = 'web'
 
     # step 1/2 : get additional cookies for step 2.
     url = _ARTETV_AUTH_URL + ARTETV_ENDPOINTS['custom_token']
