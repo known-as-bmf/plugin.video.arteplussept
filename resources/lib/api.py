@@ -5,8 +5,8 @@ import requests
 # pylint: disable=import-error
 from xbmcswift2 import xbmc
 from xbmcswift2.plugin import Plugin
-from . import hof
-from . import logger
+from resources.lib import hof
+from resources.lib import logger
 
 _PLUGIN_NAME = Plugin().name
 _PLUGIN_VERSION = Plugin().addon.getAddonInfo('version')
@@ -59,6 +59,12 @@ ARTETV_ENDPOINTS = {
     # rproxy
     # category=HOME, CIN, SER, SEARCH client=app, tv, web, orange, free
     'page': '/emac/v4/{lang}/{client}/pages/{category}/',
+    # rproxy
+    # zone_id=167d478a-b668-42a3-b88a-f01a436c7394...
+    # keep path and url in a snigle place for readibility
+    # page_id=SEARCH, HOME...
+    # pylint: disable=line-too-long
+    'zone' : '/emac/v4/{lang}/{client}/zones/{zone_id}/content?abv=A&authorizedCountry={lang}&page={page}&pageId={page_id}&query={query}&zoneIndexInPage=0',
     # not yet impl.
     # rproxy date=2023-01-17
     # 'guide_tv': '/emac/v3/{lang}/{client}/pages/TV_GUIDE/?day={DATE}',
@@ -77,9 +83,10 @@ ARTETV_HEADERS = {
     'accept': 'application/json'
 }
 
-def get_favorites(lang, tkn):
+def get_favorites(lang, tkn, page_idx, page_size=50):
     """Retrieve favorites from a personal account."""
-    url = _ARTETV_URL + ARTETV_ENDPOINTS['get_favorites'].format(lang=lang, page='1', limit='50')
+    url = _ARTETV_URL + ARTETV_ENDPOINTS['get_favorites'].format(
+        lang=lang, page=page_idx, limit=page_size)
     return _load_json_personal_content('artetv_getfavorites', url, tkn)
 
 def add_favorite(tkn, program_id):
@@ -113,10 +120,37 @@ def purge_favorites(tkn):
     logger.log_json(reply, 'artetv_purgefavorites')
     return reply.status_code
 
-def get_last_viewed(lang, tkn):
+def get_last_viewed(lang, tkn, page_idx, page_size=50):
     """Retrieve content recently watched by a user."""
-    url = _ARTETV_URL + ARTETV_ENDPOINTS['get_last_viewed'].format(lang=lang, page='1', limit='50')
+    url = _ARTETV_URL + ARTETV_ENDPOINTS['get_last_viewed'].format(
+        lang=lang, page=page_idx, limit=page_size)
     return _load_json_personal_content('artetv_lastviewed', url, tkn)
+
+def get_last_viewed_all(lang, tkn):
+    """
+    Retrieve every content recently watched by a user, all pages.
+    Never None. Empty list in the worst case
+    """
+    all_data = []
+    next_page_idx = 1
+    while next_page_idx:
+        current_page = get_last_viewed(lang, tkn, next_page_idx)
+        if current_page is not None and isinstance(current_page, dict):
+            all_data = all_data + current_page.get('data', [])
+        next_page_idx = _get_next_page(current_page)
+    return all_data
+
+def _get_next_page(last_viewed):
+    """Return the next page idx or False, never None"""
+    if last_viewed is None:
+        return False
+    if not isinstance(last_viewed.get('meta', False), dict):
+        return False
+    current_page = last_viewed.get('meta').get('page')
+    if current_page < last_viewed.get('meta').get('pages'):
+        return int(current_page) + 1
+    return False
+
 
 def sync_last_viewed(tkn, program_id, time):
     """
@@ -186,9 +220,9 @@ def collection_with_last_viewed(lang, tkn, kind, collection_id):
     e.g. progress
     """
     collection_items = collection(kind, collection_id, lang)
-    last_viewed_items = get_last_viewed(lang, tkn)
+    last_viewed_items = get_last_viewed_all(lang, tkn)
     # nothing to do
-    if len(collection_items) < 1 or last_viewed_items is None or len(last_viewed_items) < 1:
+    if len(collection_items) < 1 or len(last_viewed_items) < 1:
         return collection_items
     # merge the 2 collection based on program id.
     last_viewed_map = {}
@@ -221,15 +255,32 @@ def page_content(lang):
         lang=lang, category='HOME', client='tv')
     return _load_json_full_url('artetv_home', url, ARTETV_HEADERS).get('value', [])
 
-def search(lang, query, page='1'):
-    """Search for content in Arte TV API.
-    /emac/v4/{lang}/{client}/pages/SEARCH/?page={page}&query={query}
+def init_search(lang, query):
+    """
+    Initialize a search for content in Arte TV API.
+    Search will be identified by zone id then.
     """
     url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['page'].format(
         lang=lang, category='SEARCH', client='tv')
-    params = {'page' : page, 'query' : query}
-    return _load_json_full_url('artetv_search', url, ARTETV_HEADERS, params).get(
+    params = {'page' : '1', 'query' : query}
+    return _load_json_full_url('artetv_initsearch', url, ARTETV_HEADERS, params).get(
         'value', []).get('zones', [None])[0]
+
+def get_search_page(lang, zone_id, page_idx, query):
+    """
+    Navigate in pages of a search identified by zone_id.
+    """
+    url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['zone'].format(
+        lang=lang, client='tv', zone_id=zone_id, page=page_idx, page_id='SEARCH', query=query)
+    return _load_json_full_url('artetv_getsearchpage', url, ARTETV_HEADERS).get('value', [])
+
+def get_zone_page(lang, zone_id, page_idx, page_id):
+    """
+    Navigate in pages of a zone identified by zone_id.
+    """
+    url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['zone'].format(
+        lang=lang, client='tv', zone_id=zone_id, page=page_idx, page_id=page_id, query='null')
+    return _load_json_full_url('artetv_getsearchpage', url, ARTETV_HEADERS).get('value', [])
 
 def _load_json(request_scope, path, headers=None):
     """Deprecated since 2022. Prefer building url on client side"""
@@ -253,7 +304,7 @@ def _load_json_personal_content(request_scope, url, tkn, hdrs=None):
     headers = _add_auth_token(tkn, hdrs)
     if not headers:
         return None
-    return _load_json_full_url(request_scope, url, headers).get('data', [])
+    return _load_json_full_url(request_scope, url, headers)
 
 # Get a bearer token and add it as HTTP header authorization
 def _add_auth_token(tkn, hdrs):

@@ -17,7 +17,7 @@ def log_json(reply, log_suffix):
     """
     plugin = Plugin()
     msettings = settings.Settings(plugin)
-    if (not reply or msettings.loglevel != settings.loglevel[1]):
+    if (reply is None or msettings.loglevel != settings.loglevel[1]):
         return
 
     base_path = plugin.storage_path

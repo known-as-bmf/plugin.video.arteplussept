@@ -1,11 +1,14 @@
 """Add-on settings"""
+
+import dataclasses
+
 languages = ['fr', 'de', 'en', 'es', 'pl', 'it']
 qualities = ['SQ', 'EQ', 'HQ']
 loglevel = ['DEFAULT', 'API']
 
 
+@dataclasses.dataclass
 class Settings:
-    # pylint: disable=too-few-public-methods
     """Add-on settings"""
     def __init__(self, plugin):
         # Language used to query arte api
