@@ -28,6 +28,10 @@ from xbmcswift2 import Plugin
 from xbmcswift2 import xbmc
 from resources.lib import user
 from resources.lib import view
+from resources.lib.arte.collection.artefavorites import ArteFavorites
+from resources.lib.arte.collection.artehistory import ArteHistory
+#import resources.lib.arte.collection.favorites.ArteFavorites
+#import resources.lib.arte.collection.history.ArteHistory
 from resources.lib.player import Player
 from resources.lib.settings import Settings
 
@@ -41,7 +45,7 @@ settings = Settings(plugin)
 @plugin.route('/', name='index')
 def index():
     """Display home menu"""
-    return view.build_home_page(plugin.get_storage('cached_categories', TTL=60), settings)
+    return view.build_home_page(settings, plugin.get_storage('cached_categories', TTL=60))
 
 
 @plugin.route('/api_category/<category_code>', name='api_category')
@@ -78,30 +82,31 @@ def play_collection(kind, collection_id):
     return result
 
 
-@plugin.route('/favorites', name='favorites')
-def favorites():
+@plugin.route('/favorites', name='favorites_default')
+@plugin.route('/favorites/<page>', name='favorites')
+def favorites(page=1):
     """Display the menu for user favorites"""
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_favorites(plugin, settings))
+    return plugin.finish(ArteFavorites(plugin, settings).build_menu(page))
 
 @plugin.route('/add_favorite/<program_id>/<label>', name='add_favorite')
 def add_favorite(program_id, label):
     """Add content program_id to user favorites.
     Notify about completion status with label,
     useful when several operations are requested in parallel."""
-    view.add_favorite(plugin, settings.username, program_id, label)
+    ArteFavorites(plugin, settings).add_favorite(program_id, label)
 
 @plugin.route('/remove_favorite/<program_id>/<label>', name='remove_favorite')
 def remove_favorite(program_id, label):
     """Remove content program_id from user favorites
     Notify about completion status with label,
     useful when several operations are requested in parallel."""
-    view.remove_favorite(plugin, settings.username, program_id, label)
+    ArteFavorites(plugin, settings).remove_favorite(program_id, label)
 
 @plugin.route('/purge_favorites', name='purge_favorites')
 def purge_favroties():
     """Flush user history and notify about completion status"""
-    view.purge_favorites(plugin, settings.username)
+    ArteFavorites(plugin, settings).purge()
 
 
 @plugin.route('/mark_as_watched/<program_id>/<label>', name='mark_as_watched')
@@ -112,16 +117,17 @@ def mark_as_watched(program_id, label):
     view.mark_as_watched(plugin, settings.username, program_id, label)
 
 
-@plugin.route('/last_viewed', name='last_viewed')
-def last_viewed():
+@plugin.route('/last_viewed', name='last_viewed_default')
+@plugin.route('/last_viewed/<page>', name='last_viewed')
+def last_viewed(page=1):
     """Display the menu of user history"""
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_last_viewed(plugin, settings))
+    return plugin.finish(ArteHistory(plugin, settings).build_menu(page))
 
 @plugin.route('/purge_last_viewed', name='purge_last_viewed')
 def purge_last_viewed():
     """Flush user history and notify about completion status"""
-    view.purge_last_viewed(plugin, settings.username)
+    ArteHistory(plugin, settings).purge()
 
 
 @plugin.route('/display_collection/<kind>/<program_id>', name='display_collection')

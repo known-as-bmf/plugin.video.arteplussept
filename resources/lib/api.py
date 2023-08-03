@@ -7,7 +7,6 @@ from xbmcswift2 import xbmc
 from . import hof
 from . import logger
 
-
 # Arte hbbtv - deprecated API since 2022 prefer Arte TV API
 _HBBTV_URL = 'http://www.arte.tv/hbbtvv2/services/web/index.php'
 _HBBTV_HEADERS = {
@@ -80,6 +79,11 @@ def get_favorites(lang, tkn):
     url = _ARTETV_URL + ARTETV_ENDPOINTS['get_favorites'].format(lang=lang, page='1', limit='50')
     return _load_json_personal_content('artetv_getfavorites', url, tkn)
 
+def get_favorites_class(lang, tkn, page_idx, page_size=50):
+    """Retrieve favorites from a personal account."""
+    url = _ARTETV_URL + ARTETV_ENDPOINTS['get_favorites'].format(lang=lang, page=page_idx, limit=page_size)
+    return _load_json_personal_content_full('artetv_getfavorites', url, tkn)
+
 def add_favorite(tkn, program_id):
     """
     Add content program_id to user favorites.
@@ -115,6 +119,11 @@ def get_last_viewed(lang, tkn):
     """Retrieve content recently watched by a user."""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['get_last_viewed'].format(lang=lang, page='1', limit='50')
     return _load_json_personal_content('artetv_lastviewed', url, tkn)
+
+def get_last_viewed_class(lang, tkn, page_idx, page_size=50):
+    """Retrieve content recently watched by a user."""
+    url = _ARTETV_URL + ARTETV_ENDPOINTS['get_last_viewed'].format(lang=lang, page=page_idx, limit=page_size)
+    return _load_json_personal_content_full('artetv_lastviewed', url, tkn)
 
 def sync_last_viewed(tkn, program_id, time):
     """
@@ -252,6 +261,15 @@ def _load_json_personal_content(request_scope, url, tkn, hdrs=None):
     if not headers:
         return None
     return _load_json_full_url(request_scope, url, headers).get('data', [])
+
+def _load_json_personal_content_full(request_scope, url, tkn, hdrs=None):
+    """Get a bearer token and add it in headers before sending the request"""
+    if hdrs is None:
+        hdrs = ARTETV_HEADERS
+    headers = _add_auth_token(tkn, hdrs)
+    if not headers:
+        return None
+    return _load_json_full_url(request_scope, url, headers)
 
 # Get a bearer token and add it as HTTP header authorization
 def _add_auth_token(tkn, hdrs):

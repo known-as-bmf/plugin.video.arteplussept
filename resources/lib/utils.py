@@ -1,16 +1,11 @@
 """Utility methods mainly to format strings and manipulate date"""
 import datetime
-import html
 import urllib.parse
 # pylint: disable=import-error
 import dateutil.parser
 # pylint: disable=import-error
 from xbmcswift2 import xbmc
 
-
-def format_live_title_and_subtitle(title, subtitle=None):
-    """Orange prefix LIVE for live stream"""
-    return f"[COLOR ffffa500]LIVE[/COLOR] - {format_title_and_subtitle(title, subtitle)}"
 
 def colorize(text, color):
     """
@@ -23,15 +18,6 @@ def colorize(text, color):
     if color.startswith('#'):
         color = color[1:]
     return f"[COLOR ff{color}]{text}[/COLOR]"
-
-
-def format_title_and_subtitle(title, subtitle=None):
-    """Build string for menu entry thanks to title and optionally subtitle"""
-    label = f"[B]{html.unescape(title)}[/B]"
-    # suffixes
-    if subtitle:
-        label += f" - {html.unescape(subtitle)}"
-    return label
 
 
 def encode_string(string):
