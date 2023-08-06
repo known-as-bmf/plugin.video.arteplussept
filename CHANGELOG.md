@@ -1,5 +1,11 @@
 Changelog also available in file ./addon.xml xpath /addon/extension/news following Kodi guidelines https://kodi.wiki/view/Add-on_structure#changelog.txt
 
+v1.3.0 (2023-8-6)
+- Improve security with better password management
+  - Stop storing password on filesystem though addon settings
+- Make thomas-ernest fork official in addon.xml for visibility in wiki
+- Minor fix/clean-up in translation
+
 v1.2.0 (2023-7-26)
 - Manage collections TV_SERIES and MAGAZINE as video playlist
 - Add a context menu item to purge favorites
