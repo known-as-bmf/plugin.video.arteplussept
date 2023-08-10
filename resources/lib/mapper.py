@@ -281,7 +281,10 @@ def map_artetv_item_new(item, path, is_playable):
             # ResumeTime and TotalTime deprecated. Use InfoTagVideo.setResumePoint() instead.
             'ResumeTime': str(time_offset),
             'TotalTime': str(duration),
-            'StartPercent': str(progress * 100)
+            #'StartPercent': str(progress * 100),
+            'StartPercent': '0' if duration is None else str(
+                float(time_offset if isinstance(time_offset, int) else 0) * 100.0
+                / float(duration)),
         },
         'context_menu': [
             (plugin.addon.getLocalizedString(30023),
