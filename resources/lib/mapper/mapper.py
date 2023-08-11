@@ -1,8 +1,6 @@
 """Map JSON API outputs into playable content and meanus for Kodi"""
 # pylint: disable=import-error
 from xbmcswift2 import xbmc
-# pylint: disable=cyclic-import
-from addon import plugin
 from resources.lib import hof
 from resources.lib import utils
 from resources.lib.mapper.arteitem import ArteVideoItem
@@ -14,7 +12,7 @@ from resources.lib.mapper.artefavorites import ArteFavorites
 from resources.lib.mapper.artehistory import ArteHistory
 
 
-def map_category_item(item, category_code):
+def map_category_item(plugin, item, category_code):
     """Return menu entry to access a category content"""
     title = item.get('title')
     path = plugin.url_for(
@@ -28,17 +26,17 @@ def map_category_item(item, category_code):
     }
 
 
-def map_generic_item(item, show_video_streams):
+def map_generic_item(plugin, item, show_video_streams):
     """Return entry menu for video or playlist"""
     if ArteVideoItem(plugin, item).is_playlist():
         item = ArteCollectionItem(plugin, item).map_collection_as_menu_item()
     elif show_video_streams is True:
-        item = map_video_streams_as_menu(item)
+        item = map_video_streams_as_menu(plugin, item)
     else:
-        item = map_video_as_item(item)
+        item = map_video_as_item(plugin, item)
     return item
 
-def map_collection_as_playlist(arte_collection, req_start_program_id = None):
+def map_collection_as_playlist(plugin, arte_collection, req_start_program_id = None):
     """
     Map a collection from arte API to a list of items ready to build a playlist.
     Playlist item will be in the same order as arte_collection, if start_program_id
@@ -52,7 +50,7 @@ def map_collection_as_playlist(arte_collection, req_start_program_id = None):
     # assume arte_collection[0] will be mapped successfully with map_video_as_playlist_item
     start_program_id = arte_collection[0].get('programId')
     for arte_item in arte_collection or []:
-        xbmc_item = map_video_as_playlist_item(arte_item)
+        xbmc_item = map_video_as_playlist_item(plugin, arte_item)
         if xbmc_item is None:
             break
 
@@ -76,7 +74,7 @@ def map_collection_as_playlist(arte_collection, req_start_program_id = None):
     return { 'collection': items_after_start + items_before_start,
         'start_program_id': start_program_id}
 
-def map_video_as_playlist_item(item):
+def map_video_as_playlist_item(plugin, item):
     """
     Create a video menu item without recursiveness to fetch parent collection
     from a json returned by Arte HBBTV or ArteTV API
@@ -91,13 +89,13 @@ def map_video_as_playlist_item(item):
     result = ArteVideoItem(plugin, item).build_item(path, True)
     return result
 
-def map_video_streams_as_menu(item):
+def map_video_streams_as_menu(plugin, item):
     """Create a menu item for video streams from a json returned by Arte HBBTV API"""
     program_id = item.get('programId')
     path = plugin.url_for('streams', program_id=program_id)
     return ArteHbbTvVideoItem(plugin, item).build_item(path, False)
 
-def map_video_as_item(item):
+def map_video_as_item(plugin, item):
     """Create a playable video menu item from a json returned by Arte HBBTV API"""
     program_id = item.get('programId')
     kind = item.get('kind')
@@ -105,12 +103,12 @@ def map_video_as_item(item):
     return ArteHbbTvVideoItem(plugin, item).build_item(path, True)
 
 
-def map_streams(item, streams, quality):
+def map_streams(plugin, item, streams, quality):
     """Map JSON item and list of audio streams into a menu."""
     program_id = item.get('programId')
     kind = item.get('kind')
 
-    video_item = map_video_as_item(item)
+    video_item = map_video_as_item(plugin, item)
 
     filtered_streams = None
     for qlt in [quality] + [i for i in ['SQ', 'EQ', 'HQ', 'MQ'] if i is not quality]:
@@ -139,7 +137,7 @@ def map_streams(item, streams, quality):
 
 
 
-def map_zone_to_item(settings, zone, cached_categories):
+def map_zone_to_item(plugin, settings, zone, cached_categories):
     """Arte TV API page is split into zones. Map a 'zone' to menu item(s).
     Populate cached_categories for zones with videos available in child 'content'"""
     menu_item = None
@@ -151,7 +149,7 @@ def map_zone_to_item(settings, zone, cached_categories):
     elif zone.get('content') and zone.get('content').get('data'):
         menu_item = ArteZone(plugin, settings, cached_categories).build_item(zone)
     elif zone.get('link'):
-        menu_item = map_api_categories_item(zone)
+        menu_item = map_api_categories_item(plugin, zone)
     else:
         xbmc.log(f"Zone \"{title}\" will be ignored. No link. No content. id unknown.")
 
@@ -170,7 +168,7 @@ def get_authenticated_content_type(artetv_zone):
     return artetv_zone.get('authenticatedContent', {}).get('contentId', None)
 
 
-def map_api_categories_item(item):
+def map_api_categories_item(plugin, item):
     """Return a menu entry to access content of category item.
     :param dict item: JSON node item
     """

@@ -51,7 +51,7 @@ def index():
 @plugin.route('/api_category/<category_code>', name='api_category')
 def api_category(category_code):
     """Display the menu for a category that needs an api call"""
-    return view.build_api_category(category_code, settings)
+    return view.build_api_category(plugin, category_code, settings)
 
 
 @plugin.route('/cached_category/<zone_id>', name='cached_category')
@@ -139,13 +139,13 @@ def purge_last_viewed():
 def display_collection(kind, program_id):
     """Display menu for collection of content"""
     plugin.set_content('tvshows')
-    return plugin.finish(view.build_mixed_collection(kind, program_id, settings))
+    return plugin.finish(view.build_mixed_collection(plugin, kind, program_id, settings))
 
 
 @plugin.route('/streams/<program_id>', name='streams')
 def streams(program_id):
     """Play a multi language content."""
-    return plugin.finish(view.build_video_streams(program_id, settings))
+    return plugin.finish(view.build_video_streams(plugin, settings, program_id))
 
 @plugin.route('/play_live/<stream_url>', name='play_live')
 def play_live(stream_url):

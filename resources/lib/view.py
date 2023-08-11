@@ -30,15 +30,15 @@ def build_home_page(plugin, settings, cached_categories):
 
     arte_home = api.page_content(settings.language)
     for zone in arte_home.get('zones'):
-        menu_item = mapper.map_zone_to_item(settings, zone, cached_categories)
+        menu_item = mapper.map_zone_to_item(plugin, settings, zone, cached_categories)
         if menu_item:
             addon_menu.append(menu_item)
     return addon_menu
 
 
-def build_api_category(category_code, settings):
+def build_api_category(plugin, category_code, settings):
     """Build the menu for a category that needs an api call"""
-    category = [mapper.map_category_item(item, category_code) for item in
+    category = [mapper.map_category_item(plugin, item, category_code) for item in
                 api.category(category_code, settings.language)]
 
     return category
@@ -74,13 +74,13 @@ def mark_as_watched(plugin, usr, program_id, label):
 
 
 
-def build_mixed_collection(kind, collection_id, settings):
+def build_mixed_collection(plugin, kind, collection_id, settings):
     """Build menu of content available in collection collection_id thanks to HBB TV API"""
-    return [mapper.map_generic_item(item, settings.show_video_streams) for item in
+    return [mapper.map_generic_item(plugin, item, settings.show_video_streams) for item in
             api.collection(kind, collection_id, settings.language)]
 
 
-def build_video_streams(program_id, settings):
+def build_video_streams(plugin, settings, program_id):
     """Build the menu with the audio streams available for content program_id"""
     item = api.video(program_id, settings.language)
 
@@ -91,7 +91,7 @@ def build_video_streams(program_id, settings):
     kind = item.get('kind')
 
     return mapper.map_streams(
-        item, api.streams(kind, program_id, settings.language), settings.quality)
+        plugin, item, api.streams(kind, program_id, settings.language), settings.quality)
 
 
 def build_sibling_playlist(plugin, settings, program_id):
@@ -122,7 +122,7 @@ def build_collection_playlist(plugin, settings, kind, collection_id):
     Return a pair with collection with collection_id
     and program id of the first element in the collection
     """
-    return mapper.map_collection_as_playlist(api.collection_with_last_viewed(
+    return mapper.map_collection_as_playlist(plugin, api.collection_with_last_viewed(
         settings.language,
         user.get_cached_token(plugin, settings.username, True),
         kind, collection_id))

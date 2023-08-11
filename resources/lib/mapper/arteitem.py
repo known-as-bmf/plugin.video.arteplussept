@@ -71,6 +71,7 @@ class ArteVideoItem(ArteItem):
             },
             'properties': {
                 'fanart_image': self._get_image_url(),
+                'TotalTime': str(self._get_duration()),
             },
             'context_menu': [
                 (self.plugin.addon.getLocalizedString(30023),
@@ -87,9 +88,18 @@ class ArteVideoItem(ArteItem):
 
     def _get_duration(self):
         """
-        Abstract method to be implemented in child classes.
         Return video item duration in seconds
         """
+        item = self.json_dict
+        duration = item.get('durationSeconds')
+        if isinstance(duration, int):
+            return duration
+        duration = item.get('duration', None)
+        if isinstance(duration, int):
+            return duration
+        if isinstance(duration, dict):
+            if isinstance(duration.get('seconds', None), int):
+                return duration.get('seconds')
         return None
 
     def _get_air_date(self):
@@ -158,11 +168,16 @@ class ArteTvVideoItem(ArteVideoItem):
         if kind == 'EXTERNAL':
             return None
 
+        additional_context_menu = []
         if self.is_playlist():
             if kind in self.PREFERED_KINDS:
                 #content_type = Content.PLAYLIST
                 path = self.plugin.url_for('play_collection', kind=kind, collection_id=program_id)
                 is_playable = True
+                additional_context_menu = [
+                    (self.plugin.addon.getLocalizedString(30011),
+                    actions.update_view(self.plugin.url_for(
+                        'display_collection', program_id=program_id, kind=kind)))]
             else:
                 #content_type = Content.MENU_ITEM
                 path = self.plugin.url_for('display_collection', kind=kind, program_id=program_id)
@@ -172,7 +187,10 @@ class ArteTvVideoItem(ArteVideoItem):
             path = self.plugin.url_for('play', kind=kind, program_id=program_id)
             is_playable = True
 
-        return self.build_item(path, is_playable)
+        xbmc_item = self.build_item(path, is_playable)
+        if xbmc_item is not None:
+            xbmc_item['context_menu'].extend(additional_context_menu)
+        return xbmc_item
 
     def build_item(self, path, is_playable):
         """
@@ -185,7 +203,8 @@ class ArteTvVideoItem(ArteVideoItem):
         if basic_item is None:
             return None
         progress = self.get_progress()
-        if self.json_dict.get('lastviewed', False) and self._get_duration() is not None:
+        duration = self._get_duration()
+        if self.json_dict.get('lastviewed', False) and duration is not None:
             artetv_item = {
                 'info': {
                     'playcount': '1' if progress >= 0.95 else '0',
@@ -196,28 +215,14 @@ class ArteTvVideoItem(ArteVideoItem):
                     # Use InfoTagVideo.setResumePoint() instead.
                     'ResumeTime': str(self._get_time_offset()),
                     'TotalTime': str(self._get_duration()),
-                    'StartPercent': str(float(self._get_time_offset()) * 100.0
-                                        / float(self._get_duration()))
+                    'StartPercent': str(float(self._get_time_offset()) * 100.0 / float(duration))
                 },
             }
-        else:
-            artetv_item = {
-                'properties': {
-                    'fanart_image': self._get_image_url(),
-                },
-            }
+            basic_item['info'] = {**basic_item['info'], **artetv_item['info']}
+            basic_item['properties'] = {**basic_item['properties'], **artetv_item['properties']}
 
-        return {**basic_item, **artetv_item}
+        return basic_item
 
-
-    def _get_duration(self):
-        duration = self.json_dict.get('durationSeconds')
-        if isinstance(duration, int):
-            return duration
-        duration = self.json_dict.get('duration')
-        if isinstance(duration, int):
-            return duration
-        return None
 
     def _get_air_date(self):
         airdate = self.json_dict.get('beginsAt')
@@ -304,16 +309,8 @@ class ArteHbbTvVideoItem(ArteVideoItem):
                 'director': item.get('director'),
             },
         }
-        return {**basic_item, **hbbtv_item}
-
-    def _get_duration(self):
-        item = self.json_dict
-        duration = item.get('durationSeconds')
-        if duration is None:
-            duration = item.get('duration', None)
-            if isinstance(duration, dict):
-                duration = duration.get('seconds', None)
-        return duration
+        basic_item['info'] = {**basic_item['info'], **hbbtv_item['info']}
+        return basic_item
 
     def _get_air_date(self):
         airdate = self.json_dict.get('broadcastBegin')
