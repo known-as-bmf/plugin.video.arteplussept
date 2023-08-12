@@ -1,5 +1,9 @@
 Changelog also available in file ./addon.xml xpath /addon/extension/news following Kodi guidelines https://kodi.wiki/view/Add-on_structure#changelog.txt
 
+v1.2.1 (2023-8-12)
+- Add context menu to view collection as menu instead of playlist
+- Set resume point to 0 when video was fully watched. Avoid crash when playing seq of watched videos in playlist.
+
 v1.2.0 (2023-7-26)
 - Manage collections TV_SERIES and MAGAZINE as video playlist
 - Add a context menu item to purge favorites
