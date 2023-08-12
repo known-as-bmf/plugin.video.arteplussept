@@ -202,11 +202,16 @@ def map_artetv_item(item):
     if kind == 'EXTERNAL':
         return None
 
+    additional_context_menu = []
     if utils.is_playlist(program_id):
         if kind in PREFERED_KINDS:
             #content_type = Content.PLAYLIST
             path = plugin.url_for('play_collection', kind=kind, collection_id=program_id)
             is_playable = True
+            additional_context_menu = [
+                (plugin.addon.getLocalizedString(30011),
+                actions.update_view(plugin.url_for(
+                    'display_collection', program_id=program_id, kind=kind)))]
         else:
             #content_type = Content.MENU_ITEM
             path = plugin.url_for('display_collection', kind=kind, program_id=program_id)
@@ -216,7 +221,11 @@ def map_artetv_item(item):
         path = plugin.url_for('play', kind=kind, program_id=program_id)
         is_playable = True
 
-    return map_artetv_item_new(item, path, is_playable)
+    xbmc_item = map_artetv_item_new(item, path, is_playable)
+    if xbmc_item is not None:
+        xbmc_item['context_menu'].extend(additional_context_menu)
+    return xbmc_item
+
 
 def map_artetv_item_new(item, path, is_playable):
     """
