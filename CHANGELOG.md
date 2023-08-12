@@ -6,6 +6,10 @@ v1.3.0 (2023-8-6)
 - Make thomas-ernest fork official in addon.xml for visibility in wiki
 - Minor fix/clean-up in translation
 
+v1.2.1 (2023-8-12)
+- Add context menu to view collection as menu instead of playlist
+- Set resume point to 0 when video was fully watched. Avoid crash when playing seq of watched videos in playlist.
+
 v1.2.0 (2023-7-26)
 - Manage collections TV_SERIES and MAGAZINE as video playlist
 - Add a context menu item to purge favorites

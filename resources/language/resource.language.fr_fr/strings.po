@@ -47,6 +47,11 @@ msgid "Log out"
 msgstr "Se déconnecter"
 
 
+msgctxt "#30011"
+msgid "View collection as menu"
+msgstr "Voir la collection dans un menu"
+
+
 msgctxt "#30012"
 msgid "Search"
 msgstr "Recherche"

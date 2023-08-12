@@ -47,6 +47,11 @@ msgid "Log out"
 msgstr "Austragen"
 
 
+msgctxt "#30011"
+msgid "View collection as menu"
+msgstr "Sammlung als Menü anzeigen"
+
+
 msgctxt "#30012"
 msgid "Search"
 msgstr "Suche"
