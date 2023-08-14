@@ -3,6 +3,7 @@
 from xbmcswift2 import xbmc
 from resources.lib import api
 
+
 # this player send request to Arte TV API
 # to synchronise playback progress
 # when playback is paused or stopped or crashed

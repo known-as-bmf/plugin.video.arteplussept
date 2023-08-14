@@ -60,11 +60,13 @@ def cached_category(zone_id):
     in cache from previous api call like home page"""
     return view.get_cached_category(zone_id, plugin.get_storage('cached_categories', TTL=60))
 
+
 @plugin.route('/category_page/<zone_id>/<page>/<page_id>', name='category_page')
 def category_page(zone_id, page, page_id):
     """Display the menu for a category that needs an api call"""
     return ArteZone(plugin, settings, plugin.get_storage('cached_categories', TTL=60)) \
         .build_menu(zone_id, page, page_id)
+
 
 @plugin.route('/play_collection/<kind>/<collection_id>', name='play_collection')
 def play_collection(kind, collection_id):
@@ -94,6 +96,7 @@ def favorites(page=1):
     plugin.set_content('tvshows')
     return plugin.finish(ArteFavorites(plugin, settings).build_menu(page))
 
+
 @plugin.route('/add_favorite/<program_id>/<label>', name='add_favorite')
 def add_favorite(program_id, label):
     """Add content program_id to user favorites.
@@ -101,12 +104,14 @@ def add_favorite(program_id, label):
     useful when several operations are requested in parallel."""
     ArteFavorites(plugin, settings).add_favorite(program_id, label)
 
+
 @plugin.route('/remove_favorite/<program_id>/<label>', name='remove_favorite')
 def remove_favorite(program_id, label):
     """Remove content program_id from user favorites
     Notify about completion status with label,
     useful when several operations are requested in parallel."""
     ArteFavorites(plugin, settings).remove_favorite(program_id, label)
+
 
 @plugin.route('/purge_favorites', name='purge_favorites')
 def purge_favroties():
@@ -129,6 +134,7 @@ def last_viewed(page=1):
     plugin.set_content('tvshows')
     return plugin.finish(ArteHistory(plugin, settings).build_menu(page))
 
+
 @plugin.route('/purge_last_viewed', name='purge_last_viewed')
 def purge_last_viewed():
     """Flush user history and notify about completion status"""
@@ -146,6 +152,7 @@ def display_collection(kind, program_id):
 def streams(program_id):
     """Play a multi language content."""
     return plugin.finish(view.build_video_streams(plugin, settings, program_id))
+
 
 @plugin.route('/play_live/<stream_url>', name='play_live')
 def play_live(stream_url):
@@ -210,6 +217,7 @@ def search_default():
     plugin.set_content('tvshows')
     return plugin.finish(ArteSearch(plugin, settings).init_search())
 
+
 @plugin.route('/search/<zone_id>/<page>/<query>', name='search')
 def search_page(zone_id, page, query):
     """Display the keyboard to search for content. Then, display the menu of search results"""
@@ -222,10 +230,12 @@ def user_login():
     """Login user with email already set in settings by creating and persisting a token."""
     return plugin.finish(succeeded=user.login(plugin, settings))
 
+
 @plugin.route('/user/logout', name='user_logout')
 def user_logout():
     """Discard token of user in settings."""
     return plugin.finish(succeeded=user.logout(plugin, settings))
+
 
 # plugin bootstrap
 if __name__ == '__main__':

@@ -6,6 +6,7 @@ Module for Arte Zone
 from resources.lib import api
 from resources.lib.mapper.artecollection import ArteCollection
 
+
 class ArteZone(ArteCollection):
     """
     A zone is a collection of video, that may be split in several pages.

@@ -72,8 +72,6 @@ def mark_as_watched(plugin, usr, program_id, label):
         plugin.notify(msg=msg, image='error')
 
 
-
-
 def build_mixed_collection(plugin, kind, collection_id, settings):
     """Build menu of content available in collection collection_id thanks to HBB TV API"""
     return [mapper.map_generic_item(plugin, item, settings.show_video_streams) for item in
@@ -117,6 +115,7 @@ def build_sibling_playlist(plugin, settings, program_id):
         return mapper.map_collection_as_playlist(sibling_arte_items, program_id)
     return None
 
+
 def build_collection_playlist(plugin, settings, kind, collection_id):
     """
     Return a pair with collection with collection_id
@@ -126,6 +125,7 @@ def build_collection_playlist(plugin, settings, kind, collection_id):
         settings.language,
         user.get_cached_token(plugin, settings.username, True),
         kind, collection_id))
+
 
 def build_stream_url(plugin, kind, program_id, audio_slot, settings):
     """

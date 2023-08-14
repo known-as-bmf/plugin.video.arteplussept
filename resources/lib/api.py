@@ -63,8 +63,10 @@ ARTETV_ENDPOINTS = {
     # zone_id=167d478a-b668-42a3-b88a-f01a436c7394...
     # keep path and url in a snigle place for readibility
     # page_id=SEARCH, HOME...
-    # pylint: disable=line-too-long
-    'zone' : '/emac/v4/{lang}/{client}/zones/{zone_id}/content?abv=A&authorizedCountry={lang}&page={page}&pageId={page_id}&query={query}&zoneIndexInPage=0',
+    'zone':
+        '/emac/v4/{lang}/{client}/zones/{zone_id}/content?' +
+        'abv=A&authorizedCountry={lang}&page={page}&pageId={page_id}&' +
+        'query={query}&zoneIndexInPage=0',
     # not yet impl.
     # rproxy date=2023-01-17
     # 'guide_tv': '/emac/v3/{lang}/{client}/pages/TV_GUIDE/?day={DATE}',
@@ -82,12 +84,21 @@ ARTETV_HEADERS = {
     'client': 'tv',
     'accept': 'application/json'
 }
+_API_KEY = '97598990-f0af-427b-893e-9da348d9f5a6'
+_COOKIES = {
+    'TCPID': '123261154911117061452',
+    # pylint: disable=line-too-long
+    'TC_PRIVACY': '1%40031%7C29%7C3445%40%40%401677322453596%2C1677322453596%2C1711018453596%40',
+    'TC_PRIVACY_CENTER': None
+}
+
 
 def get_favorites(lang, tkn, page_idx, page_size=50):
     """Retrieve favorites from a personal account."""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['get_favorites'].format(
         lang=lang, page=page_idx, limit=page_size)
     return _load_json_personal_content('artetv_getfavorites', url, tkn)
+
 
 def add_favorite(tkn, program_id):
     """
@@ -101,6 +112,7 @@ def add_favorite(tkn, program_id):
     logger.log_json(reply, 'artetv_addfavorite')
     return reply.status_code
 
+
 def remove_favorite(tkn, program_id):
     """
     Remove content program_id from user favorites.
@@ -112,6 +124,7 @@ def remove_favorite(tkn, program_id):
     logger.log_json(reply, 'artetv_removefavorite')
     return reply.status_code
 
+
 def purge_favorites(tkn):
     """Flush user favorites"""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['purge_favorites']
@@ -120,11 +133,13 @@ def purge_favorites(tkn):
     logger.log_json(reply, 'artetv_purgefavorites')
     return reply.status_code
 
+
 def get_last_viewed(lang, tkn, page_idx, page_size=50):
     """Retrieve content recently watched by a user."""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['get_last_viewed'].format(
         lang=lang, page=page_idx, limit=page_size)
     return _load_json_personal_content('artetv_lastviewed', url, tkn)
+
 
 def get_last_viewed_all(lang, tkn):
     """
@@ -139,6 +154,7 @@ def get_last_viewed_all(lang, tkn):
             all_data = all_data + current_page.get('data', [])
         next_page_idx = _get_next_page(current_page)
     return all_data
+
 
 def _get_next_page(last_viewed):
     """Return the next page idx or False, never None"""
@@ -164,6 +180,7 @@ def sync_last_viewed(tkn, program_id, time):
     logger.log_json(reply, 'artetv_synchlastviewed')
     return reply.status_code
 
+
 def purge_last_viewed(tkn):
     """Flush user history"""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['purge_last_viewed']
@@ -172,15 +189,18 @@ def purge_last_viewed(tkn):
     logger.log_json(reply, 'artetv_purgelastviewed')
     return reply.status_code
 
+
 def player_video(lang, program_id):
     """Get the info of content program_id from Arte TV API."""
     url = _ARTETV_URL + ARTETV_ENDPOINTS['player'].format(lang=lang, program_id=program_id)
     return _load_json_full_url('artetv_player', url, None).get('data', {})
 
+
 def program_video(lang, program_id):
     """Get the info of content program_id from Arte TV API."""
     url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['program'].format(lang=lang, program_id=program_id)
     return _load_json_full_url('artetv_program', url, None).get('value', {})
+
 
 def get_parent_collection(lang, program_id):
     """
@@ -195,9 +215,11 @@ def get_parent_collection(lang, program_id):
                     return data.get('parentCollections', [])
     return []
 
+
 def is_of_kind(arte_item, kind):
     """Return true if arte_item is not None and of the kind provided as parameter"""
     return (arte_item and arte_item.get('kind') == kind) or False
+
 
 def category(category_code, lang):
     """Get the info of category with category_code."""
@@ -213,6 +235,7 @@ def collection(kind, collection_id, lang):
     return hof.flat_map(
         lambda sub_collections: sub_collections.get('videos', []),
         sub_collections)
+
 
 def collection_with_last_viewed(lang, tkn, kind, collection_id):
     """
@@ -249,11 +272,13 @@ def streams(kind, program_id, lang):
         kind=kind, program_id=program_id, lang=lang)
     return _load_json('hbbtv_streams', url).get('videoStreams', [])
 
+
 def page_content(lang):
     """Get content to be display in a page. It can be a page for a category or the home page."""
     url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['page'].format(
         lang=lang, category='HOME', client='tv')
     return _load_json_full_url('artetv_home', url, ARTETV_HEADERS).get('value', [])
+
 
 def init_search(lang, query):
     """
@@ -262,9 +287,10 @@ def init_search(lang, query):
     """
     url = ARTETV_RPROXY_URL + ARTETV_ENDPOINTS['page'].format(
         lang=lang, category='SEARCH', client='tv')
-    params = {'page' : '1', 'query' : query}
+    params = {'page': '1', 'query': query}
     return _load_json_full_url('artetv_initsearch', url, ARTETV_HEADERS, params).get(
         'value', []).get('zones', [None])[0]
+
 
 def get_search_page(lang, zone_id, page_idx, query):
     """
@@ -274,6 +300,7 @@ def get_search_page(lang, zone_id, page_idx, query):
         lang=lang, client='tv', zone_id=zone_id, page=page_idx, page_id='SEARCH', query=query)
     return _load_json_full_url('artetv_getsearchpage', url, ARTETV_HEADERS).get('value', [])
 
+
 def get_zone_page(lang, zone_id, page_idx, page_id):
     """
     Navigate in pages of a zone identified by zone_id.
@@ -282,12 +309,14 @@ def get_zone_page(lang, zone_id, page_idx, page_id):
         lang=lang, client='tv', zone_id=zone_id, page=page_idx, page_id=page_id, query='null')
     return _load_json_full_url('artetv_getsearchpage', url, ARTETV_HEADERS).get('value', [])
 
+
 def _load_json(request_scope, path, headers=None):
     """Deprecated since 2022. Prefer building url on client side"""
     if headers is None:
         headers = _HBBTV_HEADERS
     url = _HBBTV_URL + path
     return _load_json_full_url(request_scope, url, headers)
+
 
 def _load_json_full_url(request_scope, url, headers=None, params=None):
     if headers is None:
@@ -297,6 +326,7 @@ def _load_json_full_url(request_scope, url, headers=None, params=None):
     logger.log_json(reply, request_scope)
     return reply.json(object_pairs_hook=OrderedDict)
 
+
 def _load_json_personal_content(request_scope, url, tkn, hdrs=None):
     """Get a bearer token and add it in headers before sending the request"""
     if hdrs is None:
@@ -305,6 +335,7 @@ def _load_json_personal_content(request_scope, url, tkn, hdrs=None):
     if not headers:
         return None
     return _load_json_full_url(request_scope, url, headers)
+
 
 # Get a bearer token and add it as HTTP header authorization
 def _add_auth_token(tkn, hdrs):
@@ -374,20 +405,12 @@ def authenticate_in_arte(plugin, username='', password='', headers=None):
         return None
     return reply.json(object_pairs_hook=OrderedDict)
 
+
 def persist_token_in_arte(plugin, tokens, headers=None):
     """Calls the sequence of 2 services to be able to reuse authentication token
     Return True, if token is persisted, False otherwise.
     Notify the user with a warning if persistance failed.
     """
-    # constants taken from my reverse engineering
-    api_key = '97598990-f0af-427b-893e-9da348d9f5a6'
-    cookies = {
-        'TCPID' : '123261154911117061452',
-        # pylint: disable=line-too-long
-        'TC_PRIVACY' : '1%40031%7C29%7C3445%40%40%401677322453596%2C1677322453596%2C1711018453596%40',
-        'TC_PRIVACY_CENTER' : None
-    }
-
     if headers is None:
         headers = ARTETV_HEADERS
     # set client to web, because with tv get error client_invalid, error Client not authorized
@@ -396,15 +419,15 @@ def persist_token_in_arte(plugin, tokens, headers=None):
     # step 1/2 : get additional cookies for step 2.
     url = _ARTETV_AUTH_URL + ARTETV_ENDPOINTS['custom_token']
     params = {
-        'shouldValidateAnonymous' : False,
-        'token' : tokens['access_token'],
-        'apikey' : api_key,
-        'isrememberme' : True
+        'shouldValidateAnonymous': False,
+        'token': tokens['access_token'],
+        'apikey': _API_KEY,
+        'isrememberme': True
     }
     error = None
     cstm_tkn = None
     try:
-        cstm_tkn = requests.get(url,params=params, headers=headers, cookies=cookies, timeout=10)
+        cstm_tkn = requests.get(url, params=params, headers=headers, cookies=_COOKIES, timeout=10)
         logger.log_json(cstm_tkn, 'artetv_customtoken')
     except requests.exceptions.ConnectionError as err:
         error = err
@@ -418,11 +441,11 @@ def persist_token_in_arte(plugin, tokens, headers=None):
 
     # step 2/2 : persist / remember token so that it can be reused
     url = _ARTETV_AUTH_URL + ARTETV_ENDPOINTS['login']
-    params = {'shouldValidateAnonymous' : 'false', 'apikey' : api_key}
-    cookies = hof.merge_dicts(cookies, cstm_tkn.cookies)
+    params = {'shouldValidateAnonymous': 'false', 'apikey': _API_KEY}
+    cookies = hof.merge_dicts(_COOKIES, cstm_tkn.cookies)
     login = None
     try:
-        login = requests.get(url,params=params, headers=headers, cookies=cookies, timeout=10)
+        login = requests.get(url, params=params, headers=headers, cookies=cookies, timeout=10)
         logger.log_json(login, 'artetv_login')
     except requests.exceptions.ConnectionError as err:
         error = err
