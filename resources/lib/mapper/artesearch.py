@@ -7,6 +7,7 @@ from xbmcswift2 import xbmc
 from resources.lib import api
 from resources.lib.mapper.artecollection import ArteCollection
 
+
 class ArteSearch(ArteCollection):
     """
     Build item to initiate a search.
@@ -22,7 +23,6 @@ class ArteSearch(ArteCollection):
             'label': self.plugin.addon.getLocalizedString(30012),
             'path': self.plugin.url_for('search_default')
         }
-
 
     def init_search(self):
         """Display keyboard to search for content. Then, display the menu of search results.

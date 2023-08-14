@@ -6,6 +6,7 @@ Arte Collection is a set of videos or collections like in favorites or history.
 from xbmcswift2 import actions
 from resources.lib.mapper.arteitem import ArteTvVideoItem
 
+
 # Utility class that may become an abstract class
 # pylint: disable=too-few-public-methods
 class ArteCollection:
@@ -17,7 +18,6 @@ class ArteCollection:
     def __init__(self, plugin, settings):
         self.plugin = plugin
         self.settings = settings
-
 
     def _build_menu(self, json_dict, collection_type, **nav_arg):
         """
@@ -54,7 +54,6 @@ class ArteCollection:
         either under pagination, either under meta.
         """
         return json_dict.get('meta', None)
-
 
     def _build_item(self, collection_type, item_label, purge_label_id):
         """

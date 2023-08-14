@@ -8,6 +8,7 @@ from resources.lib import api
 from resources.lib import user
 from resources.lib.mapper.artecollection import ArteCollection
 
+
 class ArteHistory(ArteCollection):
     """
     Arte history allows to keep track of what user watched fully or partially.
@@ -19,13 +20,11 @@ class ArteHistory(ArteCollection):
         super().__init__(plugin, settings)
         self.auth_token = user.get_cached_token(self.plugin, settings.username)
 
-
     def build_item(self, label):
         """
         Return menu item to access logged-in user's Arte history
         """
         return super()._build_item('last_viewed', label, 30030)
-
 
     def build_menu(self, page):
         """
@@ -35,7 +34,6 @@ class ArteHistory(ArteCollection):
             api.get_last_viewed(self.settings.language, self.auth_token, page),
             'last_viewed'
         )
-
 
     def purge(self):
         """Flush user history and notify about success or failure"""

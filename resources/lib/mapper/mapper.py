@@ -36,7 +36,8 @@ def map_generic_item(plugin, item, show_video_streams):
         item = map_video_as_item(plugin, item)
     return item
 
-def map_collection_as_playlist(plugin, arte_collection, req_start_program_id = None):
+
+def map_collection_as_playlist(plugin, arte_collection, req_start_program_id=None):
     """
     Map a collection from arte API to a list of items ready to build a playlist.
     Playlist item will be in the same order as arte_collection, if start_program_id
@@ -71,8 +72,11 @@ def map_collection_as_playlist(plugin, arte_collection, req_start_program_id = N
             items_before_start.append(xbmc_item)
         else:
             items_after_start.append(xbmc_item)
-    return { 'collection': items_after_start + items_before_start,
-        'start_program_id': start_program_id}
+    return {
+        'collection': items_after_start + items_before_start,
+        'start_program_id': start_program_id
+    }
+
 
 def map_video_as_playlist_item(plugin, item):
     """
@@ -89,11 +93,13 @@ def map_video_as_playlist_item(plugin, item):
     result = ArteVideoItem(plugin, item).build_item(path, True)
     return result
 
+
 def map_video_streams_as_menu(plugin, item):
     """Create a menu item for video streams from a json returned by Arte HBBTV API"""
     program_id = item.get('programId')
     path = plugin.url_for('streams', program_id=program_id)
     return ArteHbbTvVideoItem(plugin, item).build_item(path, False)
+
 
 def map_video_as_item(plugin, item):
     """Create a playable video menu item from a json returned by Arte HBBTV API"""
@@ -136,7 +142,6 @@ def map_streams(plugin, item, streams, quality):
     return [map_stream(dict(video_item), stream) for stream in sorted_filtered_streams]
 
 
-
 def map_zone_to_item(plugin, settings, zone, cached_categories):
     """Arte TV API page is split into zones. Map a 'zone' to menu item(s).
     Populate cached_categories for zones with videos available in child 'content'"""
@@ -177,6 +182,7 @@ def map_api_categories_item(plugin, item):
         'path': plugin.url_for('api_category', category_code=item.get('link').get('page'))
     }
 
+
 def map_playable(streams, quality, audio_slot, match):
     """Select the stream best matching quality and audio slot criteria in streams
     and map to a menu entry"""
@@ -195,10 +201,12 @@ def map_playable(streams, quality, audio_slot, match):
         'path': stream.get('url'),
     }
 
+
 def match_hbbtv(stream, quality, audio_slot):
     """Return True if item from HHB TV API matches quality and audio_slot constraints,
     False otherwise"""
     return stream.get('quality') == quality and stream.get('audioSlot') == audio_slot
+
 
 def match_artetv(stream, quality, audio_slot):
     """Return True if item from Arte TV API matches quality and audio_slot constraints,

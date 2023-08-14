@@ -11,6 +11,7 @@ from xbmcswift2 import xbmc
 # pylint: disable=import-error
 from xbmcswift2 import actions
 
+
 # pylint: disable=too-few-public-methods
 class ArteItem:
     """
@@ -33,7 +34,6 @@ class ArteItem:
         if subtitle:
             label += f" - {html.unescape(subtitle)}"
         return label
-
 
 
 class ArteVideoItem(ArteItem):
@@ -115,7 +115,6 @@ class ArteVideoItem(ArteItem):
         Return url to image to display for the current item.
         """
 
-
     def is_playlist(self):
         """Return True if program_id is a str starting with PL- or RC-."""
         is_playlist_var = False
@@ -123,7 +122,6 @@ class ArteVideoItem(ArteItem):
         if isinstance(program_id, str):
             is_playlist_var = program_id.startswith('RC-') or program_id.startswith('PL-')
         return is_playlist_var
-
 
     def is_hbbtv(self):
         """
@@ -150,7 +148,6 @@ class ArteVideoItem(ArteItem):
         return None
 
 
-
 class ArteTvVideoItem(ArteVideoItem):
     """
     Data and methods to build a XBMC ListItem to play a video
@@ -171,19 +168,20 @@ class ArteTvVideoItem(ArteVideoItem):
         additional_context_menu = []
         if self.is_playlist():
             if kind in self.PREFERED_KINDS:
-                #content_type = Content.PLAYLIST
+                # content_type = Content.PLAYLIST
                 path = self.plugin.url_for('play_collection', kind=kind, collection_id=program_id)
                 is_playable = True
-                additional_context_menu = [
-                    (self.plugin.addon.getLocalizedString(30011),
-                    actions.update_view(self.plugin.url_for(
-                        'display_collection', program_id=program_id, kind=kind)))]
+                additional_context_menu = [(
+                    self.plugin.addon.getLocalizedString(30011),
+                    actions.update_view(
+                        self.plugin.url_for(
+                            'display_collection', program_id=program_id, kind=kind)))]
             else:
-                #content_type = Content.MENU_ITEM
+                # content_type = Content.MENU_ITEM
                 path = self.plugin.url_for('display_collection', kind=kind, program_id=program_id)
                 is_playable = False
         else:
-            #content_type = Content.VIDEO
+            # content_type = Content.VIDEO
             path = self.plugin.url_for('play', kind=kind, program_id=program_id)
             is_playable = True
 
@@ -223,7 +221,6 @@ class ArteTvVideoItem(ArteVideoItem):
 
         return basic_item
 
-
     def _get_air_date(self):
         airdate = self.json_dict.get('beginsAt')
         if airdate is not None:
@@ -241,7 +238,6 @@ class ArteTvVideoItem(ArteVideoItem):
             date = None
         return date
 
-
     def _get_image_url(self):
         item = self.json_dict
         image_url = None
@@ -250,7 +246,7 @@ class ArteTvVideoItem(ArteVideoItem):
             image_url = item.get('images')[0].get('url').replace('?type=TEXT', '')
             # Set same image for fanart and thumbnail to spare network bandwidth
             # and business logic easier to maintain
-            #if item.get('images')[0].get('alternateResolutions'):
+            # if item.get('images')[0].get('alternateResolutions'):
             #    smallerImage = item.get('images')[0].get('alternateResolutions')[3]
             #    if smallerImage and smallerImage.get('url'):
             #        thumbnailUrl = smallerImage.get('url').replace('?type=TEXT', '')
@@ -325,8 +321,9 @@ class ArteHbbTvVideoItem(ArteVideoItem):
         try:
             date = dateutil.parser.parse(datestr)
         except dateutil.parser.ParserError as error:
-            xbmc.log(f"[plugin.video.arteplussept] Problem with parsing date: {error}",
-                    level=xbmc.LOGWARNING)
+            xbmc.log(
+                f"[plugin.video.arteplussept] Problem with parsing date: {error}",
+                level=xbmc.LOGWARNING)
         return date
 
     def _get_image_url(self):

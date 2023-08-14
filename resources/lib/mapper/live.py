@@ -44,11 +44,11 @@ class ArteLiveItem(ArteTvVideoItem):
             thumbnail_url = fanart_url
             # Set same image for fanart and thumbnail to spare network bandwidth
             # and business logic easier to maintain
-            #if item.get('images')[0].get('alternateResolutions'):
+            # if item.get('images')[0].get('alternateResolutions'):
             #    smallerImage = item.get('images')[0].get('alternateResolutions')[3]
             #    if smallerImage and smallerImage.get('url'):
             #        thumbnailUrl = smallerImage.get('url').replace('?type=TEXT', '')
-        stream_url=mapper.map_playable(
+        stream_url = mapper.map_playable(
             attr.get('streams'), quality, audio_slot, mapper.match_artetv).get('path')
 
         return {
@@ -58,14 +58,14 @@ class ArteLiveItem(ArteTvVideoItem):
             # while it starts the video like the live tv, with the above
             #  'path': plugin.url_for('play', kind='SHOW', program_id=programId.replace('_fr', '')),
             'thumbnail': thumbnail_url,
-            'is_playable': True, # not show_video_streams
+            'is_playable': True,  # not show_video_streams
             'info_type': 'video',
             'info': {
                 'title': meta.get('title'),
                 'duration': duration,
                 'plot': meta.get('description'),
-                #'director': item.get('director'),
-                #'aired': airdate
+                # 'director': item.get('director'),
+                # 'aired': airdate
                 'playcount': '0',
             },
             'properties': {
