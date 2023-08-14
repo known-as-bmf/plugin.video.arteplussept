@@ -1,3 +1,6 @@
 {
-  "editor.tabSize": 4
+  "editor.tabSize": 4,
+  "flake8.args": [
+    "--max-line-length=100"
+  ]
 }
